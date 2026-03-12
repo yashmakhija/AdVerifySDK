@@ -47,8 +47,8 @@ export default function KeysPage() {
 
   async function load() {
     try {
-      const data = await api<{ keys: ApiKey[] }>("/admin/keys", { token });
-      setKeys(Array.isArray(data.keys) ? data.keys : []);
+      const data = await api<ApiKey[]>("/admin/keys", { token });
+      setKeys(Array.isArray(data) ? data : []);
     } finally {
       setLoading(false);
     }
@@ -69,7 +69,7 @@ export default function KeysPage() {
 
   async function toggleKey(id: number, isActive: boolean) {
     await api(`/admin/keys/${id}`, {
-      method: "PUT",
+      method: "PATCH",
       token,
       body: { isActive: !isActive },
     });
