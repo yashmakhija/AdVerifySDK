@@ -4,32 +4,20 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: var(--font-poppins), system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-active: var(--sidebar-active);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-destructive: var(--destructive);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -39,52 +27,23 @@
 
 :root {
   --radius: 0.625rem;
-  --background: #fafafa;
+  --background: #ffffff;
   --foreground: #09090b;
-
   --card: #ffffff;
   --card-foreground: #09090b;
-  --popover: #ffffff;
-  --popover-foreground: #09090b;
-
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
-  --secondary: #f5f3ff;
-  --secondary-foreground: #312e81;
   --muted: #f4f4f5;
   --muted-foreground: #71717a;
-  --accent: #ede9fe;
-  --accent-foreground: #312e81;
-  --destructive: #ef4444;
-
   --border: #e4e4e7;
   --input: #e4e4e7;
-  --ring: #4f46e5;
-
-  --sidebar: #0c0a1d;
-  --sidebar-foreground: #e4e4e7;
-  --sidebar-border: #1e1b3a;
-  --sidebar-active: #1e1b3a;
+  --ring: #18181b;
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  --destructive: #ef4444;
 }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px -5px rgba(79, 70, 229, 0.3); }
-  50% { box-shadow: 0 0 30px -5px rgba(79, 70, 229, 0.5); }
 }
 
 html {
@@ -103,28 +62,7 @@ body {
 }
 
 @layer utilities {
-  .wrapper {
-    @apply max-w-6xl p-4 md:p-6 mx-auto w-full;
-  }
-
-  .gradient-text {
-    @apply bg-clip-text text-transparent;
-  }
-
-  .animate-fade-in-up {
-    animation: fadeInUp 0.6s ease-out both;
-  }
-
-  .animate-slide-in-right {
-    animation: slideInRight 0.6s ease-out both;
-  }
-
-  .animate-shimmer {
-    background-size: 200% 100%;
-    animation: shimmer 3s linear infinite;
-  }
-
-  .animate-pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
+  .animate-in {
+    animation: fadeIn 0.4s ease-out both;
   }
 }

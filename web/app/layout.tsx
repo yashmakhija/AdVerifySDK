@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const poppins = Poppins({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-poppins",
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
   title: "AdVerify - Ad Verification & PIN SDK for Android",
   description:
-    "Secure ad serving and PIN-based user verification SDK for Android apps. Manage ads, API keys, and PIN authentication from one dashboard.",
+    "Secure ad serving and PIN-based user verification SDK for Android apps.",
 };
 
 export default function RootLayout({
@@ -21,9 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`${poppins.variable} font-sans antialiased bg-[#fafafa] text-zinc-900`}
-      >
+      <body className={`${inter.variable} font-sans antialiased bg-white text-zinc-950`}>
         {children}
       </body>
     </html>

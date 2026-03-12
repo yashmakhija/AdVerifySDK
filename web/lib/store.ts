@@ -47,3 +47,15 @@ export const useAuthStore = create<AuthState>()(
     { name: "adverify-auth" }
   )
 );
+
+interface ToastState {
+  message: string | null;
+  show: (msg: string) => void;
+  clearToast: () => void;
+}
+
+export const useToastStore = create<ToastState>((set) => ({
+  message: null,
+  show: (message) => set({ message }),
+  clearToast: () => set({ message: null }),
+}));

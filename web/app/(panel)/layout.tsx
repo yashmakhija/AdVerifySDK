@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { Sidebar } from "@/components/sidebar";
 import { ToastContainer } from "@/components/ui/toast";
+import { Menu } from "lucide-react";
 
 export default function PanelLayout({
   children,
@@ -13,41 +14,34 @@ export default function PanelLayout({
 }) {
   const router = useRouter();
   const token = useAuthStore((s) => s.token);
-  const verify = useAuthStore((s) => s.verify);
-  const [checked, setChecked] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
+    if (!token) router.replace("/login");
+  }, [token, router]);
 
-    verify().then((valid) => {
-      if (!valid) {
-        router.replace("/login");
-      } else {
-        setChecked(true);
-      }
-    });
-  }, [token, verify, router]);
-
-  if (!token || !checked) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="flex items-center gap-3 text-muted-foreground">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
-          <span className="text-sm">Verifying session...</span>
-        </div>
-      </div>
-    );
-  }
+  if (!token) return null;
 
   return (
-    <div className="flex h-screen bg-background">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-6 md:p-8 max-w-6xl">{children}</div>
-      </main>
+    <div className="flex h-screen bg-white">
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <header className="flex h-12 items-center gap-3 border-b border-zinc-200 px-4 md:hidden">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 hover:bg-zinc-100"
+          >
+            <Menu className="h-4 w-4" />
+          </button>
+          <span className="text-sm font-semibold text-zinc-950">AdVerify</span>
+        </header>
+
+        <main className="flex-1 overflow-y-auto">
+          <div className="mx-auto max-w-5xl px-5 py-6 md:py-8">{children}</div>
+        </main>
+      </div>
+
       <ToastContainer />
     </div>
   );

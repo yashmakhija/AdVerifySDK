@@ -1,61 +1,56 @@
-import { cn } from "@/lib/utils";
+"use client";
 
 interface Column<T> {
-  key: string;
-  header: string;
-  render: (item: T) => React.ReactNode;
-  className?: string;
+  key: keyof T | string;
+  label: string;
+  render?: (row: T) => React.ReactNode;
 }
 
 interface DataTableProps<T> {
   columns: Column<T>[];
   data: T[];
   emptyMessage?: string;
-  keyExtractor: (item: T) => string | number;
 }
 
-export function DataTable<T>({
+export function DataTable<T extends Record<string, any>>({
   columns,
   data: rawData,
-  emptyMessage = "No data yet",
-  keyExtractor,
+  emptyMessage = "No data found.",
 }: DataTableProps<T>) {
   const data = Array.isArray(rawData) ? rawData : [];
+
+  if (data.length === 0) {
+    return (
+      <div className="rounded-xl border border-zinc-200 bg-white p-10 text-center text-sm text-zinc-400">
+        {emptyMessage}
+      </div>
+    );
+  }
+
   return (
-    <div className="overflow-x-auto rounded-2xl border border-zinc-100 bg-white shadow-sm">
-      <table className="w-full text-left text-sm">
-        <thead className="border-b border-zinc-100 bg-zinc-50/50 text-xs uppercase text-zinc-400 tracking-wider">
+    <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+      <table className="w-full min-w-[600px] text-left text-sm">
+        <thead className="border-b border-zinc-100 text-[11px] font-medium uppercase tracking-widest text-zinc-400">
           <tr>
             {columns.map((col) => (
-              <th key={col.key} className={cn("px-5 py-3.5 font-medium", col.className)}>
-                {col.header}
+              <th key={String(col.key)} className="px-5 py-3 font-medium">
+                {col.label}
               </th>
             ))}
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-50">
-          {data.map((item) => (
-            <tr
-              key={keyExtractor(item)}
-              className="transition-colors hover:bg-zinc-50/50"
-            >
+          {data.map((row, i) => (
+            <tr key={i} className="text-zinc-700 transition-colors hover:bg-zinc-50/50">
               {columns.map((col) => (
-                <td key={col.key} className={cn("px-5 py-3.5", col.className)}>
-                  {col.render(item)}
+                <td key={String(col.key)} className="px-5 py-3">
+                  {col.render
+                    ? col.render(row)
+                    : (row[col.key as keyof T] as React.ReactNode)}
                 </td>
               ))}
             </tr>
           ))}
-          {data.length === 0 && (
-            <tr>
-              <td
-                colSpan={columns.length}
-                className="px-5 py-14 text-center text-zinc-400"
-              >
-                {emptyMessage}
-              </td>
-            </tr>
-          )}
         </tbody>
       </table>
     </div>

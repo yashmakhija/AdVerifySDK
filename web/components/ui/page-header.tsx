@@ -4,25 +4,30 @@ import { Plus } from "lucide-react";
 interface PageHeaderProps {
   title: string;
   description?: string;
-  action?: {
-    label: string;
-    onClick: () => void;
-  };
+  actionLabel?: string;
+  onAction?: () => void;
 }
 
-export function PageHeader({ title, description, action }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  description,
+  actionLabel,
+  onAction,
+}: PageHeaderProps) {
   return (
-    <div className="mb-8 flex items-start justify-between">
+    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h1 className="text-xl font-bold text-zinc-900">{title}</h1>
+        <h1 className="text-lg font-semibold tracking-tight text-zinc-950">
+          {title}
+        </h1>
         {description && (
-          <p className="mt-1 text-sm text-zinc-500">{description}</p>
+          <p className="mt-0.5 text-[13px] text-zinc-500">{description}</p>
         )}
       </div>
-      {action && (
-        <Button variant="gradient" onClick={action.onClick} className="gap-1.5">
-          <Plus className="h-4 w-4" />
-          {action.label}
+      {actionLabel && onAction && (
+        <Button size="sm" onClick={onAction} className="gap-1.5">
+          <Plus className="h-3.5 w-3.5" />
+          {actionLabel}
         </Button>
       )}
     </div>

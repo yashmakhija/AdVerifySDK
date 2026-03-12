@@ -31,6 +31,8 @@ export interface PinConfig {
   maxAttempts: number;
   getPinUrl: string;
   getPinBtnText: string;
+  expiryMode: "never" | "duration";
+  expiryHours: number;
 }
 
 export interface UserPin {
@@ -41,6 +43,7 @@ export interface UserPin {
   isUsed: boolean;
   createdAt: string;
   usedAt: string | null;
+  expiresAt: string | null;
   apiKey?: { appName: string };
 }
 

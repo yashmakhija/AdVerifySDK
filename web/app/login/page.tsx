@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { KeyRound } from "lucide-react";
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -53,69 +52,53 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center relative bg-[#fafafa]">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(99,102,241,0.08),transparent)] pointer-events-none" />
-
-      <div className="relative w-full max-w-sm animate-fade-in-up">
-        <div className="rounded-2xl border border-zinc-100 bg-white p-8 shadow-xl shadow-zinc-200/50">
-          <Link href="/" className="flex items-center gap-2.5 mb-8 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 shadow-md shadow-indigo-600/20">
-              <span className="text-sm font-bold text-white leading-none">
-                A
-              </span>
-            </div>
-            <span className="text-lg font-bold text-zinc-900">
-              Ad<span className="text-indigo-600">Verify</span>
-            </span>
+    <div className="flex min-h-screen items-center justify-center bg-white px-5">
+      <div className="w-full max-w-sm animate-in">
+        <div className="mb-8">
+          <Link href="/" className="text-[15px] font-semibold text-zinc-950">
+            AdVerify
           </Link>
-
-          <p className="mb-6 text-sm text-zinc-500">
-            Sign in to your admin panel
-          </p>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-zinc-500">
-                Username
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-zinc-500">
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
-                required
-              />
-            </div>
-
-            {error && (
-              <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-600">
-                <KeyRound className="h-4 w-4" />
-                {error}
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              variant="gradient"
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? "Signing in..." : "Sign In"}
-            </Button>
-          </form>
         </div>
+
+        <h1 className="text-lg font-semibold text-zinc-950">Sign in</h1>
+        <p className="mt-1 text-[13px] text-zinc-500">
+          Enter your credentials to access the admin panel.
+        </p>
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <div>
+            <label className="mb-1.5 block text-[13px] font-medium text-zinc-700">
+              Username
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-950 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
+              required
+            />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-[13px] font-medium text-zinc-700">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-950 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
+              required
+            />
+          </div>
+
+          {error && (
+            <p className="text-[13px] text-red-600">{error}</p>
+          )}
+
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? "Signing in..." : "Sign in"}
+          </Button>
+        </form>
       </div>
     </div>
   );

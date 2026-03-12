@@ -1,157 +1,74 @@
 import {
-  ShieldCheck,
   Smartphone,
+  Lock,
   Key,
   BarChart3,
-  Lock,
+  ShieldCheck,
   Zap,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 
-interface Feature {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  style: "gradient" | "outlined" | "filled";
-  gradient?: string;
-  bg?: string;
-  iconBg: string;
-  iconColor: string;
-  span?: string;
-}
-
-const FEATURES: Feature[] = [
+const FEATURES = [
   {
     icon: Smartphone,
     title: "Android Native SDK",
     description:
-      "Drop-in library with 3-line initialization. Supports interstitial, banner, and native ad formats. No extra dependencies.",
-    style: "gradient",
-    gradient: "from-indigo-600 to-violet-700",
-    iconBg: "bg-white/20",
-    iconColor: "text-white",
-    span: "sm:col-span-2",
+      "Drop-in library. Three lines to initialize. Supports interstitial, banner, and native ad formats.",
   },
   {
     icon: Lock,
     title: "PIN Verification",
     description:
-      "6-digit PIN system tied to device IDs. Integrates with any CPA network or link shortener.",
-    style: "outlined",
-    iconBg: "bg-violet-50",
-    iconColor: "text-violet-600",
+      "6-digit PINs tied to device IDs. Integrates with any CPA network or link shortener.",
   },
   {
     icon: Key,
     title: "API Key Management",
     description:
-      "Create, rotate, and revoke API keys per app. One-click enable/disable from the dashboard.",
-    style: "outlined",
-    iconBg: "bg-amber-50",
-    iconColor: "text-amber-600",
+      "Create, rotate, and revoke keys per app. Enable or disable with one click.",
   },
   {
     icon: BarChart3,
     title: "Real-time Analytics",
     description:
-      "Track impressions, clicks, CTR, and PIN usage across all your apps. Live dashboard with daily breakdowns.",
-    style: "filled",
-    bg: "bg-zinc-900",
-    iconBg: "bg-white/10",
-    iconColor: "text-white",
+      "Track impressions, clicks, CTR, and PIN usage across all apps in real-time.",
   },
   {
     icon: ShieldCheck,
-    title: "Device-level Security",
+    title: "Device Security",
     description:
-      "Each PIN is tied to a unique device. Configurable max attempts, custom messages, per-app settings.",
-    style: "outlined",
-    iconBg: "bg-emerald-50",
-    iconColor: "text-emerald-600",
+      "Per-device PIN binding. Configurable max attempts, custom messages, per-app settings.",
   },
   {
     icon: Zap,
     title: "Instant Setup",
     description:
-      "Full REST API for ad management, PIN config, and analytics. All behind Basic auth. Deploy in minutes.",
-    style: "outlined",
-    iconBg: "bg-rose-50",
-    iconColor: "text-rose-600",
+      "Full REST API. Basic auth. Deploy the server, grab an API key, and ship.",
   },
 ];
 
-function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
-  const { icon: Icon, title, description, style, gradient, bg, iconBg, iconColor } = feature;
-
-  if (style === "gradient") {
-    return (
-      <div
-        className={`group relative rounded-3xl bg-gradient-to-br ${gradient} p-7 text-white shadow-xl shadow-indigo-600/15 overflow-hidden animate-fade-in-up`}
-        style={{ animationDelay: `${index * 80}ms` }}
-      >
-        <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-white/5 blur-2xl -translate-y-10 translate-x-10" />
-        <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${iconBg} backdrop-blur-sm`}>
-          <Icon className="h-5 w-5 text-white" />
-        </div>
-        <h3 className="text-base font-bold mb-2">{title}</h3>
-        <p className="text-sm text-white/70 leading-relaxed">{description}</p>
-      </div>
-    );
-  }
-
-  if (style === "filled") {
-    return (
-      <div
-        className={`group rounded-3xl ${bg} p-7 text-white shadow-xl overflow-hidden animate-fade-in-up`}
-        style={{ animationDelay: `${index * 80}ms` }}
-      >
-        <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${iconBg}`}>
-          <Icon className={`h-5 w-5 ${iconColor}`} />
-        </div>
-        <h3 className="text-base font-bold mb-2">{title}</h3>
-        <p className="text-sm text-zinc-400 leading-relaxed">{description}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="group rounded-3xl border border-zinc-100 bg-white p-7 shadow-sm transition-all duration-300 hover:shadow-xl hover:border-zinc-200 hover:-translate-y-0.5 animate-fade-in-up"
-      style={{ animationDelay: `${index * 80}ms` }}
-    >
-      <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${iconBg} transition-transform duration-300 group-hover:scale-110`}>
-        <Icon className={`h-5 w-5 ${iconColor}`} />
-      </div>
-      <h3 className="text-base font-bold text-zinc-900 mb-2">{title}</h3>
-      <p className="text-sm text-zinc-500 leading-relaxed">{description}</p>
-    </div>
-  );
-}
-
 export function FeaturesSection() {
   return (
-    <section id="features" className="w-full relative bg-[#fafafa]">
-      <div className="wrapper py-20 md:py-28">
-        <div className="mb-16 max-w-xl">
-          <span className="inline-block rounded-full bg-indigo-50 border border-indigo-100 px-3.5 py-1 text-xs font-semibold text-indigo-600 mb-4">
+    <section id="features" className="w-full border-t border-zinc-200 bg-zinc-50">
+      <div className="mx-auto max-w-5xl px-5 py-20 md:py-28">
+        <div className="mb-12 max-w-md">
+          <h2 className="text-2xl font-bold tracking-tight text-zinc-950 md:text-3xl">
             Features
-          </span>
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl text-zinc-900">
-            Everything you need,{" "}
-            <span className="gradient-text bg-gradient-to-r from-indigo-600 to-violet-600">
-              nothing you don&apos;t
-            </span>
           </h2>
-          <p className="mt-4 text-base text-zinc-500 leading-relaxed">
-            Ads, PINs, analytics, and key management — all from one SDK and one
-            dashboard.
+          <p className="mt-2 text-[15px] text-zinc-500 leading-relaxed">
+            Everything you need to serve ads and verify users.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {FEATURES.map((feature, i) => (
-            <div key={feature.title} className={feature.span || ""}>
-              <FeatureCard feature={feature} index={i} />
+        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map(({ icon: Icon, title, description }) => (
+            <div key={title} className="bg-white p-6">
+              <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-100">
+                <Icon className="h-[18px] w-[18px] text-zinc-600" />
+              </div>
+              <h3 className="text-sm font-semibold text-zinc-950">{title}</h3>
+              <p className="mt-1.5 text-[13px] text-zinc-500 leading-relaxed">
+                {description}
+              </p>
             </div>
           ))}
         </div>

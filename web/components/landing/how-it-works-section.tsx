@@ -1,123 +1,71 @@
-import { Download, Key, ShieldCheck, BarChart3 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-
-interface Step {
-  step: string;
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  code: string;
-  color: string;
-  dotColor: string;
-}
-
-const STEPS: Step[] = [
+const STEPS = [
   {
-    step: "01",
-    icon: Download,
-    title: "Add the SDK",
-    description:
-      "Add the AdVerify module to your Android project. Three lines of code in your build.gradle.",
-    code: `AdVerify.init(context, "YOUR_API_KEY", "https://api.yoursite.com");`,
-    color: "bg-indigo-50 text-indigo-600",
-    dotColor: "bg-indigo-500",
+    step: "1",
+    title: "Install SDK",
+    description: "Add the module to your Android project and call init().",
   },
   {
-    step: "02",
-    icon: Key,
+    step: "2",
     title: "Configure PINs",
-    description:
-      "Set up PIN verification from the admin panel. Connect your CPA network or link shortener webhook.",
-    code: `POST /api/sdk/generate-pin\n{ "apiKey": "...", "deviceId": "..." }`,
-    color: "bg-violet-50 text-violet-600",
-    dotColor: "bg-violet-500",
+    description: "Set up verification rules and connect your CPA webhook.",
   },
   {
-    step: "03",
-    icon: ShieldCheck,
-    title: "Users verify & unlock",
-    description:
-      "Users get a 6-digit PIN after completing an action. Enter it in-app — device unlocks permanently.",
-    code: `// Automatic flow:\n// Action → PIN generated → User enters → Verified`,
-    color: "bg-emerald-50 text-emerald-600",
-    dotColor: "bg-emerald-500",
+    step: "3",
+    title: "Users verify",
+    description: "Users complete an action, get a PIN, enter it to unlock.",
   },
   {
-    step: "04",
-    icon: BarChart3,
-    title: "Serve ads & track",
-    description:
-      "Verified users see your ads. Monitor impressions, clicks, and CTR from the live dashboard.",
-    code: `AdVerify.showAd(activity, callback);`,
-    color: "bg-amber-50 text-amber-600",
-    dotColor: "bg-amber-500",
+    step: "4",
+    title: "Serve & track",
+    description: "Ads are served to verified users. Track everything live.",
   },
 ];
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="w-full relative bg-white border-t border-zinc-100">
-      <div className="wrapper py-20 md:py-28">
-        <div className="mb-16 text-center max-w-xl mx-auto">
-          <span className="inline-block rounded-full bg-violet-50 border border-violet-100 px-3.5 py-1 text-xs font-semibold text-violet-600 mb-4">
-            How It Works
-          </span>
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl text-zinc-900">
-            Four steps to{" "}
-            <span className="gradient-text bg-gradient-to-r from-indigo-600 to-violet-600">
-              go live
-            </span>
+    <section id="how-it-works" className="w-full border-t border-zinc-200 bg-white">
+      <div className="mx-auto max-w-5xl px-5 py-20 md:py-28">
+        <div className="mb-14 max-w-md">
+          <h2 className="text-2xl font-bold tracking-tight text-zinc-950 md:text-3xl">
+            How it works
           </h2>
-          <p className="mt-4 text-base text-zinc-500 leading-relaxed">
-            From zero to serving ads with PIN verification in under 10 minutes.
+          <p className="mt-2 text-[15px] text-zinc-500 leading-relaxed">
+            Four steps from zero to live.
           </p>
         </div>
 
-        <div className="relative max-w-3xl mx-auto">
-          <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-indigo-200 via-violet-200 to-amber-200 hidden md:block" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          {STEPS.map(({ step, title, description }) => (
+            <div key={step} className="relative">
+              <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-zinc-950 text-xs font-bold text-white">
+                {step}
+              </div>
+              <h3 className="text-sm font-semibold text-zinc-950">{title}</h3>
+              <p className="mt-1 text-[13px] text-zinc-500 leading-relaxed">
+                {description}
+              </p>
+            </div>
+          ))}
+        </div>
 
-          <div className="space-y-8">
-            {STEPS.map(
-              ({ step, icon: Icon, title, description, code, color, dotColor }, i) => (
-                <div
-                  key={step}
-                  className="relative flex gap-6 animate-fade-in-up"
-                  style={{ animationDelay: `${i * 120}ms` }}
-                >
-                  <div className="hidden md:flex flex-col items-center">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${color} shadow-sm`}>
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div
-                      className={`mt-2 h-2 w-2 rounded-full ${dotColor}`}
-                    />
-                  </div>
-
-                  <div className="flex-1 rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-zinc-200">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${color} md:hidden`}>
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">
-                          Step {step}
-                        </span>
-                        <h3 className="text-base font-bold text-zinc-900">
-                          {title}
-                        </h3>
-                      </div>
-                    </div>
-                    <p className="text-sm text-zinc-500 leading-relaxed mb-4">
-                      {description}
-                    </p>
-                    <pre className="overflow-x-auto rounded-xl bg-zinc-950 p-4 text-xs leading-relaxed text-violet-300 font-mono">
-                      <code>{code}</code>
-                    </pre>
-                  </div>
-                </div>
-              )
-            )}
+        <div className="rounded-xl border border-zinc-200 bg-zinc-950 p-5 md:p-6 overflow-x-auto">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="h-3 w-3 rounded-full bg-zinc-800" />
+            <div className="h-3 w-3 rounded-full bg-zinc-800" />
+            <div className="h-3 w-3 rounded-full bg-zinc-800" />
           </div>
+          <pre className="text-[13px] leading-relaxed text-zinc-400 font-mono whitespace-pre">
+            <code>{`// 1. Initialize
+AdVerify.init(context, "YOUR_API_KEY", "https://api.yoursite.com");
+
+// 2. Webhook generates PINs
+POST /api/sdk/generate-pin { "apiKey": "...", "deviceId": "..." }
+
+// 3. User enters PIN → SDK verifies → app unlocked
+
+// 4. Show ads
+AdVerify.showAd(activity, callback);`}</code>
+          </pre>
         </div>
       </div>
     </section>

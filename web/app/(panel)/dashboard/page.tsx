@@ -5,7 +5,6 @@ import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { StatCard } from "@/components/ui/stat-card";
 import { PageHeader } from "@/components/ui/page-header";
-import type { Stats } from "@/lib/types";
 import {
   KeyRound,
   Megaphone,
@@ -17,6 +16,7 @@ import {
   BarChart3,
   Zap,
 } from "lucide-react";
+import type { Stats } from "@/lib/types";
 
 export default function DashboardPage() {
   const token = useAuthStore((s) => s.token);
@@ -32,8 +32,8 @@ export default function DashboardPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="flex items-center gap-3 text-zinc-400">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
-          <span className="text-sm">Loading dashboard...</span>
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-300 border-t-transparent" />
+          <span className="text-sm">Loading...</span>
         </div>
       </div>
     );
@@ -46,46 +46,51 @@ export default function DashboardPage() {
         description="Overview of your AdVerify platform"
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <StatCard
           label="API Keys"
           value={stats.totalKeys}
-          variant="primary"
-          icon={KeyRound}
+          icon={<KeyRound className="h-4 w-4" />}
         />
-        <StatCard label="Total Ads" value={stats.totalAds} icon={Megaphone} />
-        <StatCard label="Total PINs" value={stats.totalPins} icon={Lock} />
+        <StatCard
+          label="Total Ads"
+          value={stats.totalAds}
+          icon={<Megaphone className="h-4 w-4" />}
+        />
+        <StatCard
+          label="Total PINs"
+          value={stats.totalPins}
+          icon={<Lock className="h-4 w-4" />}
+        />
         <StatCard
           label="Used PINs"
           value={stats.usedPins}
-          variant="success"
-          icon={CheckCircle2}
+          icon={<CheckCircle2 className="h-4 w-4" />}
         />
         <StatCard
-          label="Total Impressions"
+          label="Impressions"
           value={stats.totalImpressions.toLocaleString()}
-          icon={Eye}
+          icon={<Eye className="h-4 w-4" />}
         />
         <StatCard
-          label="Today Impressions"
+          label="Today Impr."
           value={stats.todayImpressions.toLocaleString()}
-          icon={BarChart3}
+          icon={<BarChart3 className="h-4 w-4" />}
         />
         <StatCard
           label="Total Clicks"
           value={stats.totalClicks.toLocaleString()}
-          icon={MousePointerClick}
+          icon={<MousePointerClick className="h-4 w-4" />}
         />
         <StatCard
           label="Today Clicks"
           value={stats.todayClicks.toLocaleString()}
-          icon={Zap}
+          icon={<Zap className="h-4 w-4" />}
         />
         <StatCard
           label="CTR"
           value={`${stats.ctr}%`}
-          variant="success"
-          icon={TrendingUp}
+          icon={<TrendingUp className="h-4 w-4" />}
         />
       </div>
     </div>

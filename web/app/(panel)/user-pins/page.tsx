@@ -1,18 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuthStore } from "@/lib/store";
+import { useAuthStore, useToastStore } from "@/lib/store";
 import { api } from "@/lib/api";
-import { useToast } from "@/components/ui/toast";
 import { FormSelect } from "@/components/ui/modal";
-import { PageHeader } from "@/components/ui/page-header";
 import { DataTable } from "@/components/ui/data-table";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { UserPin, ApiKey } from "@/lib/types";
 
+function pinStatus(p: UserPin): { label: string; variant: "success" | "destructive" | "default" } {
+  if (!p.isUsed) return { label: "Pending", variant: "default" };
+  if (p.expiresAt && new Date(p.expiresAt) < new Date()) {
+    return { label: "Expired", variant: "destructive" };
+  }
+  return { label: "Active", variant: "success" };
+}
+
 export default function UserPinsPage() {
   const token = useAuthStore((s) => s.token)!;
-  const toast = useToast();
+  const toast = useToastStore();
   const [pins, setPins] = useState<UserPin[]>([]);
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [filterKey, setFilterKey] = useState<string>("");
@@ -47,10 +54,12 @@ export default function UserPinsPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-start justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-foreground">User PINs</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="text-lg font-semibold tracking-tight text-zinc-950">
+            User PINs
+          </h1>
+          <p className="mt-0.5 text-[13px] text-zinc-500">
             View and manage user PIN verifications
           </p>
         </div>
@@ -74,78 +83,70 @@ export default function UserPinsPage() {
         columns={[
           {
             key: "app",
-            header: "App",
+            label: "App",
             render: (p: UserPin) => (
-              <span className="text-muted-foreground">
+              <span className="text-zinc-500">
                 {p.apiKey?.appName || "-"}
               </span>
             ),
           },
           {
             key: "deviceId",
-            header: "Device ID",
+            label: "Device ID",
             render: (p: UserPin) => (
-              <code className="rounded-lg bg-sky-50 border border-sky-100 px-2 py-0.5 text-xs text-sky-700 font-mono">
+              <code className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700 font-mono">
                 {p.deviceId.slice(0, 12)}...
               </code>
             ),
           },
           {
             key: "pin",
-            header: "PIN",
+            label: "PIN",
             render: (p: UserPin) => (
-              <span className="font-mono font-medium text-foreground">
+              <span className="font-mono font-medium text-zinc-950">
                 {p.pin}
               </span>
             ),
           },
           {
             key: "status",
-            header: "Status",
+            label: "Status",
+            render: (p: UserPin) => {
+              const s = pinStatus(p);
+              return <Badge variant={s.variant}>{s.label}</Badge>;
+            },
+          },
+          {
+            key: "expires",
+            label: "Expires",
             render: (p: UserPin) => (
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold border ${
-                  p.isUsed
-                    ? "bg-emerald-50 text-emerald-600 border-emerald-200/60"
-                    : "bg-amber-50 text-amber-600 border-amber-200/60"
-                }`}
-              >
-                <span
-                  className={`h-1.5 w-1.5 rounded-full ${
-                    p.isUsed ? "bg-emerald-500" : "bg-amber-500"
-                  }`}
-                />
-                {p.isUsed ? "Used" : "Pending"}
+              <span className="text-zinc-500 text-xs">
+                {!p.isUsed
+                  ? "-"
+                  : !p.expiresAt
+                    ? "Never"
+                    : new Date(p.expiresAt).toLocaleString()}
               </span>
             ),
           },
           {
             key: "created",
-            header: "Created",
+            label: "Created",
             render: (p: UserPin) => (
-              <span className="text-muted-foreground">
+              <span className="text-zinc-500">
                 {new Date(p.createdAt).toLocaleDateString()}
               </span>
             ),
           },
           {
-            key: "usedAt",
-            header: "Used At",
-            render: (p: UserPin) => (
-              <span className="text-muted-foreground">
-                {p.usedAt ? new Date(p.usedAt).toLocaleDateString() : "-"}
-              </span>
-            ),
-          },
-          {
             key: "actions",
-            header: "Actions",
+            label: "Actions",
             render: (p: UserPin) => (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => revoke(p.deviceId, p.apiKeyId)}
-                className="text-xs text-red-500 hover:text-red-600 hover:bg-red-50 h-7 px-2"
+                className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 h-7 px-2"
               >
                 Revoke
               </Button>
@@ -153,7 +154,6 @@ export default function UserPinsPage() {
           },
         ]}
         data={filtered}
-        keyExtractor={(p) => p.id}
         emptyMessage="No user PINs yet"
       />
     </div>

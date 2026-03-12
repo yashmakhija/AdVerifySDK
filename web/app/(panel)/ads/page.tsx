@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuthStore } from "@/lib/store";
+import { useAuthStore, useToastStore } from "@/lib/store";
 import { api } from "@/lib/api";
-import { useToast } from "@/components/ui/toast";
 import { Modal, FormInput, FormSelect, FormTextarea } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
@@ -24,7 +23,7 @@ const EMPTY_AD = {
 
 export default function AdsPage() {
   const token = useAuthStore((s) => s.token)!;
-  const toast = useToast();
+  const toast = useToastStore();
   const [ads, setAds] = useState<Ad[]>([]);
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [modal, setModal] = useState(false);
@@ -81,64 +80,69 @@ export default function AdsPage() {
       <PageHeader
         title="Ads"
         description="Manage ads across your apps"
-        action={{ label: "New Ad", onClick: () => setModal(true) }}
+        actionLabel="New Ad"
+        onAction={() => setModal(true)}
       />
 
       <DataTable
         columns={[
           {
             key: "title",
-            header: "Title",
+            label: "Title",
             render: (ad: Ad) => (
-              <span className="font-medium text-foreground">{ad.title}</span>
+              <span className="font-medium text-zinc-950">{ad.title}</span>
             ),
           },
           {
             key: "app",
-            header: "App",
+            label: "App",
             render: (ad: Ad) => (
-              <span className="text-muted-foreground">
+              <span className="text-zinc-500">
                 {ad.apiKey?.appName || "-"}
               </span>
             ),
           },
           {
             key: "type",
-            header: "Type",
+            label: "Type",
             render: (ad: Ad) => (
-              <span className="inline-block rounded-lg bg-sky-50 border border-sky-100 px-2 py-0.5 text-xs font-medium text-sky-700 capitalize">
+              <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600 capitalize">
                 {ad.adType}
               </span>
             ),
           },
           {
             key: "impressions",
-            header: "Impressions",
+            label: "Impressions",
             render: (ad: Ad) => (
-              <span className="text-muted-foreground">
+              <span className="text-zinc-500">
                 {(ad._count?.impressions ?? 0).toLocaleString()}
               </span>
             ),
           },
           {
             key: "clicks",
-            header: "Clicks",
+            label: "Clicks",
             render: (ad: Ad) => (
-              <span className="text-muted-foreground">
+              <span className="text-zinc-500">
                 {(ad._count?.clicks ?? 0).toLocaleString()}
               </span>
             ),
           },
           {
             key: "status",
-            header: "Status",
-            render: (ad: Ad) => <Badge active={ad.isActive} />,
+            label: "Status",
+            render: (ad: Ad) => (
+              <Badge variant={ad.isActive ? "success" : "destructive"}>
+                {ad.isActive ? "Active" : "Inactive"}
+              </Badge>
+            ),
           },
           {
             key: "actions",
-            header: "Actions",
+            label: "Actions",
             render: (ad: Ad) => (
-              <div className="flex gap-2">
+              <div className="flex gap-1">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -151,7 +155,7 @@ export default function AdsPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => deleteAd(ad.id)}
-                  className="text-xs text-red-500 hover:text-red-600 hover:bg-red-50 h-7 px-2"
+                  className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 h-7 px-2"
                 >
                   Delete
                 </Button>
@@ -160,11 +164,10 @@ export default function AdsPage() {
           },
         ]}
         data={ads}
-        keyExtractor={(ad) => ad.id}
         emptyMessage="No ads yet"
       />
 
-      <Modal open={modal} onClose={() => setModal(false)} title="Create Ad">
+      <Modal isOpen={modal} onClose={() => setModal(false)} title="Create Ad">
         <form onSubmit={handleCreate} className="space-y-4">
           <FormSelect
             label="App"
@@ -242,9 +245,14 @@ export default function AdsPage() {
             />
           </div>
 
-          <Button type="submit" variant="gradient" className="w-full">
-            Create Ad
-          </Button>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" size="sm" onClick={() => setModal(false)} type="button">
+              Cancel
+            </Button>
+            <Button size="sm" type="submit">
+              Create Ad
+            </Button>
+          </div>
         </form>
       </Modal>
     </div>
