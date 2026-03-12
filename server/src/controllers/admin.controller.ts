@@ -4,6 +4,10 @@ import { env } from '../config/env';
 
 const service = new AdminService();
 
+function paramId(req: Request, name: string): number {
+  return parseInt(String(req.params[name]), 10);
+}
+
 export class AdminController {
   async me(_req: Request, res: Response) {
     res.json({
@@ -30,14 +34,12 @@ export class AdminController {
   }
 
   async updateKey(req: Request, res: Response) {
-    const id = parseInt(req.params.id, 10);
-    const updated = await service.updateKey(id, req.body);
+    const updated = await service.updateKey(paramId(req, 'id'), req.body);
     res.json(updated);
   }
 
   async deleteKey(req: Request, res: Response) {
-    const id = parseInt(req.params.id, 10);
-    await service.deleteKey(id);
+    await service.deleteKey(paramId(req, 'id'));
     res.json({ status: 'deleted' });
   }
 
@@ -53,40 +55,35 @@ export class AdminController {
   }
 
   async updateAd(req: Request, res: Response) {
-    const id = parseInt(req.params.id, 10);
-    const ad = await service.updateAd(id, req.body);
+    const ad = await service.updateAd(paramId(req, 'id'), req.body);
     res.json(ad);
   }
 
   async deleteAd(req: Request, res: Response) {
-    const id = parseInt(req.params.id, 10);
-    await service.deleteAd(id);
+    await service.deleteAd(paramId(req, 'id'));
     res.json({ status: 'deleted' });
   }
 
   // PIN Config
   async getPinConfig(req: Request, res: Response) {
-    const apiKeyId = parseInt(req.params.apiKeyId, 10);
-    const config = await service.getPinConfig(apiKeyId);
+    const config = await service.getPinConfig(paramId(req, 'apiKeyId'));
     res.json({ config });
   }
 
   async upsertPinConfig(req: Request, res: Response) {
-    const apiKeyId = parseInt(req.params.apiKeyId, 10);
-    const config = await service.upsertPinConfig(apiKeyId, req.body);
+    const config = await service.upsertPinConfig(paramId(req, 'apiKeyId'), req.body);
     res.json(config);
   }
 
   // User PINs
   async getUserPins(req: Request, res: Response) {
-    const apiKeyId = req.query.apiKeyId ? parseInt(req.query.apiKeyId as string, 10) : undefined;
+    const apiKeyId = req.query.apiKeyId ? parseInt(String(req.query.apiKeyId), 10) : undefined;
     const pins = await service.getUserPins(apiKeyId);
     res.json({ pins });
   }
 
   async deleteUserPin(req: Request, res: Response) {
-    const id = parseInt(req.params.id, 10);
-    await service.deleteUserPin(id);
+    await service.deleteUserPin(paramId(req, 'id'));
     res.json({ status: 'deleted' });
   }
 
