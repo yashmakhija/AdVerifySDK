@@ -4,27 +4,44 @@ import Link from "next/link";
 
 export function CtaSection() {
   return (
-    <section className="w-full border-t border-zinc-200 bg-white">
-      <div className="mx-auto max-w-5xl px-5 py-20 md:py-28 text-center">
-        <h2 className="text-2xl font-bold tracking-tight text-zinc-950 md:text-3xl">
-          Ready to get started?
-        </h2>
-        <p className="mt-3 text-[15px] text-zinc-500 max-w-md mx-auto leading-relaxed">
-          Create your admin account, generate an API key, and start serving ads
-          with PIN verification today.
-        </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link href="/login">
-            <Button size="lg" className="gap-2">
-              Open Dashboard
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-          <Link href="#docs">
-            <Button variant="outline" size="lg">
-              Read the Docs
-            </Button>
-          </Link>
+    <section className="w-full border-t border-zinc-200/60">
+      <div className="mx-auto max-w-6xl px-5 md:px-8 py-4">
+        <div className="relative overflow-hidden rounded-2xl bg-zinc-950 px-6 py-16 md:px-16 md:py-20 text-center">
+          {/* Grid bg */}
+          <div className="absolute inset-0 bg-grid-dark opacity-60" />
+
+          {/* Radial glow */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[300px] w-[500px] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06)_0%,transparent_70%)]" />
+
+          <div className="relative">
+            <h2 className="text-2xl font-bold tracking-tight text-white md:text-4xl">
+              Ready to get started?
+            </h2>
+            <p className="mt-3 text-[15px] text-zinc-400 max-w-md mx-auto leading-relaxed">
+              Deploy the server, create an API key, and start serving ads
+              with PIN verification in under 10 minutes.
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link href="/login">
+                <Button
+                  size="lg"
+                  className="gap-2 bg-white text-zinc-950 hover:bg-zinc-100 h-11 px-6 text-[14px]"
+                >
+                  Open Dashboard
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/guide">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white h-11 px-6 text-[14px]"
+                >
+                  Integration Guide
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>
