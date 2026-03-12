@@ -22,7 +22,7 @@ router.post(
   validate(z.object({ appName: z.string().min(1), packageName: z.string().optional() })),
   (req, res) => ctrl.createKey(req, res),
 );
-router.put('/keys/:id', (req, res) => ctrl.updateKey(req, res));
+router.patch('/keys/:id', (req, res) => ctrl.updateKey(req, res));
 router.delete('/keys/:id', (req, res) => ctrl.deleteKey(req, res));
 
 // Ads
@@ -43,12 +43,12 @@ router.post(
   ),
   (req, res) => ctrl.createAd(req, res),
 );
-router.put('/ads/:id', (req, res) => ctrl.updateAd(req, res));
+router.patch('/ads/:id', (req, res) => ctrl.updateAd(req, res));
 router.delete('/ads/:id', (req, res) => ctrl.deleteAd(req, res));
 
 // PIN Config
-router.get('/pin/:apiKeyId', (req, res) => ctrl.getPinConfig(req, res));
-router.put('/pin/:apiKeyId', (req, res) => ctrl.upsertPinConfig(req, res));
+router.get('/pin-config', (req, res) => ctrl.listPinConfigs(req, res));
+router.post('/pin-config', (req, res) => ctrl.savePinConfig(req, res));
 
 // User PINs
 router.get('/user-pins', (req, res) => ctrl.getUserPins(req, res));

@@ -24,7 +24,7 @@ export class AdminController {
   // Keys
   async getKeys(_req: Request, res: Response) {
     const keys = await service.getKeys();
-    res.json({ keys });
+    res.json(keys);
   }
 
   async createKey(req: Request, res: Response) {
@@ -46,7 +46,7 @@ export class AdminController {
   // Ads
   async getAds(_req: Request, res: Response) {
     const ads = await service.getAds();
-    res.json({ ads });
+    res.json(ads);
   }
 
   async createAd(req: Request, res: Response) {
@@ -65,13 +65,14 @@ export class AdminController {
   }
 
   // PIN Config
-  async getPinConfig(req: Request, res: Response) {
-    const config = await service.getPinConfig(paramId(req, 'apiKeyId'));
-    res.json({ config });
+  async listPinConfigs(_req: Request, res: Response) {
+    const configs = await service.listPinConfigs();
+    res.json(configs);
   }
 
-  async upsertPinConfig(req: Request, res: Response) {
-    const config = await service.upsertPinConfig(paramId(req, 'apiKeyId'), req.body);
+  async savePinConfig(req: Request, res: Response) {
+    const { apiKeyId, ...data } = req.body;
+    const config = await service.upsertPinConfig(apiKeyId, data);
     res.json(config);
   }
 
@@ -79,7 +80,7 @@ export class AdminController {
   async getUserPins(req: Request, res: Response) {
     const apiKeyId = req.query.apiKeyId ? parseInt(String(req.query.apiKeyId), 10) : undefined;
     const pins = await service.getUserPins(apiKeyId);
-    res.json({ pins });
+    res.json(pins);
   }
 
   async deleteUserPin(req: Request, res: Response) {

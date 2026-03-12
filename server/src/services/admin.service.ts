@@ -101,6 +101,10 @@ export class AdminService {
     return prisma.pinConfig.findUnique({ where: { apiKeyId } });
   }
 
+  async listPinConfigs() {
+    return prisma.pinConfig.findMany();
+  }
+
   async upsertPinConfig(
     apiKeyId: number,
     data: { pinEnabled?: boolean; pinMessage?: string; maxAttempts?: number; getPinUrl?: string; getPinBtnText?: string; expiryMode?: string; expiryHours?: number },
