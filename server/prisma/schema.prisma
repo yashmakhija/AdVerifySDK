@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ApiKey {
+  id          Int          @id @default(autoincrement())
+  key         String       @unique
+  appName     String       @map("app_name")
+  packageName String       @default("") @map("package_name")
+  isActive    Boolean      @default(true) @map("is_active")
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  ads         Ad[]
+  pinConfig   PinConfig?
+  userPins    UserPin[]
+  impressions Impression[]
+  clicks      Click[]
+
+  @@map("api_keys")
+}
+
+model Ad {
+  id          Int          @id @default(autoincrement())
+  apiKeyId    Int          @map("api_key_id")
+  title       String
+  description String       @default("")
+  imageUrl    String       @default("") @map("image_url")
+  redirectUrl String       @default("") @map("redirect_url")
+  adType      String       @default("interstitial") @map("ad_type")
+  buttonText  String       @default("Visit Now") @map("button_text")
+  isActive    Boolean      @default(true) @map("is_active")
+  priority    Int          @default(0)
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  apiKey      ApiKey       @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  impressions Impression[]
+  clicks      Click[]
+
+  @@map("ads")
+}
+
+model PinConfig {
+  id            Int     @id @default(autoincrement())
+  apiKeyId      Int     @unique @map("api_key_id")
+  pinEnabled    Boolean @default(false) @map("pin_enabled")
+  pinMessage    String  @default("Enter PIN to unlock") @map("pin_message")
+  maxAttempts   Int     @default(3) @map("max_attempts")
+  getPinUrl     String  @default("") @map("get_pin_url")
+  getPinBtnText String  @default("Get PIN") @map("get_pin_btn_text")
+
+  apiKey        ApiKey  @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+
+  @@map("pin_configs")
+}
+
+// Each user/device gets a unique PIN after completing action on link shortener
+model UserPin {
+  id        Int       @id @default(autoincrement())
+  apiKeyId  Int       @map("api_key_id")
+  deviceId  String    @map("device_id")
+  pin       String
+  isUsed    Boolean   @default(false) @map("is_used")
+  createdAt DateTime  @default(now()) @map("created_at")
+  usedAt    DateTime? @map("used_at")
+
+  apiKey    ApiKey    @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+
+  @@unique([apiKeyId, deviceId, pin])
+  @@index([apiKeyId, deviceId])
+  @@map("user_pins")
+}
+
+model Impression {
+  id        Int      @id @default(autoincrement())
+  adId      Int      @map("ad_id")
+  apiKeyId  Int      @map("api_key_id")
+  deviceId  String   @default("") @map("device_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  ad        Ad       @relation(fields: [adId], references: [id], onDelete: Cascade)
+  apiKey    ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+
+  @@map("impressions")
+}
+
+model Click {
+  id        Int      @id @default(autoincrement())
+  adId      Int      @map("ad_id")
+  apiKeyId  Int      @map("api_key_id")
+  deviceId  String   @default("") @map("device_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  ad        Ad       @relation(fields: [adId], references: [id], onDelete: Cascade)
+  apiKey    ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+
+  @@map("clicks")
+}

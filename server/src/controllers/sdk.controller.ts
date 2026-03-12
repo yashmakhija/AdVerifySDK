@@ -1,0 +1,64 @@
+import { Request, Response } from 'express';
+import { SdkService } from '../services/sdk.service';
+import { AuthenticatedRequest } from '../types';
+
+const service = new SdkService();
+
+export class SdkController {
+  async init(req: AuthenticatedRequest, res: Response) {
+    const { deviceId } = req.body;
+    const data = await service.init(req.apiKeyData!.id, deviceId ?? '');
+    res.json(data);
+  }
+
+  async getAds(req: AuthenticatedRequest, res: Response) {
+    const ads = await service.getAds(req.apiKeyData!.id);
+    res.json({ ads });
+  }
+
+  async verifyPin(req: AuthenticatedRequest, res: Response) {
+    const { pin, deviceId } = req.body;
+    const result = await service.verifyPin(req.apiKeyData!.id, deviceId ?? '', pin ?? '');
+    res.json(result);
+  }
+
+  async checkStatus(req: AuthenticatedRequest, res: Response) {
+    const { deviceId } = req.body;
+    const result = await service.checkStatus(req.apiKeyData!.id, deviceId ?? '');
+    res.json(result);
+  }
+
+  // Called by your link shortener when user completes the action
+  async generatePin(req: Request, res: Response) {
+    const { apiKey, deviceId } = req.body;
+
+    if (!apiKey || !deviceId) {
+      res.status(400).json({ error: 'apiKey and deviceId are required' });
+      return;
+    }
+
+    const keyData = await require('../lib/prisma').prisma.apiKey.findUnique({
+      where: { key: apiKey, isActive: true },
+    });
+
+    if (!keyData) {
+      res.status(403).json({ error: 'Invalid API key' });
+      return;
+    }
+
+    const pin = await service.generatePin(keyData.id, deviceId);
+    res.json({ pin, deviceId });
+  }
+
+  async trackImpression(req: AuthenticatedRequest, res: Response) {
+    const { adId, deviceId } = req.body;
+    await service.trackImpression(adId, req.apiKeyData!.id, deviceId ?? '');
+    res.json({ status: 'ok' });
+  }
+
+  async trackClick(req: AuthenticatedRequest, res: Response) {
+    const { adId, deviceId } = req.body;
+    await service.trackClick(adId, req.apiKeyData!.id, deviceId ?? '');
+    res.json({ status: 'ok' });
+  }
+}

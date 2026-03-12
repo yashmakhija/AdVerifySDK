@@ -1,0 +1,74 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    namespace 'com.adverify.sdk'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 34
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+// No external dependencies — pure Android framework APIs only.
+// This ensures the SDK works when added as a DEX via MT Manager.
+dependencies {}
+
+// Task to build standalone DEX for MT Manager
+android.libraryVariants.configureEach { variant ->
+    if (variant.name == "release") {
+        tasks.register("buildDex") {
+            dependsOn variant.javaCompileProvider
+            group = "build"
+            description = "Build adverify.dex for MT Manager integration"
+
+            doLast {
+                def classesDir = variant.javaCompileProvider.get().destinationDirectory.asFile.get()
+                def outputDir = new File(project.rootDir, "out")
+                outputDir.mkdirs()
+
+                def jarFile = new File(outputDir, "adverify-classes.jar")
+                def dexFile = new File(outputDir, "adverify.dex")
+
+                // Pack classes into JAR
+                ant.jar(destfile: jarFile, basedir: classesDir)
+
+                // Find d8 tool from Android SDK
+                def sdkDir = android.sdkDirectory
+                def buildToolsDir = new File(sdkDir, "build-tools")
+                def latestBuildTools = buildToolsDir.listFiles()?.sort()?.last()
+                def d8 = new File(latestBuildTools, "d8")
+
+                // Convert JAR to DEX
+                exec {
+                    commandLine d8.absolutePath, "--output", outputDir.absolutePath, jarFile.absolutePath
+                }
+
+                // Rename classes.dex to adverify.dex
+                def classesDex = new File(outputDir, "classes.dex")
+                if (classesDex.exists()) {
+                    classesDex.renameTo(dexFile)
+                }
+
+                // Cleanup temp jar
+                jarFile.delete()
+
+                println ""
+                println "✅ DEX built successfully!"
+                println "📁 Output: ${dexFile.absolutePath}"
+                println ""
+                println "MT Manager integration:"
+                println "1. Copy adverify.dex into APK as classes2.dex (or merge)"
+                println "2. Add smali hook to launcher Activity onCreate()"
+                println ""
+            }
+        }
+    }
+}
