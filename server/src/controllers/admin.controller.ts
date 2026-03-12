@@ -1,9 +1,17 @@
 import { Request, Response } from 'express';
 import { AdminService } from '../services/admin.service';
+import { env } from '../config/env';
 
 const service = new AdminService();
 
 export class AdminController {
+  async me(_req: Request, res: Response) {
+    res.json({
+      authenticated: true,
+      username: env.ADMIN_USERNAME,
+    });
+  }
+
   async getStats(_req: Request, res: Response) {
     const stats = await service.getStats();
     res.json(stats);

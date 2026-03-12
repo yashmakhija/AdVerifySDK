@@ -7,6 +7,9 @@ import { AdminController } from '../controllers/admin.controller';
 const router = Router();
 const ctrl = new AdminController();
 
+// Auth check — verifies token and returns user info
+router.get('/me', adminAuth, (req, res) => ctrl.me(req, res));
+
 router.use(adminAuth);
 
 // Dashboard

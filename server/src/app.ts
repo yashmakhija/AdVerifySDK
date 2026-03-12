@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { env } from './config/env';
+import healthRoutes from './routes/health.routes';
 import sdkRoutes from './routes/sdk.routes';
 import adminRoutes from './routes/admin.routes';
 
@@ -11,6 +12,9 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+// Public health check
+app.use('/api', healthRoutes);
 
 // API routes
 app.use('/api/sdk', sdkRoutes);
