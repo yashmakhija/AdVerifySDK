@@ -103,7 +103,7 @@ export class AdminService {
 
   async upsertPinConfig(
     apiKeyId: number,
-    data: { pinEnabled?: boolean; pinMessage?: string; maxAttempts?: number; getPinUrl?: string; getPinBtnText?: string },
+    data: { pinEnabled?: boolean; pinMessage?: string; maxAttempts?: number; getPinUrl?: string; getPinBtnText?: string; expiryMode?: string; expiryHours?: number },
   ) {
     return prisma.pinConfig.upsert({
       where: { apiKeyId },
