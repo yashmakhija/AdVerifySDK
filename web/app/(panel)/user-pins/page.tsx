@@ -22,8 +22,8 @@ export default function UserPinsPage() {
       api<UserPin[]>("/admin/user-pins", { token }),
       api<ApiKey[]>("/admin/keys", { token }),
     ]);
-    setPins(p);
-    setKeys(k);
+    setPins(Array.isArray(p) ? p : []);
+    setKeys(Array.isArray(k) ? k : []);
   }
 
   useEffect(() => {

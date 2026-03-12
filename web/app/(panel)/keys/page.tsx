@@ -20,7 +20,7 @@ export default function KeysPage() {
 
   async function load() {
     const data = await api<ApiKey[]>("/admin/keys", { token });
-    setKeys(data);
+    setKeys(Array.isArray(data) ? data : []);
   }
 
   useEffect(() => {

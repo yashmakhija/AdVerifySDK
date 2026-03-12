@@ -28,8 +28,8 @@ export default function PinConfigPage() {
       api<ApiKey[]>("/admin/keys", { token }),
       api<PinConfig[]>("/admin/pin-config", { token }),
     ]);
-    setKeys(k);
-    setConfigs(c);
+    setKeys(Array.isArray(k) ? k : []);
+    setConfigs(Array.isArray(c) ? c : []);
   }
 
   useEffect(() => {

@@ -35,8 +35,8 @@ export default function AdsPage() {
       api<Ad[]>("/admin/ads", { token }),
       api<ApiKey[]>("/admin/keys", { token }),
     ]);
-    setAds(a);
-    setKeys(k);
+    setAds(Array.isArray(a) ? a : []);
+    setKeys(Array.isArray(k) ? k : []);
   }
 
   useEffect(() => {
