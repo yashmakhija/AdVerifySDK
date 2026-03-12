@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { Sidebar } from "@/components/sidebar";
@@ -13,12 +13,34 @@ export default function PanelLayout({
 }) {
   const router = useRouter();
   const token = useAuthStore((s) => s.token);
+  const verify = useAuthStore((s) => s.verify);
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    if (!token) router.replace("/login");
-  }, [token, router]);
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
 
-  if (!token) return null;
+    verify().then((valid) => {
+      if (!valid) {
+        router.replace("/login");
+      } else {
+        setChecked(true);
+      }
+    });
+  }, [token, verify, router]);
+
+  if (!token || !checked) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
+          <span className="text-sm">Verifying session...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-background">

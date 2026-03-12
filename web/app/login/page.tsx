@@ -23,7 +23,7 @@ export default function LoginPage() {
 
     try {
       const token = btoa(`${username}:${password}`);
-      await api("/admin/stats", { token });
+      await api("/admin/me", { token });
       login(username, password);
       router.push("/dashboard");
     } catch {
