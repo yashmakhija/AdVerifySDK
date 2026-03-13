@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { SdkService } from '../services/sdk.service';
 import { AuthenticatedRequest } from '../types';
+import { env } from '../config/env';
 
 const service = new SdkService();
 
@@ -28,8 +29,15 @@ export class SdkController {
     res.json(result);
   }
 
-  // Called by your link shortener when user completes the action
+  // Called by your link shortener when user completes the ad pages
   async generatePin(req: Request, res: Response) {
+    // Verify shortener secret — only your shortener backend can call this
+    const authHeader = req.headers.authorization;
+    if (!authHeader || authHeader !== `Bearer ${env.SHORTENER_SECRET}`) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
     const { apiKey, deviceId } = req.body;
 
     if (!apiKey || !deviceId) {
