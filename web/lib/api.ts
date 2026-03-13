@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://ads.paidappstore.com/api';
 
 export async function api<T = unknown>(path: string, opts: {
   method?: string;
