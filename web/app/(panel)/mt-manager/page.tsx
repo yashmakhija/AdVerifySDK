@@ -26,27 +26,21 @@ export default function MtManagerPage() {
     setTimeout(() => setCopied(null), 2000);
   }
 
-  const serverUrl = typeof window !== "undefined" ? window.location.origin : "https://your-server.com";
+  const smaliCode = `invoke-static {p0}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Activity;)V`;
 
-  const smaliCode = selectedKey
-    ? `const-string v0, "${selectedKey.key}"
-
-const-string v1, "${serverUrl}"
-
-invoke-static {p0, v0, v1}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)V`
+  const manifestCode = selectedKey
+    ? `<meta-data android:name="adverify.api_key" android:value="${selectedKey.key}"/>
+<meta-data android:name="adverify.base_url" android:value="https://ads.paidappstore.com"/>`
     : "";
 
   const fullExample = selectedKey
     ? `.method protected onCreate(Landroid/os/Bundle;)V
-    .locals 2
+    .locals X   # <-- keep whatever the original .locals is, no change needed
 
     invoke-super {p0, p1}, Landroid/app/Activity;->onCreate(Landroid/os/Bundle;)V
 
-    # ── AdVerify hook start ──
-    const-string v0, "${selectedKey.key}"
-    const-string v1, "${serverUrl}"
-    invoke-static {p0, v0, v1}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)V
-    # ── AdVerify hook end ──
+    # ── AdVerify hook (just 1 line!) ──
+    invoke-static {p0}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Activity;)V
 
     # ... rest of original onCreate code ...
     return-void
@@ -138,9 +132,41 @@ invoke-static {p0, v0, v1}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Acti
         </div>
       </Step>
 
-      {/* Step 4: Find Launcher Activity */}
-      <Step number={5} title="Find Launcher Activity">
-        <P>Open <Code>AndroidManifest.xml</Code> and find the activity with MAIN + LAUNCHER:</P>
+      {/* Step 4: Add API Key to Manifest */}
+      <Step number={5} title="Add API Key to AndroidManifest.xml" highlight>
+        {!selectedKey ? (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+            <p className="text-[13px] text-amber-700">
+              Select an app in Step 2 above to generate the manifest code with your API key.
+            </p>
+          </div>
+        ) : (
+          <>
+            <P>
+              Open <Code>AndroidManifest.xml</Code> → find the <Code>&lt;application&gt;</Code> tag → add these 2 lines <strong className="text-zinc-950">inside</strong> it:
+            </P>
+            <div className="relative mt-3">
+              <CodeBlock>{manifestCode}</CodeBlock>
+              <button
+                onClick={() => copyText(manifestCode, "manifest")}
+                className="absolute right-3 top-3 flex items-center gap-1.5 rounded-md bg-zinc-800 px-2.5 py-1.5 text-[11px] font-medium text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-white"
+              >
+                {copied === "manifest" ? (
+                  <><Check className="h-3 w-3" /> Copied</>
+                ) : (
+                  <><Copy className="h-3 w-3" /> Copy</>
+                )}
+              </button>
+            </div>
+            <P className="mt-3">Also make sure the <Code>INTERNET</Code> permission exists:</P>
+            <CodeBlock>{`<uses-permission android:name="android.permission.INTERNET" />`}</CodeBlock>
+          </>
+        )}
+      </Step>
+
+      {/* Step 5: Find Launcher Activity */}
+      <Step number={6} title="Find Launcher Activity">
+        <P>In the same <Code>AndroidManifest.xml</Code>, find the activity with MAIN + LAUNCHER:</P>
         <CodeBlock>{`<activity android:name="com.example.app.MainActivity">
     <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -150,48 +176,38 @@ invoke-static {p0, v0, v1}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Acti
         <P className="mt-3">Note the full class name — you&apos;ll edit its smali file next.</P>
       </Step>
 
-      {/* Step 5: Add Smali Hook */}
-      <Step number={6} title="Add Smali Hook" highlight>
-        {!selectedKey ? (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-            <p className="text-[13px] text-amber-700">
-              Select an app in Step 2 above to generate the smali code with your API key.
-            </p>
-          </div>
-        ) : (
-          <>
-            <P>
-              Navigate to the launcher Activity&apos;s smali file → find <Code>onCreate</Code> → add these 3 lines <strong className="text-zinc-950">right after</strong> <Code>invoke-super</Code>:
-            </P>
+      {/* Step 6: Add Smali Hook */}
+      <Step number={7} title="Add 1 Line of Smali" highlight>
+        <P>
+          Navigate to the launcher Activity&apos;s smali file → find <Code>onCreate</Code> → add <strong className="text-zinc-950">just 1 line</strong> right after <Code>invoke-super</Code>:
+        </P>
+        <div className="relative mt-3">
+          <CodeBlock>{smaliCode}</CodeBlock>
+          <button
+            onClick={() => copyText(smaliCode, "smali")}
+            className="absolute right-3 top-3 flex items-center gap-1.5 rounded-md bg-zinc-800 px-2.5 py-1.5 text-[11px] font-medium text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-white"
+          >
+            {copied === "smali" ? (
+              <><Check className="h-3 w-3" /> Copied</>
+            ) : (
+              <><Copy className="h-3 w-3" /> Copy</>
+            )}
+          </button>
+        </div>
 
-            <div className="relative mt-3">
-              <CodeBlock>{smaliCode}</CodeBlock>
-              <button
-                onClick={() => copyText(smaliCode, "smali")}
-                className="absolute right-3 top-3 flex items-center gap-1.5 rounded-md bg-zinc-800 px-2.5 py-1.5 text-[11px] font-medium text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-white"
-              >
-                {copied === "smali" ? (
-                  <><Check className="h-3 w-3" /> Copied</>
-                ) : (
-                  <><Copy className="h-3 w-3" /> Copy</>
-                )}
-              </button>
-            </div>
-
-            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
-              <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-amber-700">Important</p>
-              <ul className="list-disc space-y-1 pl-4 text-[13px] text-amber-700">
-                <li>Change <Code>.locals 0</Code> or <Code>.locals 1</Code> to <Code>.locals 2</Code> (you need v0 and v1)</li>
-                <li><Code>p0</Code> = &quot;this&quot; (the Activity) — always available, no extra register needed</li>
-              </ul>
-            </div>
-          </>
-        )}
+        <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-emerald-700">Why this works</p>
+          <ul className="list-disc space-y-1 pl-4 text-[13px] text-emerald-700">
+            <li>Only uses <Code>p0</Code> (the Activity) — <strong>no extra registers needed</strong></li>
+            <li>No need to change <Code>.locals</Code> — works with any app</li>
+            <li>API key is read from the manifest meta-data you added in Step 5</li>
+          </ul>
+        </div>
       </Step>
 
-      {/* Step 6: Full Example */}
+      {/* Step 7: Full Example */}
       {selectedKey && (
-        <Step number={7} title="Full onCreate Example">
+        <Step number={8} title="Full onCreate Example">
           <P>Complete <Code>onCreate</Code> after adding the hook:</P>
           <div className="relative mt-3">
             <CodeBlock>{fullExample}</CodeBlock>
@@ -209,23 +225,12 @@ invoke-static {p0, v0, v1}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Acti
         </Step>
       )}
 
-      {/* Step 7: Permissions */}
-      <Step number={selectedKey ? 8 : 7} title="Check Permissions">
-        <P>In <Code>AndroidManifest.xml</Code>, make sure these exist:</P>
-        <CodeBlock>{`<!-- Required — add if not present -->
-<uses-permission android:name="android.permission.INTERNET" />
-
-<!-- Required if server uses HTTP not HTTPS -->
-<!-- Add to the <application> tag: -->
-android:usesCleartextTraffic="true"`}</CodeBlock>
-      </Step>
-
       {/* Step 8: Rebuild */}
       <Step number={selectedKey ? 9 : 8} title="Rebuild & Sign" last>
         <P>Save all changes → rebuild APK in MT Manager → sign with your keystore → install → done!</P>
         <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
           <p className="text-[13px] text-emerald-700">
-            The patched app will now show the PIN verification dialog on first launch. Users tap &quot;Get PIN&quot; to generate their device-bound PIN, enter it, and the app unlocks.
+            The patched app will now show the PIN verification dialog on first launch. Users tap &quot;Get PIN&quot; to verify through the ad pages, enter the PIN, and the app unlocks.
           </p>
         </div>
       </Step>
