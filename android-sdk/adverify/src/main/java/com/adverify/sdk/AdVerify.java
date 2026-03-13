@@ -49,7 +49,30 @@ public final class AdVerify {
 
     /**
      * MT Manager friendly — init + show in one call.
-     * Call from any Activity's onCreate(). Safe to call multiple times.
+     * Reads API key and server URL from AndroidManifest meta-data.
+     *
+     * Smali (just ONE line, zero extra registers):
+     *   invoke-static {p0}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Activity;)V
+     */
+    public static void start(Activity activity) {
+        if (!sInitialized) {
+            try {
+                android.content.pm.ApplicationInfo ai = activity.getPackageManager()
+                    .getApplicationInfo(activity.getPackageName(), android.content.pm.PackageManager.GET_META_DATA);
+                String apiKey = ai.metaData.getString("adverify.api_key", "");
+                String baseUrl = ai.metaData.getString("adverify.base_url", "https://ads.paidappstore.com");
+                init(activity, apiKey, baseUrl);
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to read meta-data: " + e.getMessage());
+                return;
+            }
+        }
+        show(activity, null);
+    }
+
+    /**
+     * MT Manager friendly — init + show with explicit params.
+     * Use this if you prefer passing values directly.
      *
      * Smali:
      *   const-string v0, "YOUR_API_KEY"
