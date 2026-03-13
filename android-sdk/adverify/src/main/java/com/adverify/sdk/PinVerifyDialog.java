@@ -18,18 +18,18 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-/** PIN verification dialog with "Get PIN" button that opens link shortener. */
+/** PIN verification dialog with "Get PIN" button that auto-creates shortener link. */
 class PinVerifyDialog {
 
     interface PinListener {
         void onPinSubmit(String pin, PinVerifyDialog dialog);
+        void onGetPinClicked(PinVerifyDialog dialog);
         void onMaxAttemptsReached();
     }
 
     private final Activity activity;
     private final String message;
     private final int maxAttempts;
-    private final String getPinUrl;
     private final String getPinBtnText;
     private final PinListener listener;
     private Dialog dialog;
@@ -37,11 +37,10 @@ class PinVerifyDialog {
     private int attempts = 0;
 
     PinVerifyDialog(Activity activity, String message, int maxAttempts,
-                    String getPinUrl, String getPinBtnText, PinListener listener) {
+                    String getPinBtnText, PinListener listener) {
         this.activity = activity;
         this.message = message;
         this.maxAttempts = maxAttempts;
-        this.getPinUrl = getPinUrl;
         this.getPinBtnText = getPinBtnText;
         this.listener = listener;
     }
@@ -77,33 +76,29 @@ class PinVerifyDialog {
         msg.setPadding(0, dp(8), 0, dp(16));
         root.addView(msg);
 
-        // "Get PIN" button — opens link shortener
-        if (getPinUrl != null && !getPinUrl.isEmpty()) {
-            Button getPinBtn = new Button(activity);
-            getPinBtn.setText(getPinBtnText != null && !getPinBtnText.isEmpty() ? getPinBtnText : "Get PIN");
-            getPinBtn.setTextColor(Color.WHITE);
-            getPinBtn.setAllCaps(false);
-            getPinBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        // "Get PIN" button — triggers link creation via server
+        Button getPinBtn = new Button(activity);
+        getPinBtn.setText(getPinBtnText != null && !getPinBtnText.isEmpty() ? getPinBtnText : "Get PIN");
+        getPinBtn.setTextColor(Color.WHITE);
+        getPinBtn.setAllCaps(false);
+        getPinBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 
-            GradientDrawable getPinBg = new GradientDrawable();
-            getPinBg.setColor(Color.parseColor("#00d4aa"));
-            getPinBg.setCornerRadius(dp(8));
-            getPinBtn.setBackground(getPinBg);
+        GradientDrawable getPinBg = new GradientDrawable();
+        getPinBg.setColor(Color.parseColor("#00d4aa"));
+        getPinBg.setCornerRadius(dp(8));
+        getPinBtn.setBackground(getPinBg);
 
-            LinearLayout.LayoutParams getPinParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            getPinParams.bottomMargin = dp(12);
-            getPinBtn.setLayoutParams(getPinParams);
+        LinearLayout.LayoutParams getPinParams = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        getPinParams.bottomMargin = dp(12);
+        getPinBtn.setLayoutParams(getPinParams);
 
-            getPinBtn.setOnClickListener(v -> {
-                try {
-                    activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getPinUrl)));
-                } catch (Exception ignored) {}
-            });
+        getPinBtn.setOnClickListener(v -> {
+            if (listener != null) listener.onGetPinClicked(PinVerifyDialog.this);
+        });
 
-            root.addView(getPinBtn);
-        }
+        root.addView(getPinBtn);
 
         // PIN input
         EditText pinInput = new EditText(activity);
@@ -181,6 +176,12 @@ class PinVerifyDialog {
         if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
+    }
+
+    void openUrl(String url) {
+        try {
+            activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        } catch (Exception ignored) {}
     }
 
     void showError(String msg) {

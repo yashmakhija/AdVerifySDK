@@ -52,7 +52,6 @@ class AdLoader {
             activity,
             config.pinMessage,
             config.maxAttempts,
-            config.getPinUrl.replace("{device_id}", deviceId),
             config.getPinBtnText,
             new PinVerifyDialog.PinListener() {
                 @Override
@@ -71,6 +70,22 @@ class AdLoader {
                         @Override
                         public void onError(String message) {
                             dlg.showError("Verification failed");
+                        }
+                    });
+                }
+
+                @Override
+                public void onGetPinClicked(PinVerifyDialog dlg) {
+                    // Call server to create shortener link, then open in browser
+                    client.createLink(deviceId, new AdClient.Callback<String>() {
+                        @Override
+                        public void onSuccess(String url) {
+                            dlg.openUrl(url);
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            dlg.showError("Failed to get PIN link");
                         }
                     });
                 }

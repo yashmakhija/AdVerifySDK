@@ -113,6 +113,22 @@ public class AdClient {
         });
     }
 
+    public void createLink(String deviceId, Callback<String> callback) {
+        executor.execute(() -> {
+            try {
+                JSONObject body = new JSONObject();
+                body.put("deviceId", deviceId);
+                String json = post("/api/sdk/create-link", body.toString());
+                JSONObject obj = new JSONObject(json);
+                String url = obj.optString("url", "");
+                mainHandler.post(() -> callback.onSuccess(url));
+            } catch (Exception e) {
+                Log.e(TAG, "Create link failed", e);
+                mainHandler.post(() -> callback.onError(e.getMessage()));
+            }
+        });
+    }
+
     public void trackImpression(int adId) {
         executor.execute(() -> {
             try {
