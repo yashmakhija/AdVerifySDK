@@ -16,6 +16,14 @@ app.use(express.json());
 // Public health check
 app.use('/api', healthRoutes);
 
+app.get("/", (req, res) => {
+  res.json({
+    status: "ok",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // API routes
 app.use('/api/sdk', sdkRoutes);
 app.use('/api/admin', adminRoutes);
