@@ -9,6 +9,7 @@ const envSchema = z.object({
   ADMIN_USERNAME: z.string().default('admin'),
   ADMIN_PASSWORD: z.string().default('admin123'),
   FRONTEND_URL: z.string().default('http://localhost:3000'),
+  ALLOWED_ORIGINS: z.string().default('').transform((s) => s ? s.split(',').map((o) => o.trim()) : []),
 });
 
 export const env = envSchema.parse(process.env);

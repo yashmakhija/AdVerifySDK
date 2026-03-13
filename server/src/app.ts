@@ -8,7 +8,16 @@ import adminRoutes from './routes/admin.routes';
 const app = express();
 
 app.use(cors({
-  origin: env.FRONTEND_URL,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    const allowed = [
+      env.FRONTEND_URL,
+      ...env.ALLOWED_ORIGINS,
+    ];
+    if (allowed.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
 app.use(express.json());
