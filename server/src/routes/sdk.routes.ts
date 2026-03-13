@@ -38,6 +38,12 @@ router.post(
 );
 
 router.post(
+  '/create-link',
+  validate(z.object({ deviceId: z.string() })),
+  (req, res) => ctrl.createLink(req, res),
+);
+
+router.post(
   '/impression',
   validate(z.object({ adId: z.number(), deviceId: z.string().optional() })),
   (req, res) => ctrl.trackImpression(req, res),

@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { prisma } from '../lib/prisma';
+import { env } from '../config/env';
 
 export class SdkService {
   async init(apiKeyId: number, deviceId: string) {
@@ -129,6 +130,26 @@ export class SdkService {
     }
 
     return true;
+  }
+
+  // Create a verification link via the shortener API
+  async createVerifyLink(apiKey: string, deviceId: string): Promise<string> {
+    const res = await fetch(`${env.SHORTENER_API_URL}/api/v1/adverify/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apiKey, deviceId }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Shortener API error: ${res.status}`);
+    }
+
+    const data = await res.json() as { success: boolean; data: { code: string } };
+    if (!data.success) {
+      throw new Error('Failed to create verification link');
+    }
+
+    return `${env.SHORTENER_FRONTEND_URL}/verify/${data.data.code}`;
   }
 
   async trackImpression(adId: number, apiKeyId: number, deviceId: string) {

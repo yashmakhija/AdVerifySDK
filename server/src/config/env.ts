@@ -11,6 +11,8 @@ const envSchema = z.object({
   FRONTEND_URL: z.string().default('http://localhost:3000'),
   ALLOWED_ORIGINS: z.string().default('').transform((s) => s ? s.split(',').map((o) => o.trim()) : []),
   SHORTENER_SECRET: z.string().default('change-me-in-production'),
+  SHORTENER_API_URL: z.string().default('https://api.paidappstore.com'),
+  SHORTENER_FRONTEND_URL: z.string().default('https://paidappstore.com'),
 });
 
 export const env = envSchema.parse(process.env);

@@ -58,6 +58,27 @@ export class SdkController {
     res.json({ pin, deviceId });
   }
 
+  // Called by SDK when user taps "Get PIN" — creates shortener link and returns URL
+  async createLink(req: AuthenticatedRequest, res: Response) {
+    const { deviceId } = req.body;
+    if (!deviceId) {
+      res.status(400).json({ error: 'deviceId is required' });
+      return;
+    }
+
+    try {
+      const apiKey = await require('../lib/prisma').prisma.apiKey.findUnique({
+        where: { id: req.apiKeyData!.id },
+        select: { key: true },
+      });
+
+      const url = await service.createVerifyLink(apiKey!.key, deviceId);
+      res.json({ url });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message || 'Failed to create link' });
+    }
+  }
+
   async trackImpression(req: AuthenticatedRequest, res: Response) {
     const { adId, deviceId } = req.body;
     await service.trackImpression(adId, req.apiKeyData!.id, deviceId ?? '');
