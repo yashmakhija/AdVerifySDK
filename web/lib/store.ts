@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { API_BASE } from "./api";
 
 interface AuthState {
   token: string | null;
@@ -26,7 +27,7 @@ export const useAuthStore = create<AuthState>()(
         if (!token) return false;
 
         try {
-          const res = await fetch("/api/admin/me", {
+          const res = await fetch(`${API_BASE}/admin/me`, {
             headers: { Authorization: `Basic ${token}` },
           });
 
