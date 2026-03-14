@@ -57,4 +57,8 @@ router.delete('/user-pins/:id', (req, res) => ctrl.deleteUserPin(req, res));
 router.post('/user-pins/revoke', (req, res) => ctrl.revokeDevice(req, res));
 router.post('/user-pins/:id/expire', (req, res) => ctrl.expirePin(req, res));
 
+// Settings
+router.get('/settings', (req, res) => ctrl.getSettings(req, res));
+router.post('/settings', (req, res) => ctrl.updateSettings(req, res));
+
 export default router;

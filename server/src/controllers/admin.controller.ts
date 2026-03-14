@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import { AdminService } from '../services/admin.service';
+import { SettingsService } from '../services/settings.service';
 import { env } from '../config/env';
 
 const service = new AdminService();
+const settingsService = new SettingsService();
 
 function paramId(req: Request, name: string): number {
   return parseInt(String(req.params[name]), 10);
@@ -103,5 +105,15 @@ export class AdminController {
     const date = req.query.date ? String(req.query.date) : undefined;
     const stats = await service.getPinStats(date);
     res.json(stats);
+  }
+
+  async getSettings(_req: Request, res: Response) {
+    const settings = await settingsService.getSettings();
+    res.json(settings);
+  }
+
+  async updateSettings(req: Request, res: Response) {
+    const settings = await settingsService.updateSettings(req.body);
+    res.json(settings);
   }
 }

@@ -78,6 +78,15 @@ model UserPin {
   @@map("user_pins")
 }
 
+model GlobalSettings {
+  id              Int      @id @default(1)
+  pinUnlockMode   String   @default("per_app") @map("pin_unlock_mode") // "per_app" | "global" | "global_except"
+  excludedAppIds  Int[]    @default([]) @map("excluded_app_ids")        // apiKey IDs excluded from global unlock
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("global_settings")
+}
+
 model Impression {
   id        Int      @id @default(autoincrement())
   adId      Int      @map("ad_id")

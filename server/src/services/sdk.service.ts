@@ -1,16 +1,20 @@
 import crypto from 'crypto';
 import { prisma } from '../lib/prisma';
 import { env } from '../config/env';
+import { SettingsService } from './settings.service';
+
+const settingsService = new SettingsService();
 
 export class SdkService {
   async init(apiKeyId: number, deviceId: string) {
-    const [apiKey, pinConfig] = await Promise.all([
+    const [apiKey, pinConfig, settings] = await Promise.all([
       prisma.apiKey.findUnique({ where: { id: apiKeyId }, select: { appName: true } }),
       prisma.pinConfig.findUnique({ where: { apiKeyId } }),
+      settingsService.getSettings(),
     ]);
 
     // Check if device has an active (non-expired) verified PIN
-    const pinVerified = await this.isDeviceVerified(apiKeyId, deviceId, pinConfig);
+    const pinVerified = await this.isDeviceVerifiedWithMode(apiKeyId, deviceId, pinConfig, settings);
 
     return {
       appName: apiKey?.appName ?? '',
@@ -42,14 +46,17 @@ export class SdkService {
 
   // Verify a per-user PIN (tied to device)
   async verifyPin(apiKeyId: number, deviceId: string, pin: string) {
-    const config = await prisma.pinConfig.findUnique({ where: { apiKeyId } });
+    const [config, settings] = await Promise.all([
+      prisma.pinConfig.findUnique({ where: { apiKeyId } }),
+      settingsService.getSettings(),
+    ]);
 
     if (!config?.pinEnabled) {
       return { verified: true, message: 'PIN not required' };
     }
 
     // Check if device already has active verification
-    if (await this.isDeviceVerified(apiKeyId, deviceId, config)) {
+    if (await this.isDeviceVerifiedWithMode(apiKeyId, deviceId, config, settings)) {
       return { verified: true, message: 'Already verified' };
     }
 
@@ -99,19 +106,71 @@ export class SdkService {
 
   // Check if device is already unlocked (accounting for expiry)
   async checkStatus(apiKeyId: number, deviceId: string) {
-    const config = await prisma.pinConfig.findUnique({ where: { apiKeyId } });
-    const verified = await this.isDeviceVerified(apiKeyId, deviceId, config);
+    const [config, settings] = await Promise.all([
+      prisma.pinConfig.findUnique({ where: { apiKeyId } }),
+      settingsService.getSettings(),
+    ]);
+    const verified = await this.isDeviceVerifiedWithMode(apiKeyId, deviceId, config, settings);
     return { unlocked: verified };
   }
 
-  // Helper: check if a device has an active (non-expired) verified PIN
+  // Check verification considering the global unlock mode
+  private async isDeviceVerifiedWithMode(
+    apiKeyId: number,
+    deviceId: string,
+    config: { expiryMode: string; expiryHours: number } | null,
+    settings: { pinUnlockMode: string; excludedAppIds: number[] },
+  ): Promise<boolean> {
+    if (!deviceId) return false;
+
+    // per_app: only check this app's PINs (original behavior)
+    if (settings.pinUnlockMode === 'per_app') {
+      return this.isDeviceVerified(apiKeyId, deviceId, config);
+    }
+
+    // global: check if device is verified on ANY app
+    if (settings.pinUnlockMode === 'global') {
+      return this.isDeviceVerifiedGlobally(deviceId);
+    }
+
+    // global_except: if this app is excluded, check only its own PINs
+    if (settings.pinUnlockMode === 'global_except') {
+      if (settings.excludedAppIds.includes(apiKeyId)) {
+        return this.isDeviceVerified(apiKeyId, deviceId, config);
+      }
+      return this.isDeviceVerifiedGlobally(deviceId);
+    }
+
+    return this.isDeviceVerified(apiKeyId, deviceId, config);
+  }
+
+  // Check if device has a valid PIN on ANY app
+  private async isDeviceVerifiedGlobally(deviceId: string): Promise<boolean> {
+    const verifiedPin = await prisma.userPin.findFirst({
+      where: { deviceId, isUsed: true },
+      include: { apiKey: { include: { pinConfig: true } } },
+      orderBy: { usedAt: 'desc' },
+    });
+
+    if (!verifiedPin) return false;
+
+    const config = verifiedPin.apiKey?.pinConfig;
+    if (!config || config.expiryMode === 'never') return true;
+
+    if (verifiedPin.expiresAt && new Date() > verifiedPin.expiresAt) {
+      await prisma.userPin.delete({ where: { id: verifiedPin.id } });
+      return false;
+    }
+
+    return true;
+  }
+
+  // Check if device has a valid PIN for a specific app
   private async isDeviceVerified(
     apiKeyId: number,
     deviceId: string,
     config: { expiryMode: string; expiryHours: number } | null,
   ): Promise<boolean> {
-    if (!deviceId) return false;
-
     const verifiedPin = await prisma.userPin.findFirst({
       where: { apiKeyId, deviceId, isUsed: true },
       orderBy: { usedAt: 'desc' },
@@ -124,7 +183,6 @@ export class SdkService {
 
     // Check if PIN has expired
     if (verifiedPin.expiresAt && new Date() > verifiedPin.expiresAt) {
-      // PIN expired — delete it so user can generate a new one
       await prisma.userPin.delete({ where: { id: verifiedPin.id } });
       return false;
     }
