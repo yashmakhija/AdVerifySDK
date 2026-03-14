@@ -109,11 +109,46 @@ export class AdminService {
     apiKeyId: number,
     data: { pinEnabled?: boolean; pinMessage?: string; maxAttempts?: number; getPinUrl?: string; getPinBtnText?: string; expiryMode?: string; expiryHours?: number },
   ) {
-    return prisma.pinConfig.upsert({
+    const config = await prisma.pinConfig.upsert({
       where: { apiKeyId },
       update: data,
       create: { apiKeyId, ...data },
     });
+
+    // When switching to "duration" mode, backfill expiresAt on existing active PINs
+    // that currently have no expiry (were set under "never" mode)
+    if (data.expiryMode === 'duration' && data.expiryHours) {
+      const activePinsWithNoExpiry = await prisma.userPin.findMany({
+        where: { apiKeyId, isUsed: true, expiresAt: null },
+      });
+
+      if (activePinsWithNoExpiry.length > 0) {
+        const now = new Date();
+        await Promise.all(
+          activePinsWithNoExpiry.map((pin) => {
+            // Calculate expiry from when the PIN was originally used
+            const baseTime = pin.usedAt || pin.createdAt;
+            const expiresAt = new Date(baseTime.getTime() + data.expiryHours! * 60 * 60 * 1000);
+            // If already past expiry based on usedAt, expire it now
+            const finalExpiry = expiresAt < now ? now : expiresAt;
+            return prisma.userPin.update({
+              where: { id: pin.id },
+              data: { expiresAt: finalExpiry },
+            });
+          }),
+        );
+      }
+    }
+
+    // When switching to "never" mode, remove expiresAt from all active PINs
+    if (data.expiryMode === 'never') {
+      await prisma.userPin.updateMany({
+        where: { apiKeyId, isUsed: true, expiresAt: { not: null } },
+        data: { expiresAt: null },
+      });
+    }
+
+    return config;
   }
 
   // ─── User PINs ───
