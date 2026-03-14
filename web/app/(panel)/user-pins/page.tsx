@@ -1,24 +1,30 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { format } from "date-fns";
+import { CalendarIcon, X } from "lucide-react";
 import { useAuthStore, useToastStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { FormSelect } from "@/components/ui/modal";
 import { DataTable } from "@/components/ui/data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import type { UserPin, ApiKey, PinStats } from "@/lib/types";
 
-function pinStatus(p: UserPin): { label: string; variant: "success" | "destructive" | "default" } {
+function pinStatus(
+  p: UserPin
+): { label: string; variant: "success" | "destructive" | "default" } {
   if (!p.isUsed) return { label: "Pending", variant: "default" };
   if (p.expiresAt && new Date(p.expiresAt) < new Date()) {
     return { label: "Expired", variant: "destructive" };
   }
   return { label: "Active", variant: "success" };
-}
-
-function formatDate(d: Date): string {
-  return d.toISOString().split("T")[0];
 }
 
 export default function UserPinsPage() {
@@ -27,7 +33,8 @@ export default function UserPinsPage() {
   const [pins, setPins] = useState<UserPin[]>([]);
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [filterKey, setFilterKey] = useState<string>("");
-  const [filterDate, setFilterDate] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [pinStats, setPinStats] = useState<PinStats | null>(null);
 
   async function load() {
@@ -59,32 +66,44 @@ export default function UserPinsPage() {
     });
     toast.show("Device revoked");
     load();
-    loadStats(filterDate || undefined);
+    loadStats(selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined);
   }
 
   async function expirePin(id: number) {
-    if (!confirm("Force expire this PIN? The user will need to re-verify.")) return;
+    if (!confirm("Force expire this PIN? The user will need to re-verify."))
+      return;
     await api(`/admin/user-pins/${id}/expire`, {
       method: "POST",
       token,
     });
     toast.show("PIN expired");
     load();
-    loadStats(filterDate || undefined);
+    loadStats(selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined);
   }
 
-  function handleDateChange(date: string) {
-    setFilterDate(date);
-    loadStats(date || undefined);
+  function handleDateSelect(date: Date | undefined) {
+    setSelectedDate(date);
+    setCalendarOpen(false);
+    if (date) {
+      loadStats(format(date, "yyyy-MM-dd"));
+    } else {
+      loadStats();
+    }
+  }
+
+  function clearDate() {
+    setSelectedDate(undefined);
+    loadStats();
   }
 
   let filtered = filterKey
     ? pins.filter((p) => p.apiKeyId === Number(filterKey))
     : pins;
 
-  if (filterDate) {
+  if (selectedDate) {
+    const dateStr = format(selectedDate, "yyyy-MM-dd");
     filtered = filtered.filter(
-      (p) => formatDate(new Date(p.createdAt)) === filterDate
+      (p) => format(new Date(p.createdAt), "yyyy-MM-dd") === dateStr
     );
   }
 
@@ -100,12 +119,37 @@ export default function UserPinsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <input
-            type="date"
-            value={filterDate}
-            onChange={(e) => handleDateChange(e.target.value)}
-            className="h-9 rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-700 outline-none focus:border-zinc-400"
-          />
+          <div className="flex items-center gap-1.5">
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-9 gap-2 px-3 font-normal text-zinc-700"
+                >
+                  <CalendarIcon className="h-3.5 w-3.5 text-zinc-400" />
+                  {selectedDate ? format(selectedDate, "MMM d, yyyy") : "Pick a date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={handleDateSelect}
+                  disabled={{ after: new Date() }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            {selectedDate && (
+              <button
+                onClick={clearDate}
+                className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
           <div className="w-40">
             <FormSelect
               label=""
@@ -127,7 +171,7 @@ export default function UserPinsPage() {
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-lg border border-zinc-200 bg-white p-3">
             <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
-              {filterDate || "Today"} Generated
+              {selectedDate ? format(selectedDate, "MMM d") : "Today"} Generated
             </p>
             <p className="mt-1 text-xl font-semibold text-zinc-950">
               {pinStats.todayGenerated}
@@ -135,7 +179,7 @@ export default function UserPinsPage() {
           </div>
           <div className="rounded-lg border border-zinc-200 bg-white p-3">
             <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
-              {filterDate || "Today"} Used
+              {selectedDate ? format(selectedDate, "MMM d") : "Today"} Used
             </p>
             <p className="mt-1 text-xl font-semibold text-zinc-950">
               {pinStats.todayUsed}
