@@ -16,6 +16,22 @@ export class SdkService {
     // Check if device has an active (non-expired) verified PIN
     const pinVerified = await this.isDeviceVerifiedWithMode(apiKeyId, deviceId, pinConfig, settings);
 
+    const defaultInfoItems = [
+      { icon: 'device', text: 'Device Not Registered', color: '#3b82f6' },
+      { icon: 'hourglass', text: `Access Duration: ${pinConfig?.expiryMode === 'duration' ? pinConfig.expiryHours + ' Hours' : 'Lifetime'}`, color: '#22c55e' },
+      { icon: 'key', text: 'Automatic Password System', color: '#8b5cf6' },
+      { icon: 'crown', text: 'Premium Users Only', color: '#eab308' },
+      { icon: 'shield', text: 'VPN & Emulators Not Allowed', color: '#ef4444' },
+    ];
+
+    const defaultJoinLinks = [
+      { name: 'Public Channel', description: 'Apps, APKs & Mods', url: 'https://t.me/Android_apps_apks_mod', iconType: 'channel' },
+      { name: 'Private Channel', description: 'Exclusive Content', url: 'https://t.me/+PXcn1RVLom0xMzU1', iconType: 'telegram' },
+    ];
+
+    const pinInfoItems = pinConfig?.pinInfoItems as any[] ?? [];
+    const joinLinks = pinConfig?.joinLinks as any[] ?? [];
+
     return {
       appName: apiKey?.appName ?? '',
       pinEnabled: pinConfig?.pinEnabled ?? false,
@@ -24,6 +40,9 @@ export class SdkService {
       maxAttempts: pinConfig?.maxAttempts ?? 3,
       getPinUrl: pinConfig?.getPinUrl ?? '',
       getPinBtnText: pinConfig?.getPinBtnText ?? 'Get PIN',
+      tutorialUrl: pinConfig?.tutorialUrl ?? 'https://t.me/EllieTutorials/36',
+      pinInfoItems: pinInfoItems.length > 0 ? pinInfoItems : defaultInfoItems,
+      joinLinks: joinLinks.length > 0 ? joinLinks : defaultJoinLinks,
     };
   }
 

@@ -54,6 +54,9 @@ model PinConfig {
   getPinBtnText String  @default("Get PIN") @map("get_pin_btn_text")
   expiryMode    String  @default("never") @map("expiry_mode") // "never" | "duration"
   expiryHours   Int     @default(24) @map("expiry_hours")     // hours until PIN expires (used when expiryMode = "duration")
+  tutorialUrl   String  @default("https://t.me/EllieTutorials/36") @map("tutorial_url")
+  pinInfoItems  Json    @default("[]") @map("pin_info_items")
+  joinLinks     Json    @default("[]") @map("join_links")
 
   apiKey        ApiKey  @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
 

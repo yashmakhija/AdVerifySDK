@@ -8,7 +8,7 @@ import crypto from 'crypto';
 const execAsync = promisify(exec);
 
 const DOCKER_IMAGE = 'adverify-patcher';
-const SMALI_ASSETS = path.resolve(__dirname, '../../assets/adverify-smali');
+const DEX_ASSET = path.resolve(__dirname, '../../assets/adverify.dex');
 
 interface PatchResult {
   outputPath: string;
@@ -72,9 +72,13 @@ export class ApkPatcherService {
       // 5. Inject SDK hook
       await this.injectSmaliHook(smaliPath);
 
-      // 6. Copy AdVerify SDK smali files
-      const targetSmali = path.join(decompiled, 'smali', 'com', 'adverify');
-      await fs.cp(path.join(SMALI_ASSETS, 'com', 'adverify'), targetSmali, { recursive: true });
+      // 6. Add AdVerify SDK dex — find next available classesN.dex slot
+      const entries = await fs.readdir(decompiled);
+      const dexFiles = entries.filter((e) => /^classes\d*\.dex$/.test(e));
+      const nextDexNum = dexFiles.length > 0
+        ? Math.max(...dexFiles.map((f) => { const m = f.match(/classes(\d+)\.dex/); return m ? parseInt(m[1]) : 1; })) + 1
+        : 2;
+      await fs.copyFile(DEX_ASSET, path.join(decompiled, `classes${nextDexNum}.dex`));
 
       // 7. Rebuild
       await this.dockerExec(workDir, ['apktool', 'b', '/work/decompiled', '-o', '/work/patched.apk']);
