@@ -18,6 +18,8 @@ import java.util.concurrent.Executors;
 
 import com.adverify.sdk.internal.models.Ad;
 import com.adverify.sdk.internal.models.InitResponse;
+import com.adverify.sdk.internal.models.JoinLink;
+import com.adverify.sdk.internal.models.PinInfoItem;
 
 /** HTTP client for communicating with the AdVerify server. */
 public class AdClient {
@@ -48,6 +50,37 @@ public class AdClient {
                 String json = post("/api/sdk/init", body.toString());
                 JSONObject obj = new JSONObject(json);
 
+                // Parse info items
+                PinInfoItem[] infoItems = new PinInfoItem[0];
+                JSONArray itemsArr = obj.optJSONArray("pinInfoItems");
+                if (itemsArr != null) {
+                    infoItems = new PinInfoItem[itemsArr.length()];
+                    for (int i = 0; i < itemsArr.length(); i++) {
+                        JSONObject item = itemsArr.getJSONObject(i);
+                        infoItems[i] = new PinInfoItem(
+                            item.optString("icon", ""),
+                            item.optString("text", ""),
+                            item.optString("color", null)
+                        );
+                    }
+                }
+
+                // Parse join links
+                JoinLink[] joinLinks = new JoinLink[0];
+                JSONArray linksArr = obj.optJSONArray("joinLinks");
+                if (linksArr != null) {
+                    joinLinks = new JoinLink[linksArr.length()];
+                    for (int i = 0; i < linksArr.length(); i++) {
+                        JSONObject link = linksArr.getJSONObject(i);
+                        joinLinks[i] = new JoinLink(
+                            link.optString("name", ""),
+                            link.optString("description", ""),
+                            link.optString("url", ""),
+                            link.optString("iconType", "telegram")
+                        );
+                    }
+                }
+
                 InitResponse response = new InitResponse(
                     obj.optString("appName", ""),
                     obj.optBoolean("pinEnabled", false),
@@ -55,7 +88,10 @@ public class AdClient {
                     obj.optString("pinMessage", ""),
                     obj.optInt("maxAttempts", 3),
                     obj.optString("getPinUrl", ""),
-                    obj.optString("getPinBtnText", "Get PIN")
+                    obj.optString("getPinBtnText", "Get PIN"),
+                    infoItems,
+                    obj.optString("tutorialUrl", ""),
+                    joinLinks
                 );
 
                 mainHandler.post(() -> callback.onSuccess(response));

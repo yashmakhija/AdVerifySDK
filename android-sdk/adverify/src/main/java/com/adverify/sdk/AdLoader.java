@@ -1,6 +1,8 @@
 package com.adverify.sdk;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import com.adverify.sdk.internal.AdClient;
@@ -29,10 +31,8 @@ class AdLoader {
             @Override
             public void onSuccess(InitResponse config) {
                 if (config.pinEnabled && !config.pinVerified) {
-                    // PIN required but this device hasn't verified yet
                     showPinDialog(config);
                 } else {
-                    // Either PIN not enabled or already verified for this device
                     fetchAndShowAds();
                 }
             }
@@ -50,15 +50,19 @@ class AdLoader {
 
         PinVerifyDialog dialog = new PinVerifyDialog(
             activity,
+            config.appName,
             config.pinMessage,
             config.maxAttempts,
             config.getPinBtnText,
+            config.pinInfoItems,
             new PinVerifyDialog.PinListener() {
                 @Override
                 public void onPinSubmit(String pin, PinVerifyDialog dlg) {
+                    dlg.setVerifyLoading(true);
                     client.verifyPin(pin, deviceId, new AdClient.Callback<Boolean>() {
                         @Override
                         public void onSuccess(Boolean verified) {
+                            dlg.setVerifyLoading(false);
                             if (verified) {
                                 dlg.dismiss();
                                 fetchAndShowAds();
@@ -69,6 +73,7 @@ class AdLoader {
 
                         @Override
                         public void onError(String message) {
+                            dlg.setVerifyLoading(false);
                             dlg.showError("Verification failed");
                         }
                     });
@@ -76,15 +81,18 @@ class AdLoader {
 
                 @Override
                 public void onGetPinClicked(PinVerifyDialog dlg) {
-                    // Call server to create shortener link, then open in browser
+                    dlg.setGetPinLoading(true);
                     client.createLink(deviceId, new AdClient.Callback<String>() {
                         @Override
                         public void onSuccess(String url) {
+                            dlg.setGetPinLoading(false);
                             dlg.openUrl(url);
+                            dlg.switchToPinState();
                         }
 
                         @Override
                         public void onError(String message) {
+                            dlg.setGetPinLoading(false);
                             dlg.showError("Failed to get PIN link");
                         }
                     });
@@ -93,6 +101,28 @@ class AdLoader {
                 @Override
                 public void onMaxAttemptsReached() {
                     if (callback != null) callback.onError("Max PIN attempts reached");
+                }
+
+                @Override
+                public void onTutorialClicked() {
+                    if (config.tutorialUrl != null && !config.tutorialUrl.isEmpty()) {
+                        try {
+                            activity.startActivity(new Intent(Intent.ACTION_VIEW,
+                                Uri.parse(config.tutorialUrl)));
+                        } catch (Exception ignored) {}
+                    }
+                }
+
+                @Override
+                public void onJoinClicked() {
+                    if (config.joinLinks != null && config.joinLinks.length > 0) {
+                        new JoinDialog(activity, config.joinLinks).show();
+                    }
+                }
+
+                @Override
+                public void onExitClicked() {
+                    activity.finish();
                 }
             });
 
