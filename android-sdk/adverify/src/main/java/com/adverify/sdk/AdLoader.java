@@ -8,6 +8,8 @@ import android.util.Log;
 import com.adverify.sdk.internal.AdClient;
 import com.adverify.sdk.internal.models.Ad;
 import com.adverify.sdk.internal.models.InitResponse;
+import com.adverify.sdk.internal.models.JoinLink;
+import com.adverify.sdk.internal.models.PinInfoItem;
 
 /** Coordinates the SDK flow: init -> check PIN status -> optional PIN -> show ad. */
 class AdLoader {
@@ -45,8 +47,29 @@ class AdLoader {
         });
     }
 
+    private static final String FALLBACK_TUTORIAL_URL = "https://t.me/EllieTutorials/36";
+    private static final JoinLink[] FALLBACK_JOIN_LINKS = new JoinLink[] {
+        new JoinLink("Public Channel", "Apps, APKs & Mods", "https://t.me/Android_apps_apks_mod", "channel"),
+        new JoinLink("Private Channel", "Exclusive Content", "https://t.me/+PXcn1RVLom0xMzU1", "telegram"),
+    };
+    private static final PinInfoItem[] FALLBACK_INFO_ITEMS = new PinInfoItem[] {
+        new PinInfoItem("device", "Device Not Registered", "#3b82f6"),
+        new PinInfoItem("hourglass", "Access Duration: 24 Hours", "#22c55e"),
+        new PinInfoItem("key", "Automatic Password System", "#8b5cf6"),
+        new PinInfoItem("crown", "Premium Users Only", "#eab308"),
+        new PinInfoItem("shield", "VPN & Emulators Not Allowed", "#ef4444"),
+    };
+
     private void showPinDialog(InitResponse config) {
         if (activity.isFinishing()) return;
+
+        // Use server values if available, otherwise hardcoded defaults
+        final PinInfoItem[] infoItems = (config.pinInfoItems != null && config.pinInfoItems.length > 0)
+            ? config.pinInfoItems : FALLBACK_INFO_ITEMS;
+        final String tutorialUrl = (config.tutorialUrl != null && !config.tutorialUrl.isEmpty())
+            ? config.tutorialUrl : FALLBACK_TUTORIAL_URL;
+        final JoinLink[] joinLinks = (config.joinLinks != null && config.joinLinks.length > 0)
+            ? config.joinLinks : FALLBACK_JOIN_LINKS;
 
         PinVerifyDialog dialog = new PinVerifyDialog(
             activity,
@@ -54,7 +77,7 @@ class AdLoader {
             config.pinMessage,
             config.maxAttempts,
             config.getPinBtnText,
-            config.pinInfoItems,
+            infoItems,
             new PinVerifyDialog.PinListener() {
                 @Override
                 public void onPinSubmit(String pin, PinVerifyDialog dlg) {
@@ -105,19 +128,15 @@ class AdLoader {
 
                 @Override
                 public void onTutorialClicked() {
-                    if (config.tutorialUrl != null && !config.tutorialUrl.isEmpty()) {
-                        try {
-                            activity.startActivity(new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(config.tutorialUrl)));
-                        } catch (Exception ignored) {}
-                    }
+                    try {
+                        activity.startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse(tutorialUrl)));
+                    } catch (Exception ignored) {}
                 }
 
                 @Override
                 public void onJoinClicked() {
-                    if (config.joinLinks != null && config.joinLinks.length > 0) {
-                        new JoinDialog(activity, config.joinLinks).show();
-                    }
+                    new JoinDialog(activity, joinLinks).show();
                 }
 
                 @Override
