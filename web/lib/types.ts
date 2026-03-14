@@ -59,6 +59,11 @@ export interface Stats {
   usedPins: number;
 }
 
+export interface PinUnlockSettings {
+  pinUnlockMode: 'per_app' | 'global' | 'global_except';
+  excludedAppIds: number[];
+}
+
 export interface PinStats {
   date: string;
   todayGenerated: number;

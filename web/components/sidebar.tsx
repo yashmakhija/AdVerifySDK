@@ -12,6 +12,7 @@ import {
   Users,
   FileCode2,
   Smartphone,
+  Settings,
   LogOut,
   X,
 } from "lucide-react";
@@ -22,6 +23,7 @@ const NAV = [
   { href: "/ads", label: "Ads", icon: Megaphone },
   { href: "/pin", label: "PIN Config", icon: Lock },
   { href: "/user-pins", label: "User PINs", icon: Users },
+  { href: "/settings", label: "Settings", icon: Settings },
   { href: "/mt-manager", label: "MT Manager", icon: Smartphone },
   { href: "/docs", label: "SDK Docs", icon: FileCode2 },
 ];
