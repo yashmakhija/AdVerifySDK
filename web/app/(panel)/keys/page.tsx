@@ -1,41 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Copy, Check, KeyRound, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
+import { KeyRound, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
 import { useAuthStore, useToastStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { Modal, FormInput } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
+import { CopyableKey } from "@/components/ui/copyable-key";
 import type { ApiKey } from "@/lib/types";
-
-function CopyableKey({ value }: { value: string }) {
-  const toast = useToastStore();
-  const [copied, setCopied] = useState(false);
-
-  async function copy() {
-    await navigator.clipboard.writeText(value);
-    setCopied(true);
-    toast.show("API key copied to clipboard");
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  return (
-    <button
-      onClick={copy}
-      title="Click to copy"
-      className="group inline-flex items-center gap-2 rounded-lg border border-zinc-200/80 bg-zinc-50 px-2.5 py-1.5 font-mono text-[11px] text-zinc-500 transition-all hover:border-zinc-300 hover:bg-zinc-100 active:scale-[0.98] max-w-full"
-    >
-      <span className="truncate">{value}</span>
-      {copied ? (
-        <Check className="h-3 w-3 shrink-0 text-emerald-500" />
-      ) : (
-        <Copy className="h-3 w-3 shrink-0 text-zinc-400 transition-colors group-hover:text-zinc-600" />
-      )}
-    </button>
-  );
-}
 
 export default function KeysPage() {
   const token = useAuthStore((s) => s.token)!;
