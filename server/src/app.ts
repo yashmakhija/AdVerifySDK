@@ -4,6 +4,7 @@ import { env } from './config/env';
 import healthRoutes from './routes/health.routes';
 import sdkRoutes from './routes/sdk.routes';
 import adminRoutes from './routes/admin.routes';
+import patcherRoutes from './routes/patcher.routes';
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.get("/", (req, res) => {
 // API routes
 app.use('/api/sdk', sdkRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/patch', patcherRoutes);
 
 app.listen(env.PORT, () => {
   console.log(`AdVerify Server running on http://localhost:${env.PORT}`);
