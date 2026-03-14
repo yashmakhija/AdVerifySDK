@@ -1,11 +1,11 @@
-import { exec } from 'child_process';
+import { execFile } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
 import crypto from 'crypto';
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 const DOCKER_IMAGE = 'adverify-patcher';
 const SMALI_ASSETS = path.resolve(__dirname, '../../assets/adverify-smali');
@@ -16,26 +16,18 @@ interface PatchResult {
   appName: string;
 }
 
-interface ManifestInfo {
-  packageName: string;
-  appName: string;
-  launcherActivity: string;
-  hasInternetPerm: boolean;
-  hasCleartext: boolean;
-}
-
 export class ApkPatcherService {
   // ─── Public ───
 
   async checkDocker(): Promise<void> {
     try {
-      await execAsync('docker info', { timeout: 10000 });
+      await execFileAsync('docker', ['info'], { timeout: 10000 });
     } catch {
       throw new Error('Docker is not running. Please start Docker first.');
     }
 
     try {
-      const { stdout } = await execAsync(`docker images -q ${DOCKER_IMAGE}`, { timeout: 10000 });
+      const { stdout } = await execFileAsync('docker', ['images', '-q', DOCKER_IMAGE], { timeout: 10000 });
       if (!stdout.trim()) {
         throw new Error(
           `Docker image "${DOCKER_IMAGE}" not found. Run: docker build -t ${DOCKER_IMAGE} server/tools/`
@@ -47,236 +39,317 @@ export class ApkPatcherService {
     }
   }
 
+  async parseApkInfo(apkPath: string): Promise<{ packageName: string; appName: string }> {
+    const workDir = await fs.mkdtemp(path.join(os.tmpdir(), 'apk-info-'));
+    try {
+      await fs.copyFile(apkPath, path.join(workDir, 'input.apk'));
+      const info = await this.parseApkWithAapt(workDir);
+      return { packageName: info.packageName, appName: info.appName };
+    } finally {
+      await fs.rm(workDir, { recursive: true, force: true }).catch((err) => {
+        console.warn(`Cleanup failed for ${workDir}:`, err.message);
+      });
+    }
+  }
+
   async patchApk(apkPath: string, apiKey: string, baseUrl: string): Promise<PatchResult> {
     const workDir = await fs.mkdtemp(path.join(os.tmpdir(), 'apk-patch-'));
+    console.log(`[PATCH] ──── Starting patch ────`);
+    console.log(`[PATCH] Work dir: ${workDir}`);
 
     try {
       const inputApk = path.join(workDir, 'input.apk');
       await fs.copyFile(apkPath, inputApk);
+      const inputStat = await fs.stat(inputApk);
+      console.log(`[PATCH] Input APK: ${(inputStat.size / 1024 / 1024).toFixed(2)} MB`);
 
-      // 1. Decompile
-      await this.dockerExec(workDir, ['apktool', 'd', '/work/input.apk', '-o', '/work/decompiled', '-f']);
+      // ─── Step 1: Parse APK info ───
+      console.log(`[PATCH] Step 1: Parsing APK info...`);
+      const apkInfo = await this.parseApkWithAapt(workDir);
+      console.log(`[PATCH]   Package: ${apkInfo.packageName}`);
+      console.log(`[PATCH]   App name: ${apkInfo.appName}`);
+      console.log(`[PATCH]   Main activity: ${apkInfo.mainActivity || 'not found'}`);
 
-      const decompiled = path.join(workDir, 'decompiled');
-      const manifestPath = path.join(decompiled, 'AndroidManifest.xml');
+      if (!apkInfo.mainActivity) {
+        throw new Error('Could not find main activity (launchable-activity) in APK');
+      }
 
-      // 2. Parse manifest
-      const manifest = await this.parseManifest(manifestPath);
+      // ─── Step 2: Count dex files ───
+      console.log(`[PATCH] Step 2: Counting dex files...`);
+      const dexListOut = await this.dockerExec(workDir, ['unzip', '-l', '/work/input.apk']);
+      const dexEntries = dexListOut.split('\n').filter(l => /\sclasses\d*\.dex$/.test(l.trim()));
+      const dexCount = dexEntries.length;
+      console.log(`[PATCH]   Original dex count: ${dexCount}`);
 
-      // 3. Modify manifest
-      await this.modifyManifest(manifestPath, manifest, apiKey, baseUrl);
+      // ─── Step 3: Patch manifest (add provider after <application>) ───
+      console.log(`[PATCH] Step 3: Patching manifest...`);
+      await fs.mkdir(path.join(workDir, 'additions'), { recursive: true });
+      try {
+        await this.dockerExec(workDir, [
+          'unzip', '-o', '/work/input.apk', 'AndroidManifest.xml', '-d', '/work/additions/',
+        ]);
+        await this.dockerExec(workDir, [
+          'java', '-cp', '/opt', 'ManifestPatcher',
+          '/work/additions/AndroidManifest.xml', apkInfo.packageName,
+        ]);
+        console.log(`[PATCH]   Manifest patched (provider added after <application>)`);
+      } catch (err: any) {
+        console.warn(`[PATCH]   Manifest patch failed: ${err.message?.slice(0, 200)}`);
+        await fs.unlink(path.join(workDir, 'additions', 'AndroidManifest.xml')).catch(() => {});
+      }
 
-      // 4. Find launcher smali
-      const smaliPath = await this.findSmaliFile(decompiled, manifest.launcherActivity);
+      // ─── Step 4: Hook main activity onCreate ───
+      console.log(`[PATCH] Step 4: Hooking main activity...`);
+      const hookedDex = await this.hookMainActivity(workDir, apkInfo.mainActivity, dexCount);
+      if (hookedDex) {
+        console.log(`[PATCH]   Hooked onCreate in ${hookedDex}`);
+      } else {
+        throw new Error(`Main activity ${apkInfo.mainActivity} not found in any dex file`);
+      }
 
-      // 5. Inject SDK hook
-      await this.injectSmaliHook(smaliPath);
+      // ─── Step 5: Compile SDK smali → dex ───
+      console.log(`[PATCH] Step 5: Compiling SDK smali to dex...`);
+      const sdkSmaliDir = path.join(workDir, 'sdk-smali');
+      await fs.cp(SMALI_ASSETS, sdkSmaliDir, { recursive: true });
+      await this.generateHookSmali(sdkSmaliDir, apiKey, baseUrl);
+      await this.generateLifecycleCallback(sdkSmaliDir, apiKey, baseUrl);
+      await this.dockerExec(workDir, ['smali', 'a', '/work/sdk-smali', '-o', '/work/sdk-classes.dex']);
+      const sdkDexName = `classes${dexCount + 1}.dex`;
+      await fs.copyFile(path.join(workDir, 'sdk-classes.dex'), path.join(workDir, sdkDexName));
+      await fs.copyFile(path.join(workDir, sdkDexName), path.join(workDir, 'additions', sdkDexName));
+      console.log(`[PATCH]   SDK dex → ${sdkDexName}`);
 
-      // 6. Copy AdVerify SDK smali files
-      const targetSmali = path.join(decompiled, 'smali', 'com', 'adverify');
-      await fs.cp(path.join(SMALI_ASSETS, 'com', 'adverify'), targetSmali, { recursive: true });
+      // ─── Step 6: Assemble patched APK ───
+      console.log(`[PATCH] Step 6: Assembling patched APK...`);
+      const assembleOut = await this.dockerExec(workDir, [
+        'java', '-cp', '/opt', 'ApkAssembler',
+        '/work/input.apk',
+        '/work/modified.apk',
+        '/work/additions',
+      ]);
+      console.log(`[PATCH]   ${assembleOut.trim()}`);
 
-      // 7. Rebuild
-      await this.dockerExec(workDir, ['apktool', 'b', '/work/decompiled', '-o', '/work/patched.apk']);
+      // ─── Step 7: Zipalign ───
+      console.log(`[PATCH] Step 7: Zipaligning...`);
+      await this.dockerExec(workDir, ['zipalign', '-f', '4', '/work/modified.apk', '/work/patched-aligned.apk']);
 
-      // 8. Sign
+      // ─── Step 8: Sign ───
+      console.log(`[PATCH] Step 8: Signing...`);
       await this.dockerExec(workDir, [
-        'jarsigner', '-sigalg', 'SHA256withRSA', '-digestalg', 'SHA-256',
-        '-keystore', '/opt/debug.keystore', '-storepass', 'android',
-        '/work/patched.apk', 'androiddebugkey',
+        'apksigner', 'sign',
+        '--ks', '/opt/debug.keystore',
+        '--ks-pass', 'pass:android',
+        '--ks-key-alias', 'androiddebugkey',
+        '--key-pass', 'pass:android',
+        '/work/patched-aligned.apk',
       ]);
 
-      // Move patched APK to a stable output location
+      // ─── Step 9: Verify ───
+      const verifyOut = await this.dockerExec(workDir, [
+        'apksigner', 'verify', '--verbose', '/work/patched-aligned.apk',
+      ]);
+      for (const line of verifyOut.trim().split('\n')) {
+        if (line.includes('Verified') || line.includes('Verifies')) {
+          console.log(`[PATCH]   ${line.trim()}`);
+        }
+      }
+
+      const finalStat = await fs.stat(path.join(workDir, 'patched-aligned.apk'));
+      console.log(`[PATCH]   Final: ${(finalStat.size / 1024 / 1024).toFixed(2)} MB`);
+
       const outputPath = path.join(os.tmpdir(), `patched-${crypto.randomUUID()}.apk`);
-      await fs.copyFile(path.join(workDir, 'patched.apk'), outputPath);
+      await fs.copyFile(path.join(workDir, 'patched-aligned.apk'), outputPath);
+      console.log(`[PATCH] ──── Done! ${outputPath} ────`);
 
       return {
         outputPath,
-        packageName: manifest.packageName,
-        appName: manifest.appName,
+        packageName: apkInfo.packageName,
+        appName: apkInfo.appName,
       };
+    } catch (err) {
+      console.error(`[PATCH] ──── FAILED ────`, err);
+      throw err;
     } finally {
-      await fs.rm(workDir, { recursive: true, force: true }).catch(() => {});
+      await fs.rm(workDir, { recursive: true, force: true }).catch((err) => {
+        console.warn(`Cleanup failed for ${workDir}:`, err.message);
+      });
     }
   }
 
   // ─── Docker ───
 
-  private async dockerExec(workDir: string, args: string[], timeout = 120000): Promise<string> {
-    const cmd = `docker run --rm -v "${workDir}:/work" ${DOCKER_IMAGE} ${args.join(' ')}`;
-    const { stdout, stderr } = await execAsync(cmd, { timeout, maxBuffer: 10 * 1024 * 1024 });
-    if (stderr && stderr.includes('Exception')) {
-      throw new Error(`Docker command failed: ${stderr.slice(0, 500)}`);
+  private async dockerExec(workDir: string, args: string[], timeout = 300000): Promise<string> {
+    try {
+      const dockerArgs = ['run', '--rm', '-v', `${workDir}:/work`, DOCKER_IMAGE, ...args];
+      const { stdout, stderr } = await execFileAsync('docker', dockerArgs, { timeout, maxBuffer: 50 * 1024 * 1024 });
+      if (stderr) {
+        const filtered = stderr.split('\n').filter(l => !l.includes('platform')).join('\n').trim();
+        if (filtered) console.warn(`[DOCKER] stderr (${args[0]}): ${filtered.slice(0, 300)}`);
+      }
+      return stdout;
+    } catch (err: any) {
+      const msg = err.stderr?.slice(0, 2000) || err.message;
+      throw new Error(`Docker command failed (${args[0]}): ${msg}`);
     }
-    return stdout;
   }
 
-  // ─── Manifest ───
+  // ─── APK Info ───
 
-  private async parseManifest(manifestPath: string): Promise<ManifestInfo> {
-    const xml = await fs.readFile(manifestPath, 'utf-8');
+  private async parseApkWithAapt(workDir: string): Promise<{
+    packageName: string;
+    appName: string;
+    mainActivity: string | null;
+  }> {
+    const aaptOut = await this.dockerExec(workDir, ['aapt', 'dump', 'badging', '/work/input.apk']);
 
-    // Package name
-    const pkgMatch = xml.match(/package="([^"]+)"/);
-    if (!pkgMatch) throw new Error('Could not find package name in manifest');
+    const pkgMatch = aaptOut.match(/package:\s*name='([^']+)'/);
+    if (!pkgMatch) throw new Error('Could not find package name via aapt dump');
     const packageName = pkgMatch[1];
 
-    // App label (for display name)
-    const labelMatch = xml.match(/<application[^>]*android:label="([^"]+)"/);
-    const appName = labelMatch ? labelMatch[1].replace(/^@string\//, '') : packageName;
+    const labelMatch = aaptOut.match(/application-label:'([^']+)'/);
+    const appName = labelMatch ? labelMatch[1] : packageName;
 
-    // Launcher activity: find activity with MAIN + LAUNCHER intent-filter
-    const launcherActivity = this.findLauncherActivity(xml, packageName);
-    if (!launcherActivity) throw new Error('Could not find launcher activity in manifest');
+    const activityMatch = aaptOut.match(/launchable-activity:\s*name='([^']+)'/);
+    const mainActivity = activityMatch ? activityMatch[1] : null;
 
-    // Permissions & flags
-    const hasInternetPerm = /android\.permission\.INTERNET/.test(xml);
-    const hasCleartext = /android:usesCleartextTraffic="true"/.test(xml);
-
-    return { packageName, appName, launcherActivity, hasInternetPerm, hasCleartext };
+    return { packageName, appName, mainActivity };
   }
 
-  private findLauncherActivity(xml: string, packageName: string): string | null {
-    // Match activity blocks that contain both MAIN and LAUNCHER
-    const activityRegex = /<activity\s[^>]*android:name="([^"]+)"[^]*?<\/activity>/g;
-    let match;
-    while ((match = activityRegex.exec(xml)) !== null) {
-      const block = match[0];
-      if (block.includes('android.intent.action.MAIN') && block.includes('android.intent.category.LAUNCHER')) {
-        let name = match[1];
-        // Resolve relative names
-        if (name.startsWith('.')) name = packageName + name;
-        else if (!name.includes('.')) name = packageName + '.' + name;
-        return name;
-      }
-    }
+  // ─── Smali Hook ───
 
-    // Fallback: try self-closing activity tags with intent-filter siblings
-    const activityRegex2 = /<activity\s[^>]*android:name="([^"]+)"[^/]*\/>/g;
-    while ((match = activityRegex2.exec(xml)) !== null) {
-      // Check context around this tag
-      const start = Math.max(0, match.index - 200);
-      const context = xml.slice(start, match.index + match[0].length + 500);
-      if (context.includes('android.intent.action.MAIN') && context.includes('android.intent.category.LAUNCHER')) {
-        let name = match[1];
-        if (name.startsWith('.')) name = packageName + name;
-        else if (!name.includes('.')) name = packageName + '.' + name;
-        return name;
+  private async hookMainActivity(workDir: string, mainActivity: string, dexCount: number): Promise<string | null> {
+    const smaliRelPath = mainActivity.replace(/\./g, '/') + '.smali';
+
+    for (let i = 1; i <= dexCount; i++) {
+      const dexName = i === 1 ? 'classes.dex' : `classes${i}.dex`;
+      const baksmaliDir = `baksmali-${i}`;
+
+      // Extract dex from APK
+      await this.dockerExec(workDir, [
+        'sh', '-c', `unzip -o /work/input.apk ${dexName} -d /work/`,
+      ]);
+
+      // Decompile with baksmali
+      await this.dockerExec(workDir, [
+        'baksmali', 'd', '--api', '35', `/work/${dexName}`, '-o', `/work/${baksmaliDir}`,
+      ]);
+
+      // Check if main activity exists in this dex
+      const smaliFile = path.join(workDir, baksmaliDir, smaliRelPath);
+      try {
+        await fs.access(smaliFile);
+      } catch {
+        continue;
       }
+
+      // Found it — inject hook after .registers in onCreate
+      console.log(`[PATCH]   Found ${mainActivity} in ${dexName}`);
+      let smali = await fs.readFile(smaliFile, 'utf-8');
+
+      const onCreateMatch = smali.match(/(\.method\s+.*onCreate\(Landroid\/os\/Bundle;\)V[\s\S]*?\.registers\s+\d+)/);
+      if (!onCreateMatch) {
+        console.log(`[PATCH]   WARNING: onCreate not found in ${mainActivity}`);
+        return null;
+      }
+
+      smali = smali.replace(
+        onCreateMatch[1],
+        `${onCreateMatch[1]}\n\n    invoke-static/range {p0 .. p0}, Lcom/adverify/sdk/AdVerifyHook;->hook(Landroid/app/Activity;)V`
+      );
+      await fs.writeFile(smaliFile, smali);
+      console.log(`[PATCH]   Injected hook after .registers in onCreate`);
+
+      // Reassemble the dex
+      await this.dockerExec(workDir, [
+        'smali', 'a', '--api', '35', `/work/${baksmaliDir}`, '-o', `/work/${dexName}`,
+      ]);
+
+      // Add modified dex to additions
+      await fs.copyFile(path.join(workDir, dexName), path.join(workDir, 'additions', dexName));
+      return dexName;
     }
 
     return null;
   }
 
-  private async modifyManifest(
-    manifestPath: string,
-    info: ManifestInfo,
-    apiKey: string,
-    baseUrl: string,
-  ): Promise<void> {
-    let xml = await fs.readFile(manifestPath, 'utf-8');
+  // ─── SDK ───
 
-    // Add INTERNET permission if missing
-    if (!info.hasInternetPerm) {
-      xml = xml.replace(
-        /<application/,
-        '<uses-permission android:name="android.permission.INTERNET"/>\n    <application'
-      );
-    }
+  private async generateHookSmali(sdkSmaliDir: string, apiKey: string, baseUrl: string): Promise<void> {
+    const hookSmali = `.class public Lcom/adverify/sdk/AdVerifyHook;
+.super Ljava/lang/Object;
 
-    // Add usesCleartextTraffic if missing
-    if (!info.hasCleartext) {
-      xml = xml.replace(
-        /<application\s/,
-        '<application android:usesCleartextTraffic="true" '
-      );
-    }
-
-    // Insert meta-data after <application ...> opening tag
-    const metaData = [
-      `<meta-data android:name="adverify.api_key" android:value="${apiKey}"/>`,
-      `<meta-data android:name="adverify.base_url" android:value="${baseUrl}"/>`,
-    ].join('\n        ');
-
-    // Find the end of the <application> opening tag
-    const appTagMatch = xml.match(/<application\s[^>]*>/);
-    if (appTagMatch) {
-      const insertPos = appTagMatch.index! + appTagMatch[0].length;
-      xml = xml.slice(0, insertPos) + '\n        ' + metaData + xml.slice(insertPos);
-    }
-
-    await fs.writeFile(manifestPath, xml);
+.method public static hook(Landroid/app/Activity;)V
+    .locals 2
+    const-string v0, "${apiKey}"
+    const-string v1, "${baseUrl}"
+    invoke-static {p0, v0, v1}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)V
+    return-void
+.end method
+`;
+    const hookPath = path.join(sdkSmaliDir, 'com', 'adverify', 'sdk', 'AdVerifyHook.smali');
+    await fs.writeFile(hookPath, hookSmali);
   }
 
-  // ─── Smali ───
+  private async generateLifecycleCallback(sdkSmaliDir: string, apiKey: string, baseUrl: string): Promise<void> {
+    const callbackSmali = `.class public Lcom/adverify/sdk/AdVerifyLifecycleCallback;
+.super Ljava/lang/Object;
+.source "AdVerifyLifecycleCallback.java"
 
-  private async findSmaliFile(decompiled: string, className: string): Promise<string> {
-    const relativePath = className.replace(/\./g, '/') + '.smali';
+.implements Landroid/app/Application$ActivityLifecycleCallbacks;
 
-    // Search across smali/, smali_classes2/, smali_classes3/, etc.
-    const entries = await fs.readdir(decompiled);
-    const smaliDirs = entries.filter((e) => e.startsWith('smali'));
+.field private final app:Landroid/app/Application;
 
-    for (const dir of smaliDirs) {
-      const candidate = path.join(decompiled, dir, relativePath);
-      try {
-        await fs.access(candidate);
-        return candidate;
-      } catch {
-        // Not in this directory
-      }
-    }
+.method public constructor <init>(Landroid/app/Application;)V
+    .locals 0
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+    iput-object p1, p0, Lcom/adverify/sdk/AdVerifyLifecycleCallback;->app:Landroid/app/Application;
+    return-void
+.end method
 
-    throw new Error(`Could not find smali file for ${className}. Searched: ${smaliDirs.join(', ')}`);
-  }
+.method public onActivityCreated(Landroid/app/Activity;Landroid/os/Bundle;)V
+    .locals 2
 
-  private async injectSmaliHook(smaliPath: string): Promise<void> {
-    let smali = await fs.readFile(smaliPath, 'utf-8');
+    const-string v0, "${apiKey}"
+    const-string v1, "${baseUrl}"
+    invoke-static {p1, v0, v1}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)V
 
-    const hookLine = '    invoke-static {p0}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Activity;)V';
+    iget-object v0, p0, Lcom/adverify/sdk/AdVerifyLifecycleCallback;->app:Landroid/app/Application;
+    invoke-virtual {v0, p0}, Landroid/app/Application;->unregisterActivityLifecycleCallbacks(Landroid/app/Application$ActivityLifecycleCallbacks;)V
 
-    // Check if already injected
-    if (smali.includes('Lcom/adverify/sdk/AdVerify;->start')) return;
+    return-void
+.end method
 
-    // Case 1: onCreate exists
-    const onCreateMatch = smali.match(/\.method\s+(?:public|protected)\s+onCreate\(Landroid\/os\/Bundle;\)V/);
-    if (onCreateMatch) {
-      // Find the invoke-super or invoke-direct calling parent onCreate
-      const superCallRegex = /invoke-(?:super|direct)\s+\{[^}]*\},\s*L[^;]+;->onCreate\(Landroid\/os\/Bundle;\)V/;
-      const superMatch = smali.match(superCallRegex);
-      if (superMatch) {
-        const insertPos = superMatch.index! + superMatch[0].length;
-        smali = smali.slice(0, insertPos) + '\n\n' + hookLine + smali.slice(insertPos);
-      } else {
-        // Insert after .locals or .registers line in onCreate
-        const localsRegex = /\.method\s+(?:public|protected)\s+onCreate\(Landroid\/os\/Bundle;\)V[\s\S]*?(\.locals\s+\d+|\.registers\s+\d+)/;
-        const localsMatch = smali.match(localsRegex);
-        if (localsMatch) {
-          const insertPos = localsMatch.index! + localsMatch[0].length;
-          smali = smali.slice(0, insertPos) + '\n\n' + hookLine + smali.slice(insertPos);
-        }
-      }
-    } else {
-      // Case 2: No onCreate, append a complete method
-      const superMatch = smali.match(/\.super\s+(\S+)/);
-      const superClass = superMatch ? superMatch[1] : 'Landroid/app/Activity;';
+.method public onActivityStarted(Landroid/app/Activity;)V
+    .locals 0
+    return-void
+.end method
 
-      const method = [
-        '',
-        '.method protected onCreate(Landroid/os/Bundle;)V',
-        '    .locals 0',
-        '',
-        `    invoke-super {p0, p1}, ${superClass}->onCreate(Landroid/os/Bundle;)V`,
-        '',
-        hookLine,
-        '',
-        '    return-void',
-        '.end method',
-      ].join('\n');
+.method public onActivityResumed(Landroid/app/Activity;)V
+    .locals 0
+    return-void
+.end method
 
-      smali += '\n' + method + '\n';
-    }
+.method public onActivityPaused(Landroid/app/Activity;)V
+    .locals 0
+    return-void
+.end method
 
-    await fs.writeFile(smaliPath, smali);
+.method public onActivityStopped(Landroid/app/Activity;)V
+    .locals 0
+    return-void
+.end method
+
+.method public onActivitySaveInstanceState(Landroid/app/Activity;Landroid/os/Bundle;)V
+    .locals 0
+    return-void
+.end method
+
+.method public onActivityDestroyed(Landroid/app/Activity;)V
+    .locals 0
+    return-void
+.end method
+`;
+    const callbackPath = path.join(sdkSmaliDir, 'com', 'adverify', 'sdk', 'AdVerifyLifecycleCallback.smali');
+    await fs.writeFile(callbackPath, callbackSmali);
   }
 }
