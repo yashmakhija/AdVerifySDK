@@ -111,7 +111,7 @@ export default function UserPinsPage() {
     <div>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight text-zinc-950">
+          <h1 className="text-lg font-semibold tracking-tight text-zinc-900">
             User PINs
           </h1>
           <p className="mt-0.5 text-[13px] text-zinc-500">
@@ -125,7 +125,7 @@ export default function UserPinsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-9 gap-2 px-3 font-normal text-zinc-700"
+                  className="h-9 gap-2 px-3 font-normal text-zinc-600"
                 >
                   <CalendarIcon className="h-3.5 w-3.5 text-zinc-400" />
                   {selectedDate ? format(selectedDate, "MMM d, yyyy") : "Pick a date"}
@@ -169,23 +169,23 @@ export default function UserPinsPage() {
 
       {pinStats && (
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-lg border border-zinc-200 bg-white p-3">
+          <div className="rounded-lg border border-zinc-200/80 bg-white p-3.5">
             <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
               {selectedDate ? format(selectedDate, "MMM d") : "Today"} Generated
             </p>
-            <p className="mt-1 text-xl font-semibold text-zinc-950">
+            <p className="mt-1 text-xl font-semibold text-zinc-900">
               {pinStats.todayGenerated}
             </p>
           </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-3">
+          <div className="rounded-lg border border-zinc-200/80 bg-white p-3.5">
             <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
               {selectedDate ? format(selectedDate, "MMM d") : "Today"} Used
             </p>
-            <p className="mt-1 text-xl font-semibold text-zinc-950">
+            <p className="mt-1 text-xl font-semibold text-zinc-900">
               {pinStats.todayUsed}
             </p>
           </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-3">
+          <div className="rounded-lg border border-zinc-200/80 bg-white p-3.5">
             <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
               Active PINs
             </p>
@@ -193,7 +193,7 @@ export default function UserPinsPage() {
               {pinStats.totalActive}
             </p>
           </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-3">
+          <div className="rounded-lg border border-zinc-200/80 bg-white p-3.5">
             <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
               Expired PINs
             </p>
@@ -219,7 +219,7 @@ export default function UserPinsPage() {
             key: "deviceId",
             label: "Device ID",
             render: (p: UserPin) => (
-              <code className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700 font-mono">
+              <code className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 font-mono">
                 {p.deviceId.slice(0, 12)}...
               </code>
             ),
@@ -228,7 +228,7 @@ export default function UserPinsPage() {
             key: "pin",
             label: "PIN",
             render: (p: UserPin) => (
-              <span className="font-mono font-medium text-zinc-950">
+              <span className="font-mono font-medium text-zinc-900">
                 {p.pin}
               </span>
             ),

@@ -108,7 +108,7 @@ export default function SettingsPage() {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-lg font-semibold tracking-tight text-zinc-950">
+        <h1 className="text-lg font-semibold tracking-tight text-zinc-900">
           Settings
         </h1>
         <p className="mt-0.5 text-[13px] text-zinc-500">
@@ -119,7 +119,7 @@ export default function SettingsPage() {
       <div className="mx-auto max-w-xl space-y-6">
         {/* Mode selector */}
         <div>
-          <label className="mb-2.5 block text-[13px] font-medium text-zinc-950">
+          <label className="mb-2.5 block text-[13px] font-medium text-zinc-900">
             PIN Unlock Mode
           </label>
           <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
@@ -213,7 +213,7 @@ export default function SettingsPage() {
         {/* Excluded apps */}
         {settings.pinUnlockMode === "global_except" && (
           <div>
-            <label className="mb-1 block text-[13px] font-medium text-zinc-950">
+            <label className="mb-1 block text-[13px] font-medium text-zinc-900">
               Excluded Apps
             </label>
             <p className="mb-3 text-[12px] text-zinc-400">
@@ -227,7 +227,7 @@ export default function SettingsPage() {
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200 bg-white">
+              <div className="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200/80 bg-white">
                 {keys.map((k) => {
                   const isExcluded = settings.excludedAppIds.includes(k.id);
                   return (

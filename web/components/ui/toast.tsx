@@ -2,6 +2,7 @@
 
 import { useToastStore } from "@/lib/store";
 import { useEffect } from "react";
+import { Check } from "lucide-react";
 
 export function ToastContainer() {
   const { message, clearToast } = useToastStore();
@@ -15,8 +16,9 @@ export function ToastContainer() {
   if (!message) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 animate-in">
-      <div className="rounded-lg bg-zinc-950 px-4 py-2.5 text-[13px] font-medium text-white shadow-lg">
+    <div className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 animate-in">
+      <div className="flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2.5 text-[13px] font-medium text-white shadow-xl shadow-zinc-900/10">
+        <Check className="h-3.5 w-3.5 text-emerald-400" />
         {message}
       </div>
     </div>

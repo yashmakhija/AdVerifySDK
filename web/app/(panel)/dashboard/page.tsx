@@ -51,7 +51,7 @@ export default function DashboardPage() {
         description="Overview of your AdVerify platform"
       />
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
         <StatCard
           label="API Keys"
           value={stats.totalKeys}
@@ -101,10 +101,10 @@ export default function DashboardPage() {
 
       {pinStats && (
         <>
-          <h2 className="mt-8 mb-4 text-sm font-semibold text-zinc-950">
+          <h2 className="mt-8 mb-3 text-[13px] font-semibold text-zinc-900">
             PIN Analytics
           </h2>
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
             <StatCard
               label="PINs Today"
               value={pinStats.todayGenerated}

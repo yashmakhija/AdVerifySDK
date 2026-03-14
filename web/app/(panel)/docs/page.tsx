@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { PageHeader } from "@/components/ui/page-header";
+import { Copy, Check } from "lucide-react";
 
 const ENDPOINTS = [
   { method: "GET", path: "/api/admin/stats", desc: "Dashboard statistics" },
@@ -14,10 +16,49 @@ const ENDPOINTS = [
   { method: "DELETE", path: "/api/admin/ads/:id", desc: "Delete ad" },
   { method: "GET", path: "/api/admin/pin-config", desc: "List PIN configs" },
   { method: "POST", path: "/api/admin/pin-config", desc: "Upsert PIN config" },
+  { method: "GET", path: "/api/admin/settings", desc: "Get global settings" },
+  { method: "POST", path: "/api/admin/settings", desc: "Update settings" },
   { method: "POST", path: "/api/sdk/generate-pin", desc: "Generate PIN (SDK)" },
   { method: "POST", path: "/api/sdk/verify-pin", desc: "Verify PIN (SDK)" },
   { method: "GET", path: "/api/sdk/ads", desc: "Get ads (SDK)" },
 ];
+
+const METHOD_COLORS: Record<string, string> = {
+  GET: "text-emerald-600 bg-emerald-50",
+  POST: "text-blue-600 bg-blue-50",
+  PATCH: "text-amber-600 bg-amber-50",
+  DELETE: "text-red-600 bg-red-50",
+};
+
+function CodeSnippet({ code, id }: { code: string; id: string }) {
+  const [copied, setCopied] = useState<string | null>(null);
+
+  function copy() {
+    navigator.clipboard.writeText(code);
+    setCopied(id);
+    setTimeout(() => setCopied(null), 2000);
+  }
+
+  return (
+    <div className="group relative">
+      <pre className="overflow-x-auto rounded-lg bg-zinc-900 px-3.5 py-3 text-[12px] leading-relaxed text-zinc-400 font-mono">
+        <code className="whitespace-pre-wrap break-all sm:whitespace-pre sm:break-normal">
+          {code}
+        </code>
+      </pre>
+      <button
+        onClick={copy}
+        className="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-zinc-800 px-2 py-1 text-[10px] font-medium text-zinc-400 opacity-100 transition-all hover:bg-zinc-700 hover:text-white sm:opacity-0 sm:group-hover:opacity-100"
+      >
+        {copied === id ? (
+          <><Check className="h-3 w-3" /> Copied</>
+        ) : (
+          <><Copy className="h-3 w-3" /> Copy</>
+        )}
+      </button>
+    </div>
+  );
+}
 
 export default function DocsPage() {
   return (
@@ -27,56 +68,56 @@ export default function DocsPage() {
         description="API endpoints and integration guide"
       />
 
-      <div className="space-y-6">
-        <div className="rounded-xl border border-zinc-200 bg-zinc-950 p-5">
-          <p className="mb-4 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+      <div className="space-y-5">
+        <div className="rounded-xl border border-zinc-200/80 bg-zinc-950 p-5">
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
             Quick Start
           </p>
           <div className="space-y-3">
-            <pre className="rounded-lg bg-zinc-900 p-3 text-[12px] leading-relaxed text-zinc-400 font-mono overflow-x-auto">
-              <code>{`// build.gradle
-implementation project(':adverify')`}</code>
-            </pre>
-            <pre className="rounded-lg bg-zinc-900 p-3 text-[12px] leading-relaxed text-zinc-400 font-mono overflow-x-auto">
-              <code>{`// Initialize in Application.onCreate()
-AdVerify.init(context, "YOUR_API_KEY", "https://api.yoursite.com");`}</code>
-            </pre>
-            <pre className="rounded-lg bg-zinc-900 p-3 text-[12px] leading-relaxed text-zinc-400 font-mono overflow-x-auto">
-              <code>{`// Show an ad
-AdVerify.showAd(activity, new AdCallback() {
-    @Override public void onAdClosed() { /* continue */ }
-});`}</code>
-            </pre>
+            <CodeSnippet
+              id="gradle"
+              code={`// build.gradle\nimplementation project(':adverify')`}
+            />
+            <CodeSnippet
+              id="init"
+              code={`// Initialize in Application.onCreate()\nAdVerify.init(context,\n  "YOUR_API_KEY",\n  "https://api.yoursite.com");`}
+            />
+            <CodeSnippet
+              id="show"
+              code={`// Show an ad\nAdVerify.showAd(activity,\n  new AdCallback() {\n    @Override\n    public void onAdClosed() {\n      /* continue */\n    }\n});`}
+            />
           </div>
         </div>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-5">
-          <p className="mb-4 text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+        <div className="rounded-xl border border-zinc-200/80 bg-white p-5">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
             API Endpoints
           </p>
           <p className="mb-4 text-[13px] text-zinc-500">
-            All admin endpoints use HTTP Basic Auth. SDK endpoints use an{" "}
-            <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-[12px] font-mono text-zinc-700">
-              apiKey
+            Admin endpoints use HTTP Basic Auth. SDK endpoints use{" "}
+            <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-mono text-zinc-600">
+              x-api-key
             </code>{" "}
-            in the request body.
+            header.
           </p>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[500px] text-left text-[13px]">
+          <div className="overflow-x-auto -mx-5 px-5">
+            <table className="w-full min-w-[480px] text-left text-[13px]">
               <thead className="border-b border-zinc-100 text-[11px] text-zinc-400">
                 <tr>
-                  <th className="pb-2.5 pr-4 font-medium">Method</th>
-                  <th className="pb-2.5 pr-4 font-medium">Path</th>
+                  <th className="pb-2.5 pr-3 font-medium w-16">Method</th>
+                  <th className="pb-2.5 pr-3 font-medium">Path</th>
                   <th className="pb-2.5 font-medium">Description</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-50">
                 {ENDPOINTS.map(({ method, path, desc }) => (
                   <tr key={`${method}-${path}`}>
-                    <td className="py-2.5 pr-4 font-mono text-[11px] text-zinc-500">
-                      {method}
+                    <td className="py-2.5 pr-3">
+                      <span className={`inline-block rounded px-1.5 py-0.5 font-mono text-[10px] font-bold ${METHOD_COLORS[method] || ""}`}>
+                        {method}
+                      </span>
                     </td>
-                    <td className="py-2.5 pr-4 font-mono text-[11px] text-zinc-950">
+                    <td className="py-2.5 pr-3 font-mono text-[11px] text-zinc-800 whitespace-nowrap">
                       {path}
                     </td>
                     <td className="py-2.5 text-zinc-500">{desc}</td>

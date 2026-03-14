@@ -111,7 +111,7 @@ export default function PinConfigPage() {
                 className={`flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm transition-all ${
                   isSelected
                     ? "border-zinc-900 bg-zinc-900 text-white shadow-sm"
-                    : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50"
+                    : "border-zinc-200/80 bg-white text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50"
                 }`}
               >
                 <Shield
@@ -135,13 +135,13 @@ export default function PinConfigPage() {
       {selectedKey && (
         <form onSubmit={handleSave} className="max-w-2xl space-y-5">
           {/* Enable/disable toggle */}
-          <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-5 py-4">
+          <div className="flex items-center justify-between rounded-xl border border-zinc-200/80 bg-white px-5 py-4">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-100">
                 <Shield className="h-4 w-4 text-zinc-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-zinc-950">
+                <p className="text-sm font-medium text-zinc-900">
                   PIN Verification
                 </p>
                 <p className="text-xs text-zinc-400">
@@ -172,7 +172,7 @@ export default function PinConfigPage() {
             <>
               {/* Message & Button text */}
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-xl border border-zinc-200 bg-white p-4">
+                <div className="rounded-xl border border-zinc-200/80 bg-white p-4">
                   <div className="mb-3 flex items-center gap-2">
                     <MessageSquare className="h-3.5 w-3.5 text-zinc-400" />
                     <label className="text-[13px] font-medium text-zinc-600">
@@ -184,12 +184,12 @@ export default function PinConfigPage() {
                     onChange={(e) =>
                       setForm({ ...form, pinMessage: e.target.value })
                     }
-                    className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-950 outline-none transition-colors focus:border-zinc-400 focus:bg-white"
+                    className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-400 focus:bg-white"
                     placeholder="Enter your PIN to unlock the app"
                   />
                 </div>
 
-                <div className="rounded-xl border border-zinc-200 bg-white p-4">
+                <div className="rounded-xl border border-zinc-200/80 bg-white p-4">
                   <div className="mb-3 flex items-center gap-2">
                     <Type className="h-3.5 w-3.5 text-zinc-400" />
                     <label className="text-[13px] font-medium text-zinc-600">
@@ -201,14 +201,14 @@ export default function PinConfigPage() {
                     onChange={(e) =>
                       setForm({ ...form, getPinBtnText: e.target.value })
                     }
-                    className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-950 outline-none transition-colors focus:border-zinc-400 focus:bg-white"
+                    className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-400 focus:bg-white"
                     placeholder="Get PIN"
                   />
                 </div>
               </div>
 
               {/* Max attempts */}
-              <div className="rounded-xl border border-zinc-200 bg-white p-4">
+              <div className="rounded-xl border border-zinc-200/80 bg-white p-4">
                 <div className="mb-3 flex items-center gap-2">
                   <Hash className="h-3.5 w-3.5 text-zinc-400" />
                   <label className="text-[13px] font-medium text-zinc-600">
@@ -229,7 +229,7 @@ export default function PinConfigPage() {
                     }
                     className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-zinc-200 accent-zinc-900 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-zinc-900"
                   />
-                  <span className="min-w-[2.5rem] rounded-md bg-zinc-100 px-2.5 py-1 text-center text-sm font-medium text-zinc-950">
+                  <span className="min-w-[2.5rem] rounded-md bg-zinc-100 px-2.5 py-1 text-center text-sm font-medium text-zinc-900">
                     {form.maxAttempts}
                   </span>
                 </div>
@@ -239,7 +239,7 @@ export default function PinConfigPage() {
               </div>
 
               {/* Expiry mode */}
-              <div className="rounded-xl border border-zinc-200 bg-white p-4">
+              <div className="rounded-xl border border-zinc-200/80 bg-white p-4">
                 <p className="mb-3 text-[13px] font-medium text-zinc-600">
                   PIN Expiry
                 </p>
@@ -268,7 +268,7 @@ export default function PinConfigPage() {
                       <p
                         className={`text-sm font-medium ${
                           form.expiryMode === "never"
-                            ? "text-zinc-950"
+                            ? "text-zinc-900"
                             : "text-zinc-600"
                         }`}
                       >
@@ -304,7 +304,7 @@ export default function PinConfigPage() {
                       <p
                         className={`text-sm font-medium ${
                           form.expiryMode === "duration"
-                            ? "text-zinc-950"
+                            ? "text-zinc-900"
                             : "text-zinc-600"
                         }`}
                       >
@@ -331,7 +331,7 @@ export default function PinConfigPage() {
                         })
                       }
                       min={1}
-                      className="w-20 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-center text-sm font-medium text-zinc-950 outline-none focus:border-zinc-400"
+                      className="w-20 rounded-md border border-zinc-200/80 bg-white px-2.5 py-1.5 text-center text-sm font-medium text-zinc-900 outline-none focus:border-zinc-400"
                     />
                     <span className="text-sm text-zinc-600">hours</span>
                     <span className="ml-auto text-xs text-zinc-400">
