@@ -18,7 +18,6 @@ export default function PinConfigPage() {
     pinEnabled: true,
     pinMessage: "Enter your PIN to unlock the app",
     maxAttempts: 5,
-    getPinUrl: "",
     getPinBtnText: "Get PIN",
     expiryMode: "never" as "never" | "duration",
     expiryHours: 24,
@@ -45,7 +44,6 @@ export default function PinConfigPage() {
           pinEnabled: existing.pinEnabled,
           pinMessage: existing.pinMessage,
           maxAttempts: existing.maxAttempts,
-          getPinUrl: existing.getPinUrl,
           getPinBtnText: existing.getPinBtnText,
           expiryMode: existing.expiryMode || "never",
           expiryHours: existing.expiryHours || 24,
@@ -55,7 +53,6 @@ export default function PinConfigPage() {
           pinEnabled: true,
           pinMessage: "Enter your PIN to unlock the app",
           maxAttempts: 5,
-          getPinUrl: "",
           getPinBtnText: "Get PIN",
           expiryMode: "never",
           expiryHours: 24,
@@ -137,21 +134,6 @@ export default function PinConfigPage() {
             min={1}
             max={20}
           />
-
-          <div>
-            <label className="mb-1.5 block text-[13px] font-medium text-zinc-700">
-              Get PIN URL{" "}
-              <span className="text-zinc-400">
-                (use {"{device_id}"} as placeholder)
-              </span>
-            </label>
-            <input
-              value={form.getPinUrl}
-              onChange={(e) => setForm({ ...form, getPinUrl: e.target.value })}
-              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-950 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400"
-              placeholder="https://yoursite.com/get-pin?device={device_id}"
-            />
-          </div>
 
           <FormInput
             label="Get PIN Button Text"
