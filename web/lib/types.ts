@@ -58,3 +58,13 @@ export interface Stats {
   totalPins: number;
   usedPins: number;
 }
+
+export interface PinStats {
+  date: string;
+  todayGenerated: number;
+  todayUsed: number;
+  yesterdayGenerated: number;
+  yesterdayUsed: number;
+  totalActive: number;
+  totalExpired: number;
+}

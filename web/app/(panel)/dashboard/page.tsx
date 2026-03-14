@@ -15,16 +15,21 @@ import {
   TrendingUp,
   BarChart3,
   Zap,
+  CalendarDays,
+  ShieldCheck,
+  ShieldOff,
 } from "lucide-react";
-import type { Stats } from "@/lib/types";
+import type { Stats, PinStats } from "@/lib/types";
 
 export default function DashboardPage() {
   const token = useAuthStore((s) => s.token);
   const [stats, setStats] = useState<Stats | null>(null);
+  const [pinStats, setPinStats] = useState<PinStats | null>(null);
 
   useEffect(() => {
     if (token) {
       api<Stats>("/admin/stats", { token }).then(setStats).catch(() => {});
+      api<PinStats>("/admin/user-pins/stats", { token }).then(setPinStats).catch(() => {});
     }
   }, [token]);
 
@@ -93,6 +98,46 @@ export default function DashboardPage() {
           icon={<TrendingUp className="h-4 w-4" />}
         />
       </div>
+
+      {pinStats && (
+        <>
+          <h2 className="mt-8 mb-4 text-sm font-semibold text-zinc-950">
+            PIN Analytics
+          </h2>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+            <StatCard
+              label="PINs Today"
+              value={pinStats.todayGenerated}
+              icon={<CalendarDays className="h-4 w-4" />}
+            />
+            <StatCard
+              label="Used Today"
+              value={pinStats.todayUsed}
+              icon={<CheckCircle2 className="h-4 w-4" />}
+            />
+            <StatCard
+              label="PINs Yesterday"
+              value={pinStats.yesterdayGenerated}
+              icon={<CalendarDays className="h-4 w-4" />}
+            />
+            <StatCard
+              label="Used Yesterday"
+              value={pinStats.yesterdayUsed}
+              icon={<CheckCircle2 className="h-4 w-4" />}
+            />
+            <StatCard
+              label="Active PINs"
+              value={pinStats.totalActive}
+              icon={<ShieldCheck className="h-4 w-4" />}
+            />
+            <StatCard
+              label="Expired PINs"
+              value={pinStats.totalExpired}
+              icon={<ShieldOff className="h-4 w-4" />}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }

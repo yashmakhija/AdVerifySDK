@@ -7,7 +7,7 @@ import { FormSelect } from "@/components/ui/modal";
 import { DataTable } from "@/components/ui/data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { UserPin, ApiKey } from "@/lib/types";
+import type { UserPin, ApiKey, PinStats } from "@/lib/types";
 
 function pinStatus(p: UserPin): { label: string; variant: "success" | "destructive" | "default" } {
   if (!p.isUsed) return { label: "Pending", variant: "default" };
@@ -17,12 +17,18 @@ function pinStatus(p: UserPin): { label: string; variant: "success" | "destructi
   return { label: "Active", variant: "success" };
 }
 
+function formatDate(d: Date): string {
+  return d.toISOString().split("T")[0];
+}
+
 export default function UserPinsPage() {
   const token = useAuthStore((s) => s.token)!;
   const toast = useToastStore();
   const [pins, setPins] = useState<UserPin[]>([]);
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [filterKey, setFilterKey] = useState<string>("");
+  const [filterDate, setFilterDate] = useState<string>("");
+  const [pinStats, setPinStats] = useState<PinStats | null>(null);
 
   async function load() {
     const [p, k] = await Promise.all([
@@ -33,8 +39,15 @@ export default function UserPinsPage() {
     setKeys(Array.isArray(k) ? k : []);
   }
 
+  async function loadStats(date?: string) {
+    const query = date ? `?date=${date}` : "";
+    const s = await api<PinStats>(`/admin/user-pins/stats${query}`, { token });
+    setPinStats(s);
+  }
+
   useEffect(() => {
     load();
+    loadStats();
   }, []);
 
   async function revoke(deviceId: string, apiKeyId: number) {
@@ -46,11 +59,34 @@ export default function UserPinsPage() {
     });
     toast.show("Device revoked");
     load();
+    loadStats(filterDate || undefined);
   }
 
-  const filtered = filterKey
+  async function expirePin(id: number) {
+    if (!confirm("Force expire this PIN? The user will need to re-verify.")) return;
+    await api(`/admin/user-pins/${id}/expire`, {
+      method: "POST",
+      token,
+    });
+    toast.show("PIN expired");
+    load();
+    loadStats(filterDate || undefined);
+  }
+
+  function handleDateChange(date: string) {
+    setFilterDate(date);
+    loadStats(date || undefined);
+  }
+
+  let filtered = filterKey
     ? pins.filter((p) => p.apiKeyId === Number(filterKey))
     : pins;
+
+  if (filterDate) {
+    filtered = filtered.filter(
+      (p) => formatDate(new Date(p.createdAt)) === filterDate
+    );
+  }
 
   return (
     <div>
@@ -63,21 +99,66 @@ export default function UserPinsPage() {
             View and manage user PIN verifications
           </p>
         </div>
-        <div className="w-48">
-          <FormSelect
-            label=""
-            value={filterKey}
-            onChange={(e) => setFilterKey(e.target.value)}
-          >
-            <option value="">All Apps</option>
-            {keys.map((k) => (
-              <option key={k.id} value={k.id}>
-                {k.appName}
-              </option>
-            ))}
-          </FormSelect>
+        <div className="flex items-center gap-3">
+          <input
+            type="date"
+            value={filterDate}
+            onChange={(e) => handleDateChange(e.target.value)}
+            className="h-9 rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-700 outline-none focus:border-zinc-400"
+          />
+          <div className="w-40">
+            <FormSelect
+              label=""
+              value={filterKey}
+              onChange={(e) => setFilterKey(e.target.value)}
+            >
+              <option value="">All Apps</option>
+              {keys.map((k) => (
+                <option key={k.id} value={k.id}>
+                  {k.appName}
+                </option>
+              ))}
+            </FormSelect>
+          </div>
         </div>
       </div>
+
+      {pinStats && (
+        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-lg border border-zinc-200 bg-white p-3">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+              {filterDate || "Today"} Generated
+            </p>
+            <p className="mt-1 text-xl font-semibold text-zinc-950">
+              {pinStats.todayGenerated}
+            </p>
+          </div>
+          <div className="rounded-lg border border-zinc-200 bg-white p-3">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+              {filterDate || "Today"} Used
+            </p>
+            <p className="mt-1 text-xl font-semibold text-zinc-950">
+              {pinStats.todayUsed}
+            </p>
+          </div>
+          <div className="rounded-lg border border-zinc-200 bg-white p-3">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+              Active PINs
+            </p>
+            <p className="mt-1 text-xl font-semibold text-emerald-600">
+              {pinStats.totalActive}
+            </p>
+          </div>
+          <div className="rounded-lg border border-zinc-200 bg-white p-3">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+              Expired PINs
+            </p>
+            <p className="mt-1 text-xl font-semibold text-red-500">
+              {pinStats.totalExpired}
+            </p>
+          </div>
+        </div>
+      )}
 
       <DataTable
         columns={[
@@ -141,16 +222,31 @@ export default function UserPinsPage() {
           {
             key: "actions",
             label: "Actions",
-            render: (p: UserPin) => (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => revoke(p.deviceId, p.apiKeyId)}
-                className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 h-7 px-2"
-              >
-                Revoke
-              </Button>
-            ),
+            render: (p: UserPin) => {
+              const s = pinStatus(p);
+              return (
+                <div className="flex items-center gap-1">
+                  {s.label === "Active" && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => expirePin(p.id)}
+                      className="text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 h-7 px-2"
+                    >
+                      Expire
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => revoke(p.deviceId, p.apiKeyId)}
+                    className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 h-7 px-2"
+                  >
+                    Revoke
+                  </Button>
+                </div>
+              );
+            },
           },
         ]}
         data={filtered}
