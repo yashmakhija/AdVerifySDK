@@ -93,4 +93,15 @@ export class AdminController {
     await service.revokeDeviceAccess(apiKeyId, deviceId);
     res.json({ status: 'revoked' });
   }
+
+  async expirePin(req: Request, res: Response) {
+    await service.expirePin(paramId(req, 'id'));
+    res.json({ status: 'expired' });
+  }
+
+  async getPinStats(req: Request, res: Response) {
+    const date = req.query.date ? String(req.query.date) : undefined;
+    const stats = await service.getPinStats(date);
+    res.json(stats);
+  }
 }

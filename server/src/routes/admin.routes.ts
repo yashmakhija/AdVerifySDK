@@ -52,7 +52,9 @@ router.post('/pin-config', (req, res) => ctrl.savePinConfig(req, res));
 
 // User PINs
 router.get('/user-pins', (req, res) => ctrl.getUserPins(req, res));
+router.get('/user-pins/stats', (req, res) => ctrl.getPinStats(req, res));
 router.delete('/user-pins/:id', (req, res) => ctrl.deleteUserPin(req, res));
 router.post('/user-pins/revoke', (req, res) => ctrl.revokeDevice(req, res));
+router.post('/user-pins/:id/expire', (req, res) => ctrl.expirePin(req, res));
 
 export default router;
