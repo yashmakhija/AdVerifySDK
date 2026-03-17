@@ -51,7 +51,8 @@ model PinConfig {
   pinMessage    String  @default("Enter PIN to unlock") @map("pin_message")
   maxAttempts   Int     @default(3) @map("max_attempts")
   getPinUrl     String  @default("") @map("get_pin_url")
-  getPinBtnText String  @default("Get PIN") @map("get_pin_btn_text")
+  getPinBtnText   String  @default("Get PIN") @map("get_pin_btn_text")
+  enterPinBtnText String  @default("Enter PIN") @map("enter_pin_btn_text")
   expiryMode    String  @default("never") @map("expiry_mode") // "never" | "duration"
   expiryHours   Int     @default(24) @map("expiry_hours")     // hours until PIN expires (used when expiryMode = "duration")
   tutorialUrl   String  @default("https://t.me/EllieTutorials/36") @map("tutorial_url")

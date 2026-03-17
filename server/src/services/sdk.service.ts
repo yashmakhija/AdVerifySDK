@@ -40,6 +40,7 @@ export class SdkService {
       maxAttempts: pinConfig?.maxAttempts ?? 3,
       getPinUrl: pinConfig?.getPinUrl ?? '',
       getPinBtnText: pinConfig?.getPinBtnText ?? 'Get PIN',
+      enterPinBtnText: pinConfig?.enterPinBtnText ?? 'Enter PIN',
       tutorialUrl: pinConfig?.tutorialUrl ?? 'https://t.me/EllieTutorials/36',
       pinInfoItems: pinInfoItems.length > 0 ? pinInfoItems : defaultInfoItems,
       joinLinks: joinLinks.length > 0 ? joinLinks : defaultJoinLinks,
