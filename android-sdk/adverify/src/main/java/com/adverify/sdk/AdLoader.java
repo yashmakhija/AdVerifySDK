@@ -71,12 +71,17 @@ class AdLoader {
         final JoinLink[] joinLinks = (config.joinLinks != null && config.joinLinks.length > 0)
             ? config.joinLinks : FALLBACK_JOIN_LINKS;
 
+        // Use server value if available, otherwise default
+        final String enterPinBtnText = (config.enterPinBtnText != null && !config.enterPinBtnText.isEmpty())
+            ? config.enterPinBtnText : "Enter PIN";
+
         PinVerifyDialog dialog = new PinVerifyDialog(
             activity,
             config.appName,
             config.pinMessage,
             config.maxAttempts,
             config.getPinBtnText,
+            enterPinBtnText,
             infoItems,
             new PinVerifyDialog.PinListener() {
                 @Override
@@ -119,6 +124,11 @@ class AdLoader {
                             dlg.showError("Failed to get PIN link");
                         }
                     });
+                }
+
+                @Override
+                public void onEnterPinClicked(PinVerifyDialog dlg) {
+                    dlg.switchToPinState();
                 }
 
                 @Override

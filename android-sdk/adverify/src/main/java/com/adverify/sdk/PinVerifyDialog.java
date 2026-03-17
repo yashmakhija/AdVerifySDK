@@ -37,6 +37,7 @@ class PinVerifyDialog {
     interface PinListener {
         void onPinSubmit(String pin, PinVerifyDialog dialog);
         void onGetPinClicked(PinVerifyDialog dialog);
+        void onEnterPinClicked(PinVerifyDialog dialog);
         void onMaxAttemptsReached();
         void onTutorialClicked();
         void onJoinClicked();
@@ -63,6 +64,7 @@ class PinVerifyDialog {
     private final String message;
     private final int maxAttempts;
     private final String getPinBtnText;
+    private final String enterPinBtnText;
     private final PinInfoItem[] infoItems;
     private final PinListener listener;
 
@@ -73,16 +75,19 @@ class PinVerifyDialog {
     private TextView attemptsText;
     private EditText pinInput;
     private Button generateBtn;
+    private Button enterPinBtn;
     private Button verifyBtn;
     private int attempts = 0;
 
     PinVerifyDialog(Activity activity, String title, String message, int maxAttempts,
-                    String getPinBtnText, PinInfoItem[] infoItems, PinListener listener) {
+                    String getPinBtnText, String enterPinBtnText,
+                    PinInfoItem[] infoItems, PinListener listener) {
         this.activity = activity;
         this.title = title;
         this.message = message;
         this.maxAttempts = maxAttempts;
         this.getPinBtnText = getPinBtnText;
+        this.enterPinBtnText = enterPinBtnText;
         this.infoItems = infoItems;
         this.listener = listener;
     }
@@ -152,10 +157,18 @@ class PinVerifyDialog {
             infoState.addView(buildInfoCard());
         }
 
-        // Generate button — solid black
+        // Action buttons row: Get PIN + Enter PIN
+        LinearLayout actionRow = new LinearLayout(activity);
+        actionRow.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams actionLP = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        actionLP.topMargin = dp(18);
+        actionRow.setLayoutParams(actionLP);
+
+        // Get PIN button — solid black
         generateBtn = new Button(activity);
         String genText = getPinBtnText != null && !getPinBtnText.isEmpty()
-            ? getPinBtnText : "Generate PIN & Verify";
+            ? getPinBtnText : "Get PIN";
         generateBtn.setText(genText);
         generateBtn.setTextColor(Color.WHITE);
         generateBtn.setAllCaps(false);
@@ -166,16 +179,44 @@ class PinVerifyDialog {
         genBg.setColor(Color.parseColor(C_BLACK));
         genBg.setCornerRadius(dp(12));
         generateBtn.setBackground(createRipple(Color.parseColor("#333333"), genBg));
-        generateBtn.setPadding(dp(24), dp(14), dp(24), dp(14));
+        generateBtn.setPadding(dp(16), dp(14), dp(16), dp(14));
 
-        LinearLayout.LayoutParams genLP = new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        genLP.topMargin = dp(18);
-        generateBtn.setLayoutParams(genLP);
+        LinearLayout.LayoutParams genBtnLP = new LinearLayout.LayoutParams(
+            0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        genBtnLP.rightMargin = dp(4);
+        generateBtn.setLayoutParams(genBtnLP);
         generateBtn.setOnClickListener(v -> {
             if (listener != null) listener.onGetPinClicked(PinVerifyDialog.this);
         });
-        infoState.addView(generateBtn);
+        actionRow.addView(generateBtn);
+
+        // Enter PIN button — outlined
+        enterPinBtn = new Button(activity);
+        String enterText = enterPinBtnText != null && !enterPinBtnText.isEmpty()
+            ? enterPinBtnText : "Enter PIN";
+        enterPinBtn.setText(enterText);
+        enterPinBtn.setTextColor(Color.parseColor(C_BLACK));
+        enterPinBtn.setAllCaps(false);
+        enterPinBtn.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        enterPinBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+
+        GradientDrawable enterBg = new GradientDrawable();
+        enterBg.setColor(Color.WHITE);
+        enterBg.setCornerRadius(dp(12));
+        enterBg.setStroke(dp(1), Color.parseColor("#dddddd"));
+        enterPinBtn.setBackground(createRipple(Color.parseColor("#f0f0f0"), enterBg));
+        enterPinBtn.setPadding(dp(16), dp(14), dp(16), dp(14));
+
+        LinearLayout.LayoutParams enterBtnLP = new LinearLayout.LayoutParams(
+            0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        enterBtnLP.leftMargin = dp(4);
+        enterPinBtn.setLayoutParams(enterBtnLP);
+        enterPinBtn.setOnClickListener(v -> {
+            if (listener != null) listener.onEnterPinClicked(PinVerifyDialog.this);
+        });
+        actionRow.addView(enterPinBtn);
+
+        infoState.addView(actionRow);
 
         // Secondary row: Tutorial + Join Us
         LinearLayout secRow = new LinearLayout(activity);

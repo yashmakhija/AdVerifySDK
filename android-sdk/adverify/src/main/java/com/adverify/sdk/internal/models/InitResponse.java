@@ -9,6 +9,7 @@ public class InitResponse {
     public final int maxAttempts;
     public final String getPinUrl;
     public final String getPinBtnText;
+    public final String enterPinBtnText;
     public final PinInfoItem[] pinInfoItems;
     public final String tutorialUrl;
     public final JoinLink[] joinLinks;
@@ -16,6 +17,7 @@ public class InitResponse {
     public InitResponse(String appName, boolean pinEnabled, boolean pinVerified,
                         String pinMessage, int maxAttempts,
                         String getPinUrl, String getPinBtnText,
+                        String enterPinBtnText,
                         PinInfoItem[] pinInfoItems, String tutorialUrl,
                         JoinLink[] joinLinks) {
         this.appName = appName;
@@ -25,6 +27,7 @@ public class InitResponse {
         this.maxAttempts = maxAttempts;
         this.getPinUrl = getPinUrl;
         this.getPinBtnText = getPinBtnText;
+        this.enterPinBtnText = enterPinBtnText;
         this.pinInfoItems = pinInfoItems;
         this.tutorialUrl = tutorialUrl;
         this.joinLinks = joinLinks;

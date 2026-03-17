@@ -89,6 +89,7 @@ public class AdClient {
                     obj.optInt("maxAttempts", 3),
                     obj.optString("getPinUrl", ""),
                     obj.optString("getPinBtnText", "Get PIN"),
+                    obj.optString("enterPinBtnText", "Enter PIN"),
                     infoItems,
                     obj.optString("tutorialUrl", ""),
                     joinLinks
