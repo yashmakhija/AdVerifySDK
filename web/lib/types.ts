@@ -31,6 +31,7 @@ export interface PinConfig {
   maxAttempts: number;
   getPinUrl: string;
   getPinBtnText: string;
+  enterPinBtnText: string;
   expiryMode: "never" | "duration";
   expiryHours: number;
 }

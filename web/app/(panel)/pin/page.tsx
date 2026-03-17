@@ -27,6 +27,7 @@ export default function PinConfigPage() {
     pinMessage: "Enter your PIN to unlock the app",
     maxAttempts: 5,
     getPinBtnText: "Get PIN",
+    enterPinBtnText: "Enter PIN",
     expiryMode: "never" as "never" | "duration",
     expiryHours: 24,
   });
@@ -53,6 +54,7 @@ export default function PinConfigPage() {
           pinMessage: existing.pinMessage,
           maxAttempts: existing.maxAttempts,
           getPinBtnText: existing.getPinBtnText,
+          enterPinBtnText: existing.enterPinBtnText || "Enter PIN",
           expiryMode: existing.expiryMode || "never",
           expiryHours: existing.expiryHours || 24,
         });
@@ -62,6 +64,7 @@ export default function PinConfigPage() {
           pinMessage: "Enter your PIN to unlock the app",
           maxAttempts: 5,
           getPinBtnText: "Get PIN",
+          enterPinBtnText: "Enter PIN",
           expiryMode: "never",
           expiryHours: 24,
         });
@@ -170,30 +173,31 @@ export default function PinConfigPage() {
 
           {form.pinEnabled && (
             <>
-              {/* Message & Button text */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-xl border border-zinc-200/80 bg-white p-4">
-                  <div className="mb-3 flex items-center gap-2">
-                    <MessageSquare className="h-3.5 w-3.5 text-zinc-400" />
-                    <label className="text-[13px] font-medium text-zinc-600">
-                      PIN Message
-                    </label>
-                  </div>
-                  <input
-                    value={form.pinMessage}
-                    onChange={(e) =>
-                      setForm({ ...form, pinMessage: e.target.value })
-                    }
-                    className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-400 focus:bg-white"
-                    placeholder="Enter your PIN to unlock the app"
-                  />
+              {/* Message */}
+              <div className="rounded-xl border border-zinc-200/80 bg-white p-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <MessageSquare className="h-3.5 w-3.5 text-zinc-400" />
+                  <label className="text-[13px] font-medium text-zinc-600">
+                    PIN Message
+                  </label>
                 </div>
+                <input
+                  value={form.pinMessage}
+                  onChange={(e) =>
+                    setForm({ ...form, pinMessage: e.target.value })
+                  }
+                  className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-400 focus:bg-white"
+                  placeholder="Enter your PIN to unlock the app"
+                />
+              </div>
 
+              {/* Button texts */}
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-xl border border-zinc-200/80 bg-white p-4">
                   <div className="mb-3 flex items-center gap-2">
                     <Type className="h-3.5 w-3.5 text-zinc-400" />
                     <label className="text-[13px] font-medium text-zinc-600">
-                      Button Text
+                      Get PIN Button
                     </label>
                   </div>
                   <input
@@ -203,6 +207,23 @@ export default function PinConfigPage() {
                     }
                     className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-400 focus:bg-white"
                     placeholder="Get PIN"
+                  />
+                </div>
+
+                <div className="rounded-xl border border-zinc-200/80 bg-white p-4">
+                  <div className="mb-3 flex items-center gap-2">
+                    <Type className="h-3.5 w-3.5 text-zinc-400" />
+                    <label className="text-[13px] font-medium text-zinc-600">
+                      Enter PIN Button
+                    </label>
+                  </div>
+                  <input
+                    value={form.enterPinBtnText}
+                    onChange={(e) =>
+                      setForm({ ...form, enterPinBtnText: e.target.value })
+                    }
+                    className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-400 focus:bg-white"
+                    placeholder="Enter PIN"
                   />
                 </div>
               </div>
