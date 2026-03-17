@@ -110,10 +110,14 @@
   }
 
   /* ── Buttons ── */
-  .btn-main {
-    width: 100%;
-    padding: 14px;
+  .action-row {
+    display: flex;
+    gap: 8px;
     margin-top: 18px;
+  }
+  .btn-main {
+    flex: 1;
+    padding: 14px;
     border: none;
     border-radius: 12px;
     background: #111;
@@ -126,6 +130,22 @@
   }
   .btn-main:active { opacity: 0.85; }
   .btn-main.loading { opacity: 0.45; pointer-events: none; }
+  .btn-main.full { flex: none; width: 100%; margin-top: 18px; }
+  .btn-outlined {
+    flex: 1;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background: #fff;
+    color: #111;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .btn-outlined:hover { border-color: #bbb; background: #f8f8f8; }
+  .btn-outlined:active { background: #f0f0f0; }
 
   .row2 {
     display: flex;
@@ -412,7 +432,10 @@
       </div>
     </div>
 
-    <button class="btn-main">Generate PIN & Verify</button>
+    <div class="action-row">
+      <button class="btn-main">Get PIN</button>
+      <button class="btn-outlined">Enter PIN</button>
+    </div>
 
     <div class="row2">
       <button class="btn-ghost">
@@ -482,7 +505,7 @@
     <div class="err-text">Invalid PIN. Try again.</div>
     <div class="att">2 attempts remaining</div>
 
-    <button class="btn-main" style="margin-top:18px">Verify</button>
+    <button class="btn-main full">Verify</button>
     <button class="btn-back">
       <svg viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="9,2 4,7 9,12"/>
@@ -575,11 +598,14 @@
       </div>
     </div>
 
-    <button class="btn-main loading">
-      <svg width="16" height="16" viewBox="0 0 16 16" style="animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px"><circle cx="8" cy="8" r="6" stroke="rgba(255,255,255,.25)" stroke-width="2" fill="none"/><path d="M14 8a6 6 0 00-6-6" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
-      <style>@keyframes sp{to{transform:rotate(360deg)}}</style>
-      Generating...
-    </button>
+    <div class="action-row">
+      <button class="btn-main loading">
+        <svg width="16" height="16" viewBox="0 0 16 16" style="animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px"><circle cx="8" cy="8" r="6" stroke="rgba(255,255,255,.25)" stroke-width="2" fill="none"/><path d="M14 8a6 6 0 00-6-6" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        <style>@keyframes sp{to{transform:rotate(360deg)}}</style>
+        Generating...
+      </button>
+      <button class="btn-outlined" style="opacity:.35;pointer-events:none">Enter PIN</button>
+    </div>
 
     <div class="row2">
       <button class="btn-ghost" style="opacity:.35;pointer-events:none">Tutorial</button>
@@ -668,7 +694,10 @@
       <button class="btn-dismiss" onclick="document.getElementById('joinOverlay').classList.remove('open')">Close</button>
     </div>
 
-    <button class="btn-main" style="margin-top:0;opacity:.35;pointer-events:none">Generate PIN & Verify</button>
+    <div class="action-row" style="margin-top:0;opacity:.35;pointer-events:none">
+      <button class="btn-main">Get PIN</button>
+      <button class="btn-outlined">Enter PIN</button>
+    </div>
   </div>
 </div>
 
