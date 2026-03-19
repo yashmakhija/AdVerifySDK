@@ -346,38 +346,21 @@ class AdDialog {
     }
 
     // ════════════════════════════════════════
-    // BANNER
+    // BANNER — uses basic Dialog pinned to bottom (same proven approach as card)
     // ════════════════════════════════════════
 
     private void showBanner() {
-        Dialog dialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar);
+        Dialog dialog = new Dialog(activity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(true);
         dialog.setOnDismissListener(d -> { if (listener != null) listener.onClosed(); });
 
-        FrameLayout root = new FrameLayout(activity);
-        root.setLayoutParams(new FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        root.setClipChildren(false); // allow banner shadow to render
-        root.setOnClickListener(v -> dialog.dismiss()); // tap outside to dismiss
-
-        // Banner
+        // Banner bar — horizontal layout
         LinearLayout banner = new LinearLayout(activity);
         banner.setOrientation(LinearLayout.HORIZONTAL);
         banner.setGravity(Gravity.CENTER_VERTICAL);
-        banner.setOnClickListener(v -> {}); // block click-through
-
-        GradientDrawable bannerBg = new GradientDrawable();
-        bannerBg.setColor(Color.WHITE);
-        bannerBg.setCornerRadii(new float[]{dp(16),dp(16),dp(16),dp(16), 0,0,0,0});
-        banner.setBackground(bannerBg);
-        banner.setElevation(dp(12));
-        int navH = getNavBarHeight();
-        banner.setPadding(dp(16), dp(14), dp(16), dp(14) + navH);
-
-        FrameLayout.LayoutParams bLP = new FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        bLP.gravity = Gravity.BOTTOM;
-        banner.setLayoutParams(bLP);
+        banner.setBackgroundColor(Color.WHITE);
+        banner.setPadding(dp(16), dp(14), dp(16), dp(14));
 
         // Thumb
         if (hasImage()) {
@@ -401,10 +384,11 @@ class AdDialog {
             loadImage(ad.imageUrl, thumb);
         }
 
-        // Text
+        // Text column
         LinearLayout textCol = new LinearLayout(activity);
         textCol.setOrientation(LinearLayout.VERTICAL);
-        textCol.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        textCol.setLayoutParams(new LinearLayout.LayoutParams(
+            0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
         TextView title = new TextView(activity);
         title.setText(safeStr(ad.title, ""));
@@ -424,7 +408,7 @@ class AdDialog {
 
         banner.addView(textCol);
 
-        // CTA
+        // CTA button
         TextView cta = new TextView(activity);
         cta.setText(safeStr(ad.buttonText, "Visit"));
         cta.setTextColor(Color.WHITE);
@@ -444,40 +428,21 @@ class AdDialog {
         cta.setOnClickListener(v -> { onCtaClick(); dialog.dismiss(); });
         banner.addView(cta);
 
-        root.addView(banner);
+        dialog.setContentView(banner);
 
-        // Close X above banner
-        TextView x = new TextView(activity);
-        x.setText("✕");
-        x.setTextColor(Color.parseColor("#999"));
-        x.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        x.setGravity(Gravity.CENTER);
-        GradientDrawable xBg = new GradientDrawable();
-        xBg.setColor(Color.parseColor("#f0f0f0"));
-        xBg.setCornerRadius(dp(14));
-        x.setBackground(xBg);
-        FrameLayout.LayoutParams xLP = new FrameLayout.LayoutParams(dp(28), dp(28));
-        xLP.gravity = Gravity.BOTTOM | Gravity.END;
-        xLP.bottomMargin = dp(86) + navH;
-        xLP.rightMargin = dp(12);
-        x.setLayoutParams(xLP);
-        x.setOnClickListener(v -> dialog.dismiss());
-        root.addView(x);
-
-        dialog.setContentView(root);
-        Window w = dialog.getWindow();
-        if (w != null) {
-            w.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-            w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            w.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        // Window — full width, wrap height, pinned to BOTTOM, light dim
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            window.setGravity(Gravity.BOTTOM);
+            window.setDimAmount(0.15f);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            // Slide-in animation
+            window.setWindowAnimations(android.R.style.Animation_InputMethod);
         }
-        dialog.show();
 
-        // Slide up
-        TranslateAnimation slide = new TranslateAnimation(0, 0, dp(100), 0);
-        slide.setDuration(300);
-        slide.setInterpolator(new DecelerateInterpolator());
-        banner.startAnimation(slide);
+        dialog.show();
     }
 
     // ════════════════════════════════════════
