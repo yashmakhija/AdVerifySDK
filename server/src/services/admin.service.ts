@@ -71,8 +71,15 @@ export class AdminService {
     adType?: string;
     buttonText?: string;
     priority?: number;
+    maxImpressions?: number;
+    broadcastToVerified?: boolean;
+    targetAudience?: string;
+    scheduledAt?: string | null;
   }) {
-    return prisma.ad.create({ data });
+    return prisma.ad.create({ data: {
+      ...data,
+      scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : null,
+    }});
   }
 
   async updateAd(
@@ -86,9 +93,17 @@ export class AdminService {
       buttonText?: string;
       isActive?: boolean;
       priority?: number;
+      maxImpressions?: number;
+      broadcastToVerified?: boolean;
+      targetAudience?: string;
+      scheduledAt?: string | null;
     },
   ) {
-    return prisma.ad.update({ where: { id }, data });
+    const updateData: any = { ...data };
+    if (data.scheduledAt !== undefined) {
+      updateData.scheduledAt = data.scheduledAt ? new Date(data.scheduledAt) : null;
+    }
+    return prisma.ad.update({ where: { id }, data: updateData });
   }
 
   async deleteAd(id: number) {
