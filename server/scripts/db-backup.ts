@@ -151,20 +151,28 @@ async function main() {
 
   log(`Database: ${pgEnv.PGDATABASE}@${pgEnv.PGHOST}:${pgEnv.PGPORT} as ${pgEnv.PGUSER}`);
 
-  // First test connection
-  try {
-    execSync(`pg_isready -h ${pgEnv.PGHOST} -p ${pgEnv.PGPORT} -U ${pgEnv.PGUSER}`, {
-      env: pgEnv,
-      stdio: ["pipe", "pipe", "pipe"],
-      timeout: 10_000,
-    });
-  } catch {
-    log("Warning: pg_isready check failed, trying pg_dump anyway...");
+  // Find pg_dump binary
+  let pgDump = "pg_dump";
+  const pgPaths = [
+    "/usr/bin/pg_dump",
+    "/usr/local/bin/pg_dump",
+    "/usr/lib/postgresql/16/bin/pg_dump",
+    "/usr/lib/postgresql/15/bin/pg_dump",
+    "/usr/lib/postgresql/14/bin/pg_dump",
+    "/usr/lib/postgresql/13/bin/pg_dump",
+  ];
+  for (const p of pgPaths) {
+    if (existsSync(p)) { pgDump = p; break; }
   }
+  // Also try `which`
+  try {
+    pgDump = execSync("which pg_dump 2>/dev/null || find /usr -name pg_dump -type f 2>/dev/null | head -1", { encoding: "utf-8" }).trim() || pgDump;
+  } catch {}
+  log(`Using pg_dump: ${pgDump}`);
 
   const sqlFile = filepath.replace(".gz", "");
   try {
-    execSync(`pg_dump --no-owner --no-acl -f "${sqlFile}"`, {
+    execSync(`"${pgDump}" --no-owner --no-acl -f "${sqlFile}"`, {
       env: pgEnv,
       stdio: ["pipe", "pipe", "inherit"], // show stderr
       timeout: 120_000,
