@@ -162,18 +162,28 @@ async function main() {
   } catch {}
 
   if (!pgDump) {
-    // Look for postgres Docker container
+    // Look for the right postgres Docker container by matching the DB user from DATABASE_URL
     try {
-      dockerContainer = execSync(
-        'docker ps --filter "ancestor=postgres" --filter "status=running" --format "{{.Names}}" 2>/dev/null | head -1',
+      // First try matching container name with the DB user/name
+      const allContainers = execSync(
+        'docker ps --filter "status=running" --format "{{.Names}}" 2>/dev/null',
         { encoding: "utf-8" }
-      ).trim();
+      ).trim().split("\n").filter(Boolean);
+
+      // Priority: match container name containing our db user or "freemodsapp"
+      const dbUser = pgEnv.PGUSER || "";
+      dockerContainer =
+        allContainers.find(c => c.includes(dbUser)) ||
+        allContainers.find(c => c.includes("freemodsapp")) ||
+        allContainers.find(c => c.includes("adverify")) ||
+        "";
+
+      // Fallback: find any container with postgres image
       if (!dockerContainer) {
-        // Try broader search
         dockerContainer = execSync(
-          'docker ps --filter "status=running" --format "{{.Names}}" 2>/dev/null | grep -i postgres | head -1',
+          'docker ps --filter "status=running" --format "{{.Names}} {{.Image}}" 2>/dev/null | grep postgres | head -1',
           { encoding: "utf-8" }
-        ).trim();
+        ).trim().split(" ")[0] || "";
       }
     } catch {}
 
@@ -192,8 +202,9 @@ async function main() {
   try {
     if (useDocker) {
       // Run pg_dump inside Docker, stream output to local file
+      // Use 127.0.0.1 inside container (localhost may resolve to IPv6 and fail)
       execSync(
-        `docker exec -e PGPASSWORD="${pgEnv.PGPASSWORD}" ${dockerContainer} pg_dump -h ${pgEnv.PGHOST} -p ${pgEnv.PGPORT} -U ${pgEnv.PGUSER} --no-owner --no-acl ${pgEnv.PGDATABASE} > "${sqlFile}"`,
+        `docker exec -e PGPASSWORD="${pgEnv.PGPASSWORD}" ${dockerContainer} pg_dump -h 127.0.0.1 -p 5432 -U ${pgEnv.PGUSER} --no-owner --no-acl ${pgEnv.PGDATABASE} > "${sqlFile}"`,
         { stdio: ["pipe", "pipe", "inherit"], timeout: 120_000 }
       );
     } else {
