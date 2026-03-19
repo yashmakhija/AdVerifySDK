@@ -25,17 +25,19 @@ model ApiKey {
 }
 
 model Ad {
-  id          Int          @id @default(autoincrement())
-  apiKeyId    Int          @map("api_key_id")
-  title       String
-  description String       @default("")
-  imageUrl    String       @default("") @map("image_url")
-  redirectUrl String       @default("") @map("redirect_url")
-  adType      String       @default("interstitial") @map("ad_type")
-  buttonText  String       @default("Visit Now") @map("button_text")
-  isActive    Boolean      @default(true) @map("is_active")
-  priority    Int          @default(0)
-  createdAt   DateTime     @default(now()) @map("created_at")
+  id                  Int          @id @default(autoincrement())
+  apiKeyId            Int          @map("api_key_id")
+  title               String
+  description         String       @default("")
+  imageUrl            String       @default("") @map("image_url")
+  redirectUrl         String       @default("") @map("redirect_url")
+  adType              String       @default("card") @map("ad_type")        // "fullscreen" | "card" | "banner"
+  buttonText          String       @default("Visit Now") @map("button_text")
+  isActive            Boolean      @default(true) @map("is_active")
+  priority            Int          @default(0)
+  maxImpressions      Int          @default(0) @map("max_impressions")     // 0 = unlimited per device
+  broadcastToVerified Boolean      @default(false) @map("broadcast_to_verified") // show to already-verified users on return
+  createdAt           DateTime     @default(now()) @map("created_at")
 
   apiKey      ApiKey       @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
   impressions Impression[]
@@ -101,6 +103,7 @@ model Impression {
   ad        Ad       @relation(fields: [adId], references: [id], onDelete: Cascade)
   apiKey    ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
 
+  @@index([adId, deviceId])
   @@map("impressions")
 }
 

@@ -32,10 +32,16 @@ export class SdkService {
     const pinInfoItems = pinConfig?.pinInfoItems as any[] ?? [];
     const joinLinks = pinConfig?.joinLinks as any[] ?? [];
 
+    // Check if there are broadcast ads for verified users
+    const hasBroadcastAds = pinVerified
+      ? (await prisma.ad.count({ where: { apiKeyId, isActive: true, broadcastToVerified: true } })) > 0
+      : false;
+
     return {
       appName: apiKey?.appName ?? '',
       pinEnabled: pinConfig?.pinEnabled ?? false,
       pinVerified,
+      hasBroadcastAds,
       pinMessage: pinConfig?.pinMessage ?? '',
       maxAttempts: pinConfig?.maxAttempts ?? 3,
       getPinUrl: pinConfig?.getPinUrl ?? '',
@@ -47,8 +53,8 @@ export class SdkService {
     };
   }
 
-  async getAds(apiKeyId: number) {
-    return prisma.ad.findMany({
+  async getAds(apiKeyId: number, deviceId?: string) {
+    const ads = await prisma.ad.findMany({
       where: { apiKeyId, isActive: true },
       select: {
         id: true,
@@ -59,9 +65,28 @@ export class SdkService {
         adType: true,
         buttonText: true,
         priority: true,
+        maxImpressions: true,
+        broadcastToVerified: true,
       },
       orderBy: { priority: 'desc' },
     });
+
+    // Filter by max impressions per device
+    if (deviceId && ads.some(a => a.maxImpressions > 0)) {
+      const counts = await prisma.impression.groupBy({
+        by: ['adId'],
+        where: { apiKeyId, deviceId },
+        _count: true,
+      });
+      const countMap = new Map(counts.map(c => [c.adId, c._count]));
+
+      return ads.filter(ad => {
+        if (ad.maxImpressions <= 0) return true;
+        return (countMap.get(ad.id) ?? 0) < ad.maxImpressions;
+      });
+    }
+
+    return ads;
   }
 
   // Verify a per-user PIN (tied to device)

@@ -13,7 +13,8 @@ export class SdkController {
   }
 
   async getAds(req: AuthenticatedRequest, res: Response) {
-    const ads = await service.getAds(req.apiKeyData!.id);
+    const deviceId = req.body?.deviceId || req.query?.deviceId || '';
+    const ads = await service.getAds(req.apiKeyData!.id, deviceId as string);
     res.json({ ads });
   }
 

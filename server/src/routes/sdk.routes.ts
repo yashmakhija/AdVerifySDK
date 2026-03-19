@@ -23,7 +23,13 @@ router.post(
   (req, res) => ctrl.init(req, res),
 );
 
+// Support both GET (backward compat) and POST (with deviceId for frequency filtering)
 router.get('/ads', (req, res) => ctrl.getAds(req, res));
+router.post(
+  '/ads',
+  validate(z.object({ deviceId: z.string().optional() })),
+  (req, res) => ctrl.getAds(req, res),
+);
 
 router.post(
   '/verify-pin',
