@@ -15,18 +15,18 @@ export function Badge({
     <span
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
-        variant === "success" && "bg-emerald-50 text-emerald-700",
-        variant === "destructive" && "bg-red-50 text-red-600",
-        variant === "default" && "bg-zinc-100 text-zinc-500",
+        variant === "success" && "bg-emerald-500/10 text-emerald-400",
+        variant === "destructive" && "bg-red-500/10 text-red-400",
+        variant === "default" && "bg-white/[0.06] text-zinc-400",
         className
       )}
     >
       <span
         className={cn(
           "h-1.5 w-1.5 rounded-full",
-          variant === "success" && "bg-emerald-500",
+          variant === "success" && "bg-emerald-400",
           variant === "destructive" && "bg-red-400",
-          variant === "default" && "bg-zinc-400"
+          variant === "default" && "bg-zinc-500"
         )}
       />
       {children}

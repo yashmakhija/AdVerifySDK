@@ -90,7 +90,7 @@ export default function AdsPage() {
             key: "title",
             label: "Title",
             render: (ad: Ad) => (
-              <span className="font-medium text-zinc-950">{ad.title}</span>
+              <span className="font-medium text-white">{ad.title}</span>
             ),
           },
           {
@@ -106,7 +106,7 @@ export default function AdsPage() {
             key: "type",
             label: "Type",
             render: (ad: Ad) => (
-              <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600 capitalize">
+              <span className="rounded-md bg-white/[0.06] px-2 py-0.5 text-xs font-medium text-zinc-400 capitalize">
                 {ad.adType}
               </span>
             ),
@@ -155,7 +155,7 @@ export default function AdsPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => deleteAd(ad.id)}
-                  className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 h-7 px-2"
+                  className="text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 h-7 px-2"
                 >
                   Delete
                 </Button>

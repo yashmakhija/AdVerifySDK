@@ -5,19 +5,19 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 cursor-pointer",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 cursor-pointer",
   {
     variants: {
       variant: {
-        default: "bg-indigo-500 text-white hover:bg-indigo-600 shadow-sm shadow-indigo-500/20 active:scale-[0.98]",
+        default: "bg-white text-black hover:bg-zinc-200 active:scale-[0.98]",
         destructive:
-          "bg-red-500 text-white hover:bg-red-600 shadow-sm shadow-red-500/20 active:scale-[0.98]",
+          "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 active:scale-[0.98]",
         outline:
-          "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 hover:border-zinc-300 active:scale-[0.98]",
+          "border border-white/[0.1] bg-white/[0.03] text-zinc-300 hover:bg-white/[0.06] hover:text-white active:scale-[0.98]",
         secondary:
-          "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 active:scale-[0.98]",
-        ghost: "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900",
-        link: "text-indigo-500 underline-offset-4 hover:underline",
+          "bg-white/[0.06] text-zinc-300 hover:bg-white/[0.1] active:scale-[0.98]",
+        ghost: "text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-300",
+        link: "text-white underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",

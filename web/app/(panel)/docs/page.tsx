@@ -24,10 +24,10 @@ const ENDPOINTS = [
 ];
 
 const METHOD_COLORS: Record<string, string> = {
-  GET: "text-emerald-600 bg-emerald-50",
-  POST: "text-blue-600 bg-blue-50",
-  PATCH: "text-amber-600 bg-amber-50",
-  DELETE: "text-red-600 bg-red-50",
+  GET: "text-emerald-400 bg-emerald-500/10",
+  POST: "text-blue-400 bg-blue-500/10",
+  PATCH: "text-amber-400 bg-amber-500/10",
+  DELETE: "text-red-400 bg-red-500/10",
 };
 
 function CodeSnippet({ code, id }: { code: string; id: string }) {
@@ -40,22 +40,33 @@ function CodeSnippet({ code, id }: { code: string; id: string }) {
   }
 
   return (
-    <div className="group relative">
-      <pre className="overflow-x-auto rounded-lg bg-zinc-900 px-3.5 py-3 text-[12px] leading-relaxed text-zinc-400 font-mono">
-        <code className="whitespace-pre-wrap break-all sm:whitespace-pre sm:break-normal">
-          {code}
-        </code>
-      </pre>
-      <button
-        onClick={copy}
-        className="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-zinc-800 px-2 py-1 text-[10px] font-medium text-zinc-400 opacity-100 transition-all hover:bg-zinc-700 hover:text-white sm:opacity-0 sm:group-hover:opacity-100"
-      >
-        {copied === id ? (
-          <><Check className="h-3 w-3" /> Copied</>
-        ) : (
-          <><Copy className="h-3 w-3" /> Copy</>
-        )}
-      </button>
+    <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] overflow-hidden">
+      {/* Header with copy */}
+      <div className="flex items-center justify-between px-3.5 py-1.5 border-b border-white/[0.04]">
+        <div className="flex gap-1">
+          <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
+          <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
+          <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
+        </div>
+        <button
+          onClick={copy}
+          className="flex items-center gap-1 rounded-md bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-zinc-500 transition-all hover:bg-white/[0.08] hover:text-zinc-300 active:scale-95"
+        >
+          {copied === id ? (
+            <><Check className="h-2.5 w-2.5" /> Copied</>
+          ) : (
+            <><Copy className="h-2.5 w-2.5" /> Copy</>
+          )}
+        </button>
+      </div>
+      {/* Code */}
+      <div className="overflow-x-auto px-3.5 py-3">
+        <pre className="text-[12px] leading-relaxed text-zinc-400 font-mono">
+          <code className="whitespace-pre-wrap break-all sm:whitespace-pre sm:break-normal">
+            {code}
+          </code>
+        </pre>
+      </div>
     </div>
   );
 }
@@ -69,7 +80,7 @@ export default function DocsPage() {
       />
 
       <div className="space-y-5">
-        <div className="rounded-xl border border-zinc-200/80 bg-zinc-950 p-5">
+        <div className="rounded-xl border border-white/[0.06] bg-zinc-950 p-5">
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
             Quick Start
           </p>
@@ -89,27 +100,27 @@ export default function DocsPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-zinc-200/80 bg-white p-5">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
             API Endpoints
           </p>
           <p className="mb-4 text-[13px] text-zinc-500">
             Admin endpoints use HTTP Basic Auth. SDK endpoints use{" "}
-            <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-mono text-zinc-600">
+            <code className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[11px] font-mono text-zinc-400">
               x-api-key
             </code>{" "}
             header.
           </p>
           <div className="overflow-x-auto -mx-5 px-5">
             <table className="w-full min-w-[480px] text-left text-[13px]">
-              <thead className="border-b border-zinc-100 text-[11px] text-zinc-400">
+              <thead className="border-b border-white/[0.04] text-[11px] text-zinc-500">
                 <tr>
                   <th className="pb-2.5 pr-3 font-medium w-16">Method</th>
                   <th className="pb-2.5 pr-3 font-medium">Path</th>
                   <th className="pb-2.5 font-medium">Description</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-50">
+              <tbody className="divide-y divide-white/[0.04]">
                 {ENDPOINTS.map(({ method, path, desc }) => (
                   <tr key={`${method}-${path}`}>
                     <td className="py-2.5 pr-3">
@@ -117,7 +128,7 @@ export default function DocsPage() {
                         {method}
                       </span>
                     </td>
-                    <td className="py-2.5 pr-3 font-mono text-[11px] text-zinc-800 whitespace-nowrap">
+                    <td className="py-2.5 pr-3 font-mono text-[11px] text-zinc-200 whitespace-nowrap">
                       {path}
                     </td>
                     <td className="py-2.5 text-zinc-500">{desc}</td>

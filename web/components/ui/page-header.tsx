@@ -17,11 +17,11 @@ export function PageHeader({
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h1 className="text-lg font-semibold tracking-tight text-zinc-900">
+        <h1 className="text-lg font-bold tracking-tight text-white">
           {title}
         </h1>
         {description && (
-          <p className="mt-0.5 text-[13px] text-zinc-400">{description}</p>
+          <p className="mt-0.5 text-[13px] text-zinc-500">{description}</p>
         )}
       </div>
       {actionLabel && onAction && (

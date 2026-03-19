@@ -111,7 +111,7 @@ export default function UserPinsPage() {
     <div>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight text-zinc-900">
+          <h1 className="text-lg font-semibold tracking-tight text-white">
             User PINs
           </h1>
           <p className="mt-0.5 text-[13px] text-zinc-500">
@@ -125,9 +125,9 @@ export default function UserPinsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-9 gap-2 px-3 font-normal text-zinc-600"
+                  className="h-9 gap-2 px-3 font-normal text-zinc-400"
                 >
-                  <CalendarIcon className="h-3.5 w-3.5 text-zinc-400" />
+                  <CalendarIcon className="h-3.5 w-3.5 text-zinc-500" />
                   {selectedDate ? format(selectedDate, "MMM d, yyyy") : "Pick a date"}
                 </Button>
               </PopoverTrigger>
@@ -144,7 +144,7 @@ export default function UserPinsPage() {
             {selectedDate && (
               <button
                 onClick={clearDate}
-                className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/[0.06] hover:text-zinc-300"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -169,35 +169,35 @@ export default function UserPinsPage() {
 
       {pinStats && (
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-lg border border-zinc-200/80 bg-white p-3.5">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
               {selectedDate ? format(selectedDate, "MMM d") : "Today"} Generated
             </p>
-            <p className="mt-1 text-xl font-semibold text-zinc-900">
+            <p className="mt-1 text-xl font-semibold text-white">
               {pinStats.todayGenerated}
             </p>
           </div>
-          <div className="rounded-lg border border-zinc-200/80 bg-white p-3.5">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
               {selectedDate ? format(selectedDate, "MMM d") : "Today"} Used
             </p>
-            <p className="mt-1 text-xl font-semibold text-zinc-900">
+            <p className="mt-1 text-xl font-semibold text-white">
               {pinStats.todayUsed}
             </p>
           </div>
-          <div className="rounded-lg border border-zinc-200/80 bg-white p-3.5">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
               Active PINs
             </p>
-            <p className="mt-1 text-xl font-semibold text-emerald-600">
+            <p className="mt-1 text-xl font-semibold text-emerald-400">
               {pinStats.totalActive}
             </p>
           </div>
-          <div className="rounded-lg border border-zinc-200/80 bg-white p-3.5">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
               Expired PINs
             </p>
-            <p className="mt-1 text-xl font-semibold text-red-500">
+            <p className="mt-1 text-xl font-semibold text-red-400">
               {pinStats.totalExpired}
             </p>
           </div>
@@ -219,7 +219,7 @@ export default function UserPinsPage() {
             key: "deviceId",
             label: "Device ID",
             render: (p: UserPin) => (
-              <code className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 font-mono">
+              <code className="rounded-md bg-white/[0.06] px-2 py-0.5 text-xs text-zinc-400 font-mono">
                 {p.deviceId.slice(0, 12)}...
               </code>
             ),
@@ -228,7 +228,7 @@ export default function UserPinsPage() {
             key: "pin",
             label: "PIN",
             render: (p: UserPin) => (
-              <span className="font-mono font-medium text-zinc-900">
+              <span className="font-mono font-medium text-white">
                 {p.pin}
               </span>
             ),
@@ -275,7 +275,7 @@ export default function UserPinsPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => expirePin(p.id)}
-                      className="text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 h-7 px-2"
+                      className="text-xs text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 h-7 px-2"
                     >
                       Expire
                     </Button>
@@ -284,7 +284,7 @@ export default function UserPinsPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => revoke(p.deviceId, p.apiKeyId)}
-                    className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 h-7 px-2"
+                    className="text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 h-7 px-2"
                   >
                     Revoke
                   </Button>

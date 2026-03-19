@@ -36,8 +36,8 @@ export default function DashboardPage() {
   if (!stats) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="flex items-center gap-3 text-zinc-400">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-300 border-t-transparent" />
+        <div className="flex items-center gap-3 text-zinc-600">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-transparent" />
           <span className="text-sm">Loading...</span>
         </div>
       </div>
@@ -56,52 +56,61 @@ export default function DashboardPage() {
           label="API Keys"
           value={stats.totalKeys}
           icon={<KeyRound className="h-4 w-4" />}
+          accent="#6366f1"
         />
         <StatCard
           label="Total Ads"
           value={stats.totalAds}
           icon={<Megaphone className="h-4 w-4" />}
+          accent="#3b82f6"
         />
         <StatCard
           label="Total PINs"
           value={stats.totalPins}
           icon={<Lock className="h-4 w-4" />}
+          accent="#8b5cf6"
         />
         <StatCard
           label="Used PINs"
           value={stats.usedPins}
           icon={<CheckCircle2 className="h-4 w-4" />}
+          accent="#10b981"
         />
         <StatCard
           label="Impressions"
           value={stats.totalImpressions.toLocaleString()}
           icon={<Eye className="h-4 w-4" />}
+          accent="#f59e0b"
         />
         <StatCard
           label="Today Impr."
           value={stats.todayImpressions.toLocaleString()}
           icon={<BarChart3 className="h-4 w-4" />}
+          accent="#f97316"
         />
         <StatCard
           label="Total Clicks"
           value={stats.totalClicks.toLocaleString()}
           icon={<MousePointerClick className="h-4 w-4" />}
+          accent="#ec4899"
         />
         <StatCard
           label="Today Clicks"
           value={stats.todayClicks.toLocaleString()}
           icon={<Zap className="h-4 w-4" />}
+          accent="#14b8a6"
         />
         <StatCard
           label="CTR"
           value={`${stats.ctr}%`}
           icon={<TrendingUp className="h-4 w-4" />}
+          accent="#22c55e"
         />
       </div>
 
       {pinStats && (
         <>
-          <h2 className="mt-8 mb-3 text-[13px] font-semibold text-zinc-900">
+          <h2 className="mt-8 mb-3 text-[13px] font-semibold text-zinc-400">
             PIN Analytics
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
@@ -109,31 +118,37 @@ export default function DashboardPage() {
               label="PINs Today"
               value={pinStats.todayGenerated}
               icon={<CalendarDays className="h-4 w-4" />}
+              accent="#6366f1"
             />
             <StatCard
               label="Used Today"
               value={pinStats.todayUsed}
               icon={<CheckCircle2 className="h-4 w-4" />}
+              accent="#10b981"
             />
             <StatCard
               label="PINs Yesterday"
               value={pinStats.yesterdayGenerated}
               icon={<CalendarDays className="h-4 w-4" />}
+              accent="#8b5cf6"
             />
             <StatCard
               label="Used Yesterday"
               value={pinStats.yesterdayUsed}
               icon={<CheckCircle2 className="h-4 w-4" />}
+              accent="#14b8a6"
             />
             <StatCard
               label="Active PINs"
               value={pinStats.totalActive}
               icon={<ShieldCheck className="h-4 w-4" />}
+              accent="#22c55e"
             />
             <StatCard
               label="Expired PINs"
               value={pinStats.totalExpired}
               icon={<ShieldOff className="h-4 w-4" />}
+              accent="#ef4444"
             />
           </div>
         </>

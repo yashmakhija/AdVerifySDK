@@ -25,13 +25,13 @@ function CopyableKey({ value }: { value: string }) {
     <button
       onClick={copy}
       title="Click to copy"
-      className="group inline-flex items-center gap-2 rounded-lg border border-zinc-200/80 bg-zinc-50 px-2.5 py-1.5 font-mono text-[11px] text-zinc-500 transition-all hover:border-zinc-300 hover:bg-zinc-100 active:scale-[0.98] max-w-full"
+      className="group inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-1.5 font-mono text-[11px] text-zinc-500 transition-all hover:border-white/[0.1] hover:bg-white/[0.06] active:scale-[0.98] max-w-full"
     >
       <span className="truncate">{value}</span>
       {copied ? (
-        <Check className="h-3 w-3 shrink-0 text-emerald-500" />
+        <Check className="h-3 w-3 shrink-0 text-emerald-400" />
       ) : (
-        <Copy className="h-3 w-3 shrink-0 text-zinc-400 transition-colors group-hover:text-zinc-600" />
+        <Copy className="h-3 w-3 shrink-0 text-zinc-600 transition-colors group-hover:text-zinc-300" />
       )}
     </button>
   );
@@ -94,14 +94,14 @@ export default function KeysPage() {
       />
 
       {loading ? (
-        <div className="rounded-xl border border-zinc-200/80 bg-white p-10 text-center text-[13px] text-zinc-400">
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-10 text-center text-[13px] text-zinc-600">
           Loading...
         </div>
       ) : keys.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-200 bg-white p-12 text-center">
-          <KeyRound className="mx-auto h-8 w-8 text-zinc-300" />
-          <p className="mt-3 text-sm font-medium text-zinc-500">No API keys yet</p>
-          <p className="mt-1 text-[12px] text-zinc-400">Create your first key to get started</p>
+        <div className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] p-12 text-center">
+          <KeyRound className="mx-auto h-8 w-8 text-zinc-700" />
+          <p className="mt-3 text-sm font-medium text-zinc-400">No API keys yet</p>
+          <p className="mt-1 text-[12px] text-zinc-600">Create your first key to get started</p>
           <Button size="sm" className="mt-4" onClick={() => setModal(true)}>
             Create Key
           </Button>
@@ -109,10 +109,10 @@ export default function KeysPage() {
       ) : (
         <>
           {/* Desktop */}
-          <div className="hidden lg:block rounded-xl border border-zinc-200/80 bg-white">
+          <div className="hidden lg:block rounded-xl border border-white/[0.06] bg-white/[0.02]">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-100 text-[11px] font-medium uppercase tracking-wider text-zinc-400">
+                <tr className="border-b border-white/[0.06] text-[11px] font-medium uppercase tracking-wider text-zinc-600">
                   <th className="px-5 py-3.5">App</th>
                   <th className="px-5 py-3.5">Package</th>
                   <th className="px-5 py-3.5">API Key</th>
@@ -120,13 +120,13 @@ export default function KeysPage() {
                   <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-50">
+              <tbody className="divide-y divide-white/[0.04]">
                 {keys.map((k) => (
-                  <tr key={k.id} className="text-zinc-600 transition-colors hover:bg-zinc-50/60">
+                  <tr key={k.id} className="text-zinc-400 transition-colors hover:bg-white/[0.02]">
                     <td className="px-5 py-3.5">
-                      <span className="font-medium text-zinc-900">{k.appName}</span>
+                      <span className="font-medium text-white">{k.appName}</span>
                     </td>
-                    <td className="px-5 py-3.5 text-zinc-400 text-[13px]">{k.packageName || "-"}</td>
+                    <td className="px-5 py-3.5 text-zinc-500 text-[13px]">{k.packageName || "-"}</td>
                     <td className="px-5 py-3.5">
                       <CopyableKey value={k.key} />
                     </td>
@@ -153,7 +153,7 @@ export default function KeysPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => deleteKey(k.id)}
-                          className="text-xs text-red-500 hover:text-red-600 hover:bg-red-50 h-7 px-2.5 gap-1.5"
+                          className="text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 h-7 px-2.5 gap-1.5"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                           Delete
@@ -171,13 +171,13 @@ export default function KeysPage() {
             {keys.map((k) => (
               <div
                 key={k.id}
-                className="rounded-xl border border-zinc-200/80 bg-white overflow-hidden"
+                className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden"
               >
                 <div className="p-4 space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className="font-medium text-zinc-900 truncate">{k.appName}</h3>
-                      <p className="text-[11px] text-zinc-400 mt-0.5">{k.packageName || "-"}</p>
+                      <h3 className="font-medium text-white truncate">{k.appName}</h3>
+                      <p className="text-[11px] text-zinc-600 mt-0.5">{k.packageName || "-"}</p>
                     </div>
                     <Badge variant={k.isActive ? "success" : "destructive"} className="shrink-0">
                       {k.isActive ? "Active" : "Inactive"}
@@ -185,17 +185,17 @@ export default function KeysPage() {
                   </div>
 
                   <div>
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400 mb-1.5">
+                    <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-600 mb-1.5">
                       API Key
                     </p>
                     <CopyableKey value={k.key} />
                   </div>
                 </div>
 
-                <div className="flex border-t border-zinc-100 divide-x divide-zinc-100">
+                <div className="flex border-t border-white/[0.06] divide-x divide-white/[0.06]">
                   <button
                     onClick={() => toggleKey(k.id, k.isActive)}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-zinc-50 active:bg-zinc-100"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-white/[0.03] active:bg-white/[0.05]"
                   >
                     {k.isActive ? (
                       <><ToggleRight className="h-3.5 w-3.5" /> Disable</>
@@ -205,7 +205,7 @@ export default function KeysPage() {
                   </button>
                   <button
                     onClick={() => deleteKey(k.id)}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-red-500 transition-colors hover:bg-red-50 active:bg-red-100"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10 active:bg-red-500/15"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Delete

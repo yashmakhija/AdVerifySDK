@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { AppSelector } from "@/components/ui/app-selector";
 import { Download, Copy, Check } from "lucide-react";
 import type { ApiKey } from "@/lib/types";
 
@@ -38,7 +39,7 @@ export default function MtManagerPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-lg font-semibold tracking-tight text-zinc-950">
+        <h1 className="text-lg font-semibold tracking-tight text-white">
           MT Manager Guide
         </h1>
         <p className="mt-0.5 text-[13px] text-zinc-500">
@@ -55,7 +56,7 @@ export default function MtManagerPage() {
           <a
             href="/adverify.dex"
             download="adverify.dex"
-            className="mt-3 inline-flex items-center gap-2 rounded-lg bg-zinc-950 px-4 py-2.5 text-[13px] font-medium text-white hover:bg-zinc-800"
+            className="mt-3 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-[13px] font-medium text-black hover:bg-zinc-200"
           >
             <Download className="h-4 w-4" />
             Download DEX
@@ -66,29 +67,13 @@ export default function MtManagerPage() {
         {/* Step 2 */}
         <Step n={2} title="Select your app">
           <Desc>Choose the app you&apos;re patching to auto-fill the API key.</Desc>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {keys.length === 0 && (
-              <p className="text-[13px] text-zinc-400">
-                No API keys yet. Create one first.
-              </p>
-            )}
-            {keys.map((k) => {
-              const active = selectedKey?.id === k.id;
-              return (
-                <button
-                  key={k.id}
-                  onClick={() => setSelectedKey(k)}
-                  className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-[13px] transition-all ${
-                    active
-                      ? "border-zinc-900 bg-zinc-900 text-white"
-                      : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
-                  }`}
-                >
-                  {k.appName}
-                  {active && <Check className="h-3 w-3" />}
-                </button>
-              );
-            })}
+          <div className="mt-3 max-w-sm">
+            <AppSelector
+              keys={keys}
+              selectedId={selectedKey?.id ?? null}
+              onSelect={(id) => setSelectedKey(keys.find((k) => k.id === id) ?? null)}
+              placeholder="Search and select an app..."
+            />
           </div>
         </Step>
 
@@ -111,8 +96,8 @@ export default function MtManagerPage() {
         {/* Step 5 */}
         <Step n={5} title="Add API Key to Manifest" highlight>
           {!selectedKey ? (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5">
-              <p className="text-[13px] text-amber-700">
+            <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2.5">
+              <p className="text-[13px] text-amber-400">
                 Select an app in Step 2 to generate the code.
               </p>
             </div>
@@ -170,11 +155,11 @@ export default function MtManagerPage() {
             copied={copied}
             onCopy={copyText}
           />
-          <div className="mt-3 space-y-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700">
+          <div className="mt-3 space-y-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">
               Why this works
             </p>
-            <ul className="list-disc space-y-0.5 pl-4 text-[12px] leading-relaxed text-emerald-700">
+            <ul className="list-disc space-y-0.5 pl-4 text-[12px] leading-relaxed text-emerald-400">
               <li>
                 Only uses <Mono>p0</Mono> — no extra registers
               </li>
@@ -236,18 +221,18 @@ function Step({
           <div
             className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
               highlight
-                ? "bg-zinc-950 text-white ring-[3px] ring-zinc-950/10"
-                : "bg-zinc-100 text-zinc-500"
+                ? "bg-white text-black ring-[3px] ring-white/20"
+                : "bg-white/[0.08] text-zinc-400"
             }`}
           >
             {n}
           </div>
-          {!last && <div className="mt-1.5 h-full w-px bg-zinc-150" />}
+          {!last && <div className="mt-1.5 h-full w-px bg-white/[0.08]" />}
         </div>
 
         {/* Content */}
         <div className="min-w-0 flex-1 pb-4">
-          <h3 className="mb-1.5 text-[13px] font-semibold text-zinc-950 leading-7">
+          <h3 className="mb-1.5 text-[13px] font-semibold text-white leading-7">
             {title}
           </h3>
           {children}
@@ -271,26 +256,33 @@ function CodeBlock({
   onCopy: (text: string, id: string) => void;
 }) {
   return (
-    <div className="group relative mt-2">
-      <pre className="overflow-x-auto rounded-lg bg-zinc-950 px-3 py-3 sm:px-4 sm:py-3.5">
-        <code className="block whitespace-pre-wrap break-all text-[11px] leading-relaxed text-zinc-400 font-mono sm:text-[12px] sm:break-normal sm:whitespace-pre">
-          {code}
-        </code>
-      </pre>
-      <button
-        onClick={() => onCopy(code, id)}
-        className="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-zinc-800 px-2 py-1 text-[10px] font-medium text-zinc-400 opacity-100 transition-all hover:bg-zinc-700 hover:text-white sm:opacity-0 sm:group-hover:opacity-100"
-      >
-        {copied === id ? (
-          <>
-            <Check className="h-3 w-3" /> Copied
-          </>
-        ) : (
-          <>
-            <Copy className="h-3 w-3" /> Copy
-          </>
-        )}
-      </button>
+    <div className="mt-2 rounded-xl border border-white/[0.06] bg-white/[0.03] overflow-hidden">
+      {/* Header with copy */}
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/[0.04] sm:px-4">
+        <div className="flex gap-1">
+          <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
+          <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
+          <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
+        </div>
+        <button
+          onClick={() => onCopy(code, id)}
+          className="flex items-center gap-1 rounded-md bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-zinc-500 transition-all hover:bg-white/[0.08] hover:text-zinc-300 active:scale-95"
+        >
+          {copied === id ? (
+            <><Check className="h-2.5 w-2.5" /> Copied</>
+          ) : (
+            <><Copy className="h-2.5 w-2.5" /> Copy</>
+          )}
+        </button>
+      </div>
+      {/* Code */}
+      <div className="overflow-x-auto px-3 py-3 sm:px-4 sm:py-3.5">
+        <pre>
+          <code className="block whitespace-pre-wrap break-all text-[11px] leading-relaxed text-zinc-400 font-mono sm:text-[12px] sm:break-normal sm:whitespace-pre">
+            {code}
+          </code>
+        </pre>
+      </div>
     </div>
   );
 }
@@ -315,7 +307,7 @@ function Desc({
 
 function Mono({ children }: { children: React.ReactNode }) {
   return (
-    <code className="rounded bg-zinc-100 px-1 py-px text-[11px] font-mono text-zinc-700">
+    <code className="rounded bg-white/[0.06] px-1 py-px text-[11px] font-mono text-zinc-400">
       {children}
     </code>
   );
