@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
@@ -29,6 +30,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.adverify.sdk.internal.models.Ad;
@@ -37,16 +39,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Displays an ad dialog with 3 layout modes:
- *   - "card" (default)  — centered card with image + text + CTA
- *   - "fullscreen"      — full screen image with bottom text overlay
- *   - "banner"          — slim bar at bottom of screen
- *
- * All layouts use dp() for density-independent sizing.
- * Tested on: mdpi (160), hdpi (240), xhdpi (320), xxhdpi (480), xxxhdpi (640).
- * Min API: 21 (Android 5.0).
- */
 class AdDialog {
 
     interface AdDialogListener {
@@ -65,114 +57,194 @@ class AdDialog {
     }
 
     void show() {
-        // Guard: activity must be alive
         if (activity == null || activity.isFinishing()) return;
         if (Build.VERSION.SDK_INT >= 17 && activity.isDestroyed()) return;
 
         String type = ad.adType != null ? ad.adType.toLowerCase().trim() : "card";
-
         try {
             switch (type) {
-                case "fullscreen":
-                    showFullscreen();
-                    break;
-                case "banner":
-                    showBanner();
-                    break;
-                case "card":
-                case "interstitial":
-                case "dialog":
-                default:
-                    showCard();
-                    break;
+                case "fullscreen": showFullscreen(); break;
+                case "banner": showBanner(); break;
+                default: showCard(); break;
             }
         } catch (Exception e) {
-            // If dialog fails for any reason, report closed so SDK flow continues
             if (listener != null) listener.onClosed();
         }
     }
 
-    // ════════════════════════════════════════════
-    // CARD LAYOUT (default)
-    // ════════════════════════════════════════════
+    // ════════════════════════════════════════
+    // CARD — simple Dialog, no overlay tricks
+    // ════════════════════════════════════════
 
     private void showCard() {
-        Dialog dialog = createDialog();
+        // Use a basic Dialog — simplest approach, guaranteed WRAP_CONTENT
+        Dialog dialog = new Dialog(activity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+        dialog.setOnDismissListener(d -> {
+            if (listener != null) listener.onClosed();
+        });
 
-        // Scrim overlay — tapping outside dismisses
-        FrameLayout overlay = new FrameLayout(activity);
-        overlay.setLayoutParams(matchParent());
-        overlay.setBackgroundColor(Color.parseColor("#66000000"));
-        overlay.setOnClickListener(v -> dialog.dismiss());
-
-        // Card container
-        LinearLayout card = new LinearLayout(activity);
-        card.setOrientation(LinearLayout.VERTICAL);
-        card.setOnClickListener(v -> {}); // block click-through
-
-        // Responsive width: max 340dp, min 20dp margin each side
         int screenW = getScreenWidth();
-        int cardWidth = Math.min(dp(340), screenW - dp(40));
-        // Safety: at least 240dp wide
-        cardWidth = Math.max(cardWidth, dp(240));
+        int cardWidth = Math.min(dp(320), screenW - dp(48));
 
-        applyRoundedBg(card, Color.WHITE, dp(16));
+        // Root card
+        LinearLayout root = new LinearLayout(activity);
+        root.setOrientation(LinearLayout.VERTICAL);
 
-        FrameLayout.LayoutParams cardLP = new FrameLayout.LayoutParams(
-            cardWidth, ViewGroup.LayoutParams.WRAP_CONTENT);
-        cardLP.gravity = Gravity.CENTER;
-        card.setLayoutParams(cardLP);
+        GradientDrawable rootBg = new GradientDrawable();
+        rootBg.setColor(Color.WHITE);
+        rootBg.setCornerRadius(dp(16));
+        root.setBackground(rootBg);
+        root.setClipToOutline(true);
+        root.setOutlineProvider(new ViewOutlineProvider() {
+            @Override
+            public void getOutline(View v, Outline o) {
+                o.setRoundRect(0, 0, v.getWidth(), v.getHeight(), dp(16));
+            }
+        });
 
-        // Image — 16:9 aspect ratio
+        // Image — 16:9
         if (hasImage()) {
-            ImageView img = createImageView();
+            ImageView img = new ImageView(activity);
+            img.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            img.setBackgroundColor(Color.parseColor("#f0f0f0"));
             int imgH = (int) (cardWidth * 9.0 / 16.0);
-            img.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, imgH));
-            card.addView(img);
+            LinearLayout.LayoutParams imgLP = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, imgH);
+            img.setLayoutParams(imgLP);
+            root.addView(img);
             loadImage(ad.imageUrl, img);
         }
 
-        // Content area
+        // Content
         LinearLayout content = new LinearLayout(activity);
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(20), dp(16), dp(20), dp(16));
+        LinearLayout.LayoutParams contentLP = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        content.setLayoutParams(contentLP);
 
-        // Title — 16sp bold, max 2 lines
-        content.addView(createTitle(16, Color.parseColor("#111111"), 2));
+        // Title
+        TextView title = new TextView(activity);
+        title.setText(safeStr(ad.title, ""));
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        title.setTextColor(Color.parseColor("#111111"));
+        title.setTypeface(Typeface.DEFAULT_BOLD);
+        title.setMaxLines(2);
+        title.setEllipsize(TextUtils.TruncateAt.END);
+        content.addView(title);
 
-        // Description — 13sp, max 3 lines
+        // Description
         if (hasDesc()) {
-            content.addView(createDesc(13, Color.parseColor("#888888"), 3, dp(4)));
+            TextView desc = new TextView(activity);
+            desc.setText(ad.description);
+            desc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            desc.setTextColor(Color.parseColor("#888888"));
+            desc.setLineSpacing(0, 1.3f);
+            desc.setMaxLines(3);
+            desc.setEllipsize(TextUtils.TruncateAt.END);
+            LinearLayout.LayoutParams descLP = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            descLP.topMargin = dp(4);
+            desc.setLayoutParams(descLP);
+            content.addView(desc);
         }
 
         // Divider
-        content.addView(createDivider(dp(14)));
+        View divider = new View(activity);
+        divider.setBackgroundColor(Color.parseColor("#f0f0f0"));
+        LinearLayout.LayoutParams divLP = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, dp(1));
+        divLP.topMargin = dp(14);
+        divider.setLayoutParams(divLP);
+        content.addView(divider);
 
-        // Button row: Close (left) | spacer | CTA (right)
-        content.addView(createButtonRow(dialog));
+        // Button row
+        LinearLayout btnRow = new LinearLayout(activity);
+        btnRow.setOrientation(LinearLayout.HORIZONTAL);
+        btnRow.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams btnRowLP = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        btnRowLP.topMargin = dp(12);
+        btnRow.setLayoutParams(btnRowLP);
 
-        card.addView(content);
-        overlay.addView(card);
+        // Close
+        TextView closeBtn = new TextView(activity);
+        closeBtn.setText("Close");
+        closeBtn.setTextColor(Color.parseColor("#999999"));
+        closeBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        closeBtn.setPadding(dp(4), dp(8), dp(12), dp(8));
+        closeBtn.setOnClickListener(v -> dialog.dismiss());
+        btnRow.addView(closeBtn);
 
-        showDialog(dialog, overlay);
-        animateScale(card);
+        // Spacer
+        View spacer = new View(activity);
+        spacer.setLayoutParams(new LinearLayout.LayoutParams(0, 1, 1f));
+        btnRow.addView(spacer);
+
+        // CTA
+        TextView cta = new TextView(activity);
+        cta.setText(safeStr(ad.buttonText, "Visit"));
+        cta.setTextColor(Color.WHITE);
+        cta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        cta.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        cta.setGravity(Gravity.CENTER);
+        GradientDrawable ctaBg = new GradientDrawable();
+        ctaBg.setColor(Color.parseColor("#111111"));
+        ctaBg.setCornerRadius(dp(10));
+        cta.setBackground(new RippleDrawable(
+            ColorStateList.valueOf(Color.parseColor("#333333")), ctaBg, null));
+        cta.setPadding(dp(20), dp(10), dp(20), dp(10));
+        cta.setOnClickListener(v -> { onCtaClick(); dialog.dismiss(); });
+        btnRow.addView(cta);
+
+        content.addView(btnRow);
+        root.addView(content);
+
+        dialog.setContentView(root);
+
+        // Window — transparent bg, fixed width, WRAP height
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            window.setLayout(cardWidth, ViewGroup.LayoutParams.WRAP_CONTENT);
+            window.setGravity(Gravity.CENTER);
+            // Dim behind
+            window.setDimAmount(0.4f);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        }
+
+        dialog.show();
+
+        // Animate
+        AnimationSet anim = new AnimationSet(true);
+        anim.setInterpolator(new DecelerateInterpolator());
+        anim.setDuration(200);
+        anim.addAnimation(new AlphaAnimation(0f, 1f));
+        anim.addAnimation(new ScaleAnimation(0.95f, 1f, 0.95f, 1f,
+            ScaleAnimation.RELATIVE_TO_SELF, 0.5f, ScaleAnimation.RELATIVE_TO_SELF, 0.5f));
+        root.startAnimation(anim);
     }
 
-    // ════════════════════════════════════════════
-    // FULLSCREEN LAYOUT
-    // ════════════════════════════════════════════
+    // ════════════════════════════════════════
+    // FULLSCREEN
+    // ════════════════════════════════════════
 
     private void showFullscreen() {
-        Dialog dialog = createDialog();
+        Dialog dialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar);
+        dialog.setCancelable(true);
+        dialog.setOnDismissListener(d -> { if (listener != null) listener.onClosed(); });
 
         FrameLayout root = new FrameLayout(activity);
-        root.setLayoutParams(matchParent());
+        root.setLayoutParams(new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         root.setBackgroundColor(Color.BLACK);
 
-        // Full-screen image
+        // Full image
         if (hasImage()) {
-            ImageView img = createImageView();
+            ImageView img = new ImageView(activity);
+            img.setScaleType(ImageView.ScaleType.CENTER_CROP);
             img.setBackgroundColor(Color.parseColor("#111111"));
             img.setLayoutParams(new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -180,47 +252,61 @@ class AdDialog {
             loadImage(ad.imageUrl, img);
         }
 
-        // Bottom gradient scrim — ensures text is readable over any image
-        View gradient = new View(activity);
-        GradientDrawable gradBg = new GradientDrawable(
-            GradientDrawable.Orientation.BOTTOM_TOP,
-            new int[]{ Color.parseColor("#DD000000"), Color.TRANSPARENT });
-        gradient.setBackground(gradBg);
+        // Gradient
+        View grad = new View(activity);
+        grad.setBackground(new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
+            new int[]{ Color.parseColor("#DD000000"), Color.TRANSPARENT }));
         FrameLayout.LayoutParams gradLP = new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, dp(220));
         gradLP.gravity = Gravity.BOTTOM;
-        gradient.setLayoutParams(gradLP);
-        root.addView(gradient);
+        grad.setLayoutParams(gradLP);
+        root.addView(grad);
 
         // Bottom content
         LinearLayout bottom = new LinearLayout(activity);
         bottom.setOrientation(LinearLayout.VERTICAL);
-        // Extra bottom padding for devices with gesture nav bar
-        int bottomPad = dp(24) + getNavBarHeight();
-        bottom.setPadding(dp(24), dp(16), dp(24), bottomPad);
-        FrameLayout.LayoutParams bottomLP = new FrameLayout.LayoutParams(
+        int navH = getNavBarHeight();
+        bottom.setPadding(dp(24), dp(16), dp(24), dp(24) + navH);
+        FrameLayout.LayoutParams bLP = new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        bottomLP.gravity = Gravity.BOTTOM;
-        bottom.setLayoutParams(bottomLP);
+        bLP.gravity = Gravity.BOTTOM;
+        bottom.setLayoutParams(bLP);
 
-        // Title — white, 20sp, shadow for readability
-        TextView title = createTitle(20, Color.WHITE, 2);
-        title.setShadowLayer(6, 0, 2, Color.parseColor("#88000000"));
-        bottom.addView(title);
+        TextView t = new TextView(activity);
+        t.setText(safeStr(ad.title, ""));
+        t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        t.setTextColor(Color.WHITE);
+        t.setTypeface(Typeface.DEFAULT_BOLD);
+        t.setMaxLines(2);
+        t.setShadowLayer(6, 0, 2, Color.parseColor("#88000000"));
+        bottom.addView(t);
 
-        // Description
         if (hasDesc()) {
-            bottom.addView(createDesc(14, Color.parseColor("#cccccc"), 2, dp(4)));
+            TextView d = new TextView(activity);
+            d.setText(ad.description);
+            d.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            d.setTextColor(Color.parseColor("#cccccc"));
+            d.setMaxLines(2);
+            d.setLineSpacing(0, 1.3f);
+            LinearLayout.LayoutParams dLP = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            dLP.topMargin = dp(4);
+            d.setLayoutParams(dLP);
+            bottom.addView(d);
         }
 
-        // CTA — full width, white button
+        // CTA — white, full width
         TextView cta = new TextView(activity);
-        cta.setText(ad.buttonText != null ? ad.buttonText : "Visit");
+        cta.setText(safeStr(ad.buttonText, "Visit"));
         cta.setTextColor(Color.BLACK);
         cta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         cta.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         cta.setGravity(Gravity.CENTER);
-        applyRoundedBg(cta, Color.WHITE, dp(12));
+        GradientDrawable ctaBg = new GradientDrawable();
+        ctaBg.setColor(Color.WHITE);
+        ctaBg.setCornerRadius(dp(12));
+        cta.setBackground(new RippleDrawable(
+            ColorStateList.valueOf(Color.parseColor("#dddddd")), ctaBg, null));
         cta.setPadding(dp(20), dp(14), dp(20), dp(14));
         LinearLayout.LayoutParams ctaLP = new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -231,33 +317,50 @@ class AdDialog {
 
         root.addView(bottom);
 
-        // Close X — top right, safe from status bar
-        TextView closeX = createCloseButton(dp(36), 16, Color.WHITE, Color.parseColor("#66000000"));
-        FrameLayout.LayoutParams closeLP = new FrameLayout.LayoutParams(dp(36), dp(36));
-        closeLP.gravity = Gravity.TOP | Gravity.END;
-        closeLP.topMargin = dp(12) + getStatusBarHeight();
-        closeLP.rightMargin = dp(12);
-        closeX.setLayoutParams(closeLP);
-        closeX.setOnClickListener(v -> dialog.dismiss());
-        root.addView(closeX);
+        // Close X
+        TextView x = new TextView(activity);
+        x.setText("✕");
+        x.setTextColor(Color.WHITE);
+        x.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        x.setGravity(Gravity.CENTER);
+        GradientDrawable xBg = new GradientDrawable();
+        xBg.setColor(Color.parseColor("#66000000"));
+        xBg.setCornerRadius(dp(18));
+        x.setBackground(xBg);
+        FrameLayout.LayoutParams xLP = new FrameLayout.LayoutParams(dp(36), dp(36));
+        xLP.gravity = Gravity.TOP | Gravity.END;
+        xLP.topMargin = dp(12) + getStatusBarHeight();
+        xLP.rightMargin = dp(12);
+        x.setLayoutParams(xLP);
+        x.setOnClickListener(v -> dialog.dismiss());
+        root.addView(x);
 
-        showDialog(dialog, root);
-        animateScale(root);
+        dialog.setContentView(root);
+        Window w = dialog.getWindow();
+        if (w != null) {
+            w.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+            w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            w.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        }
+        dialog.show();
     }
 
-    // ════════════════════════════════════════════
-    // BANNER LAYOUT
-    // ════════════════════════════════════════════
+    // ════════════════════════════════════════
+    // BANNER
+    // ════════════════════════════════════════
 
     private void showBanner() {
-        Dialog dialog = createDialog();
+        Dialog dialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar);
+        dialog.setCancelable(true);
+        dialog.setOnDismissListener(d -> { if (listener != null) listener.onClosed(); });
 
-        FrameLayout overlay = new FrameLayout(activity);
-        overlay.setLayoutParams(matchParent());
-        // Transparent — app content visible behind, tap to dismiss
-        overlay.setOnClickListener(v -> dialog.dismiss());
+        FrameLayout root = new FrameLayout(activity);
+        root.setLayoutParams(new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        root.setClipChildren(false); // allow banner shadow to render
+        root.setOnClickListener(v -> dialog.dismiss()); // tap outside to dismiss
 
-        // Banner bar
+        // Banner
         LinearLayout banner = new LinearLayout(activity);
         banner.setOrientation(LinearLayout.HORIZONTAL);
         banner.setGravity(Gravity.CENTER_VERTICAL);
@@ -267,39 +370,44 @@ class AdDialog {
         bannerBg.setColor(Color.WHITE);
         bannerBg.setCornerRadii(new float[]{dp(16),dp(16),dp(16),dp(16), 0,0,0,0});
         banner.setBackground(bannerBg);
-        banner.setElevation(dp(16));
+        banner.setElevation(dp(12));
+        int navH = getNavBarHeight();
+        banner.setPadding(dp(16), dp(14), dp(16), dp(14) + navH);
 
-        // Extra bottom padding for gesture nav
-        int navPad = getNavBarHeight();
-        banner.setPadding(dp(16), dp(14), dp(16), dp(14) + navPad);
-
-        FrameLayout.LayoutParams bannerLP = new FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams bLP = new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        bannerLP.gravity = Gravity.BOTTOM;
-        banner.setLayoutParams(bannerLP);
+        bLP.gravity = Gravity.BOTTOM;
+        banner.setLayoutParams(bLP);
 
-        // Thumbnail
+        // Thumb
         if (hasImage()) {
-            ImageView thumb = createImageView();
-            applyRoundedBg(thumb, Color.parseColor("#f0f0f0"), dp(10));
+            ImageView thumb = new ImageView(activity);
+            thumb.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            thumb.setBackgroundColor(Color.parseColor("#f0f0f0"));
+            GradientDrawable tBg = new GradientDrawable();
+            tBg.setColor(Color.parseColor("#f0f0f0"));
+            tBg.setCornerRadius(dp(10));
+            thumb.setBackground(tBg);
             thumb.setClipToOutline(true);
-            thumb.setOutlineProvider(roundedOutline(dp(10)));
-            LinearLayout.LayoutParams thumbLP = new LinearLayout.LayoutParams(dp(52), dp(52));
-            thumbLP.rightMargin = dp(12);
-            thumb.setLayoutParams(thumbLP);
+            thumb.setOutlineProvider(new ViewOutlineProvider() {
+                @Override public void getOutline(View v, Outline o) {
+                    o.setRoundRect(0, 0, v.getWidth(), v.getHeight(), dp(10));
+                }
+            });
+            LinearLayout.LayoutParams tLP = new LinearLayout.LayoutParams(dp(52), dp(52));
+            tLP.rightMargin = dp(12);
+            thumb.setLayoutParams(tLP);
             banner.addView(thumb);
             loadImage(ad.imageUrl, thumb);
         }
 
-        // Text column (weight=1 to fill remaining space)
+        // Text
         LinearLayout textCol = new LinearLayout(activity);
         textCol.setOrientation(LinearLayout.VERTICAL);
-        textCol.setLayoutParams(new LinearLayout.LayoutParams(
-            0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        textCol.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
-        // Title — 14sp, single line, ellipsize
         TextView title = new TextView(activity);
-        title.setText(ad.title);
+        title.setText(safeStr(ad.title, ""));
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         title.setTextColor(Color.parseColor("#111111"));
         title.setTypeface(Typeface.DEFAULT_BOLD);
@@ -308,19 +416,17 @@ class AdDialog {
         title.setEllipsize(TextUtils.TruncateAt.END);
         textCol.addView(title);
 
-        // "Sponsored" label
         TextView sub = new TextView(activity);
         sub.setText("Sponsored");
         sub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         sub.setTextColor(Color.parseColor("#999999"));
-        sub.setPadding(0, dp(2), 0, 0);
         textCol.addView(sub);
 
         banner.addView(textCol);
 
-        // CTA button
+        // CTA
         TextView cta = new TextView(activity);
-        cta.setText(ad.buttonText != null ? ad.buttonText : "Visit");
+        cta.setText(safeStr(ad.buttonText, "Visit"));
         cta.setTextColor(Color.WHITE);
         cta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         cta.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
@@ -338,261 +444,89 @@ class AdDialog {
         cta.setOnClickListener(v -> { onCtaClick(); dialog.dismiss(); });
         banner.addView(cta);
 
-        overlay.addView(banner);
+        root.addView(banner);
 
-        // Close X — positioned above the banner
-        TextView closeX = createCloseButton(dp(28), 13, Color.parseColor("#999999"), Color.parseColor("#f0f0f0"));
-        FrameLayout.LayoutParams closeLP = new FrameLayout.LayoutParams(dp(28), dp(28));
-        closeLP.gravity = Gravity.BOTTOM | Gravity.END;
-        // Position above banner (banner height ~80dp + navPad)
-        closeLP.bottomMargin = dp(80) + navPad + dp(8);
-        closeLP.rightMargin = dp(12);
-        closeX.setLayoutParams(closeLP);
-        closeX.setOnClickListener(v -> dialog.dismiss());
-        overlay.addView(closeX);
+        // Close X above banner
+        TextView x = new TextView(activity);
+        x.setText("✕");
+        x.setTextColor(Color.parseColor("#999"));
+        x.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        x.setGravity(Gravity.CENTER);
+        GradientDrawable xBg = new GradientDrawable();
+        xBg.setColor(Color.parseColor("#f0f0f0"));
+        xBg.setCornerRadius(dp(14));
+        x.setBackground(xBg);
+        FrameLayout.LayoutParams xLP = new FrameLayout.LayoutParams(dp(28), dp(28));
+        xLP.gravity = Gravity.BOTTOM | Gravity.END;
+        xLP.bottomMargin = dp(86) + navH;
+        xLP.rightMargin = dp(12);
+        x.setLayoutParams(xLP);
+        x.setOnClickListener(v -> dialog.dismiss());
+        root.addView(x);
 
-        showDialog(dialog, overlay);
-
-        // Slide-up animation for banner
-        AnimationSet anim = new AnimationSet(true);
-        anim.setInterpolator(new DecelerateInterpolator());
-        anim.setDuration(300);
-        anim.addAnimation(new TranslateAnimation(0, 0, dp(100), 0));
-        anim.addAnimation(new AlphaAnimation(0f, 1f));
-        banner.startAnimation(anim);
-    }
-
-    // ════════════════════════════════════════════
-    // SHARED VIEW BUILDERS
-    // ════════════════════════════════════════════
-
-    private Dialog createDialog() {
-        Dialog dialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar);
-        dialog.setCancelable(true);
-        dialog.setOnDismissListener(d -> {
-            if (listener != null) listener.onClosed();
-        });
-        return dialog;
-    }
-
-    private void showDialog(Dialog dialog, View contentView) {
-        dialog.setContentView(contentView);
-        if (dialog.getWindow() != null) {
-            Window window = dialog.getWindow();
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-            window.setBackgroundDrawableResource(android.R.color.transparent);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-            // Make dialog draw under system bars for fullscreen
-            if (Build.VERSION.SDK_INT >= 21) {
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            }
+        dialog.setContentView(root);
+        Window w = dialog.getWindow();
+        if (w != null) {
+            w.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+            w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            w.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         }
         dialog.show();
+
+        // Slide up
+        TranslateAnimation slide = new TranslateAnimation(0, 0, dp(100), 0);
+        slide.setDuration(300);
+        slide.setInterpolator(new DecelerateInterpolator());
+        banner.startAnimation(slide);
     }
 
-    private ImageView createImageView() {
-        ImageView img = new ImageView(activity);
-        img.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        img.setBackgroundColor(Color.parseColor("#f0f0f0"));
-        return img;
-    }
-
-    private TextView createTitle(int sizeSp, int color, int maxLines) {
-        TextView t = new TextView(activity);
-        t.setText(ad.title != null ? ad.title : "");
-        t.setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeSp);
-        t.setTextColor(color);
-        t.setTypeface(Typeface.DEFAULT_BOLD);
-        t.setMaxLines(maxLines);
-        t.setEllipsize(TextUtils.TruncateAt.END);
-        return t;
-    }
-
-    private TextView createDesc(int sizeSp, int color, int maxLines, int topPad) {
-        TextView d = new TextView(activity);
-        d.setText(ad.description != null ? ad.description : "");
-        d.setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeSp);
-        d.setTextColor(color);
-        d.setPadding(0, topPad, 0, 0);
-        d.setLineSpacing(0, 1.3f);
-        d.setMaxLines(maxLines);
-        d.setEllipsize(TextUtils.TruncateAt.END);
-        return d;
-    }
-
-    private View createDivider(int topMargin) {
-        View div = new View(activity);
-        div.setBackgroundColor(Color.parseColor("#f0f0f0"));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, dp(1));
-        lp.topMargin = topMargin;
-        div.setLayoutParams(lp);
-        return div;
-    }
-
-    private LinearLayout createButtonRow(Dialog dialog) {
-        LinearLayout row = new LinearLayout(activity);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(0, dp(12), 0, 0);
-
-        // Close — min touch target 48dp
-        TextView close = new TextView(activity);
-        close.setText("Close");
-        close.setTextColor(Color.parseColor("#999999"));
-        close.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        close.setGravity(Gravity.CENTER);
-        close.setMinimumHeight(dp(44));
-        close.setMinimumWidth(dp(48));
-        close.setPadding(dp(4), 0, dp(12), 0);
-        close.setOnClickListener(v -> dialog.dismiss());
-        row.addView(close);
-
-        // Spacer
-        View spacer = new View(activity);
-        spacer.setLayoutParams(new LinearLayout.LayoutParams(
-            0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        row.addView(spacer);
-
-        // CTA — min touch target
-        TextView cta = new TextView(activity);
-        cta.setText(ad.buttonText != null ? ad.buttonText : "Visit");
-        cta.setTextColor(Color.WHITE);
-        cta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        cta.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        cta.setGravity(Gravity.CENTER);
-        cta.setMinimumHeight(dp(44));
-        GradientDrawable ctaBg = new GradientDrawable();
-        ctaBg.setColor(Color.parseColor("#111111"));
-        ctaBg.setCornerRadius(dp(10));
-        cta.setBackground(new RippleDrawable(
-            ColorStateList.valueOf(Color.parseColor("#333333")), ctaBg, null));
-        cta.setPadding(dp(20), dp(10), dp(20), dp(10));
-        cta.setOnClickListener(v -> { onCtaClick(); dialog.dismiss(); });
-        row.addView(cta);
-
-        return row;
-    }
-
-    private TextView createCloseButton(int size, int textSp, int textColor, int bgColor) {
-        TextView btn = new TextView(activity);
-        btn.setText("✕");
-        btn.setTextColor(textColor);
-        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
-        btn.setGravity(Gravity.CENTER);
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(bgColor);
-        bg.setCornerRadius(size / 2f);
-        btn.setBackground(bg);
-        // Ensure minimum touch target of 48dp
-        btn.setMinimumWidth(Math.max(size, dp(48)));
-        btn.setMinimumHeight(Math.max(size, dp(48)));
-        return btn;
-    }
-
-    private void applyRoundedBg(View view, int color, int radius) {
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(color);
-        bg.setCornerRadius(radius);
-        view.setBackground(bg);
-        if (Build.VERSION.SDK_INT >= 21) {
-            view.setElevation(dp(24));
-        }
-        view.setClipToOutline(true);
-        view.setOutlineProvider(roundedOutline(radius));
-    }
-
-    // ════════════════════════════════════════════
-    // UTILITIES
-    // ════════════════════════════════════════════
+    // ════════════════════════════════════════
+    // HELPERS
+    // ════════════════════════════════════════
 
     private void onCtaClick() {
         if (listener != null) listener.onClicked(ad.redirectUrl);
         if (ad.redirectUrl != null && !ad.redirectUrl.isEmpty()) {
-            try {
-                activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ad.redirectUrl)));
-            } catch (Exception ignored) {}
+            try { activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ad.redirectUrl))); }
+            catch (Exception ignored) {}
         }
     }
 
-    private boolean hasImage() {
-        return ad.imageUrl != null && !ad.imageUrl.isEmpty();
-    }
+    private boolean hasImage() { return ad.imageUrl != null && !ad.imageUrl.isEmpty(); }
+    private boolean hasDesc() { return ad.description != null && !ad.description.isEmpty(); }
+    private String safeStr(String s, String def) { return s != null && !s.isEmpty() ? s : def; }
 
-    private boolean hasDesc() {
-        return ad.description != null && !ad.description.isEmpty();
-    }
-
-    private ViewGroup.LayoutParams matchParent() {
-        return new ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-    }
-
-    private ViewOutlineProvider roundedOutline(int radius) {
-        return new ViewOutlineProvider() {
-            @Override
-            public void getOutline(View view, Outline outline) {
-                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), radius);
-            }
-        };
-    }
-
-    private void animateScale(View target) {
-        AnimationSet anim = new AnimationSet(true);
-        anim.setInterpolator(new DecelerateInterpolator());
-        anim.setDuration(250);
-        anim.addAnimation(new AlphaAnimation(0f, 1f));
-        anim.addAnimation(new ScaleAnimation(0.92f, 1f, 0.92f, 1f,
-            ScaleAnimation.RELATIVE_TO_SELF, 0.5f,
-            ScaleAnimation.RELATIVE_TO_SELF, 0.5f));
-        target.startAnimation(anim);
-    }
-
-    private void loadImage(String imageUrl, ImageView imageView) {
+    private void loadImage(String url, ImageView iv) {
         new Thread(() -> {
             try {
-                HttpURLConnection conn = (HttpURLConnection) new URL(imageUrl).openConnection();
-                conn.setConnectTimeout(8000);
-                conn.setReadTimeout(8000);
-                conn.setDoInput(true);
-                conn.setInstanceFollowRedirects(true);
-                conn.connect();
-                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    InputStream is = conn.getInputStream();
-                    Bitmap bitmap = BitmapFactory.decodeStream(is);
-                    is.close();
-                    conn.disconnect();
-                    if (bitmap != null && !activity.isFinishing()) {
-                        activity.runOnUiThread(() -> {
-                            try {
-                                imageView.setImageBitmap(bitmap);
-                            } catch (Exception ignored) {}
-                        });
+                HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+                c.setConnectTimeout(8000);
+                c.setReadTimeout(8000);
+                c.setInstanceFollowRedirects(true);
+                c.connect();
+                if (c.getResponseCode() == 200) {
+                    InputStream is = c.getInputStream();
+                    Bitmap bmp = BitmapFactory.decodeStream(is);
+                    is.close(); c.disconnect();
+                    if (bmp != null && !activity.isFinishing()) {
+                        activity.runOnUiThread(() -> { try { iv.setImageBitmap(bmp); } catch (Exception ignored) {} });
                     }
-                } else {
-                    conn.disconnect();
-                }
+                } else { c.disconnect(); }
             } catch (Exception ignored) {}
         }).start();
     }
 
-    private int dp(int value) {
-        return (int) TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, value,
+    private int dp(int v) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v,
             activity.getResources().getDisplayMetrics());
     }
-
-    private int getScreenWidth() {
-        return activity.getResources().getDisplayMetrics().widthPixels;
-    }
-
+    private int getScreenWidth() { return activity.getResources().getDisplayMetrics().widthPixels; }
     private int getStatusBarHeight() {
-        int resourceId = activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        return resourceId > 0 ? activity.getResources().getDimensionPixelSize(resourceId) : dp(24);
+        int id = activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        return id > 0 ? activity.getResources().getDimensionPixelSize(id) : dp(24);
     }
-
     private int getNavBarHeight() {
-        int resourceId = activity.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-        return resourceId > 0 ? activity.getResources().getDimensionPixelSize(resourceId) : 0;
+        int id = activity.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        return id > 0 ? activity.getResources().getDimensionPixelSize(id) : 0;
     }
 }
