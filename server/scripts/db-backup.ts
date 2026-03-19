@@ -135,22 +135,54 @@ async function main() {
   const filename = `${PREFIX}_${timestamp}.sql.gz`;
   const filepath = join(TMP_DIR, filename);
 
-  // pg_dump
+  // pg_dump — parse DATABASE_URL to extract parts for pg_dump env vars
   log("Taking database snapshot...");
+
+  // Parse: postgresql://user:pass@host:port/dbname
+  const dbUrl = new URL(DB_URL!);
+  const pgEnv = {
+    ...process.env,
+    PGHOST: dbUrl.hostname,
+    PGPORT: dbUrl.port || "5432",
+    PGUSER: decodeURIComponent(dbUrl.username),
+    PGPASSWORD: decodeURIComponent(dbUrl.password),
+    PGDATABASE: dbUrl.pathname.slice(1), // remove leading /
+  };
+
+  log(`Database: ${pgEnv.PGDATABASE}@${pgEnv.PGHOST}:${pgEnv.PGPORT} as ${pgEnv.PGUSER}`);
+
+  // First test connection
   try {
-    execSync(`pg_dump "${DB_URL}" --no-owner --no-acl | gzip > "${filepath}"`, {
+    execSync(`pg_isready -h ${pgEnv.PGHOST} -p ${pgEnv.PGPORT} -U ${pgEnv.PGUSER}`, {
+      env: pgEnv,
       stdio: ["pipe", "pipe", "pipe"],
+      timeout: 10_000,
+    });
+  } catch {
+    log("Warning: pg_isready check failed, trying pg_dump anyway...");
+  }
+
+  const sqlFile = filepath.replace(".gz", "");
+  try {
+    execSync(`pg_dump --no-owner --no-acl -f "${sqlFile}"`, {
+      env: pgEnv,
+      stdio: ["pipe", "pipe", "inherit"], // show stderr
       timeout: 120_000,
     });
   } catch (e: any) {
+    if (existsSync(sqlFile)) unlinkSync(sqlFile);
     fatal(`pg_dump failed: ${e.stderr?.toString() || e.message}`);
   }
 
-  const size = statSync(filepath).size;
-  if (size < 100) {
-    unlinkSync(filepath);
-    fatal("pg_dump produced empty output — check DATABASE_URL");
+  if (!existsSync(sqlFile) || statSync(sqlFile).size < 100) {
+    if (existsSync(sqlFile)) unlinkSync(sqlFile);
+    fatal("pg_dump produced empty output — check DATABASE_URL and that the database exists");
   }
+
+  // Gzip
+  execSync(`gzip -f "${sqlFile}"`, { timeout: 30_000 });
+
+  const size = statSync(filepath).size;
 
   log(`Snapshot: ${filename} (${(size / 1024).toFixed(1)} KB)`);
 
