@@ -5,6 +5,7 @@ public class InitResponse {
     public final String appName;
     public final boolean pinEnabled;
     public final boolean pinVerified;
+    public final boolean hasBroadcastAds;
     public final String pinMessage;
     public final int maxAttempts;
     public final String getPinUrl;
@@ -15,6 +16,7 @@ public class InitResponse {
     public final JoinLink[] joinLinks;
 
     public InitResponse(String appName, boolean pinEnabled, boolean pinVerified,
+                        boolean hasBroadcastAds,
                         String pinMessage, int maxAttempts,
                         String getPinUrl, String getPinBtnText,
                         String enterPinBtnText,
@@ -23,6 +25,7 @@ public class InitResponse {
         this.appName = appName;
         this.pinEnabled = pinEnabled;
         this.pinVerified = pinVerified;
+        this.hasBroadcastAds = hasBroadcastAds;
         this.pinMessage = pinMessage;
         this.maxAttempts = maxAttempts;
         this.getPinUrl = getPinUrl;

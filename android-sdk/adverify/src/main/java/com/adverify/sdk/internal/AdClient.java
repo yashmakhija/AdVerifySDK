@@ -85,6 +85,7 @@ public class AdClient {
                     obj.optString("appName", ""),
                     obj.optBoolean("pinEnabled", false),
                     obj.optBoolean("pinVerified", false),
+                    obj.optBoolean("hasBroadcastAds", false),
                     obj.optString("pinMessage", ""),
                     obj.optInt("maxAttempts", 3),
                     obj.optString("getPinUrl", ""),
@@ -103,10 +104,13 @@ public class AdClient {
         });
     }
 
-    public void fetchAds(Callback<Ad[]> callback) {
+    public void fetchAds(String deviceId, Callback<Ad[]> callback) {
         executor.execute(() -> {
             try {
-                String json = get("/api/sdk/ads");
+                // POST with deviceId for frequency filtering (server-side)
+                JSONObject body = new JSONObject();
+                body.put("deviceId", deviceId);
+                String json = post("/api/sdk/ads", body.toString());
                 JSONObject obj = new JSONObject(json);
                 JSONArray arr = obj.getJSONArray("ads");
 
@@ -119,7 +123,7 @@ public class AdClient {
                         a.optString("description", ""),
                         a.optString("imageUrl", ""),
                         a.optString("redirectUrl", ""),
-                        a.optString("adType", "interstitial"),
+                        a.optString("adType", "card"),
                         a.optString("buttonText", "Visit Now"),
                         a.optInt("priority", 0)
                     );
@@ -166,11 +170,12 @@ public class AdClient {
         });
     }
 
-    public void trackImpression(int adId) {
+    public void trackImpression(int adId, String deviceId) {
         executor.execute(() -> {
             try {
                 JSONObject body = new JSONObject();
                 body.put("adId", adId);
+                body.put("deviceId", deviceId);
                 post("/api/sdk/impression", body.toString());
             } catch (Exception e) {
                 Log.e(TAG, "Track impression failed", e);
@@ -178,11 +183,12 @@ public class AdClient {
         });
     }
 
-    public void trackClick(int adId) {
+    public void trackClick(int adId, String deviceId) {
         executor.execute(() -> {
             try {
                 JSONObject body = new JSONObject();
                 body.put("adId", adId);
+                body.put("deviceId", deviceId);
                 post("/api/sdk/click", body.toString());
             } catch (Exception e) {
                 Log.e(TAG, "Track click failed", e);

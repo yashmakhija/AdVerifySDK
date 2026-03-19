@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.WindowManager;
 
 import com.adverify.sdk.internal.AdClient;
 
@@ -56,9 +55,6 @@ public final class AdVerify {
      *   invoke-static {p0}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Activity;)V
      */
     public static void start(Activity activity) {
-        // Block screenshots and screen recording
-        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
-
         if (!sInitialized) {
             try {
                 android.content.pm.ApplicationInfo ai = activity.getPackageManager()
@@ -84,8 +80,6 @@ public final class AdVerify {
      *   invoke-static {p0, v0, v1}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;)V
      */
     public static void start(Activity activity, String apiKey, String baseUrl) {
-        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
-
         if (!sInitialized) {
             init(activity, apiKey, baseUrl);
         }

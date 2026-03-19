@@ -33,9 +33,16 @@ class AdLoader {
             @Override
             public void onSuccess(InitResponse config) {
                 if (config.pinEnabled && !config.pinVerified) {
+                    // Device not verified — show PIN dialog first
                     showPinDialog(config);
-                } else {
+                } else if (!config.pinEnabled || config.hasBroadcastAds) {
+                    // PIN not enabled, OR device is verified AND there are broadcast ads
+                    // → fetch and show ads
                     fetchAndShowAds();
+                } else {
+                    // Device is verified, no broadcast ads → nothing to show
+                    Log.d(TAG, "Device verified, no broadcast ads — skipping");
+                    if (callback != null) callback.onAdClosed();
                 }
             }
 
@@ -159,7 +166,7 @@ class AdLoader {
     }
 
     private void fetchAndShowAds() {
-        client.fetchAds(new AdClient.Callback<Ad[]>() {
+        client.fetchAds(deviceId, new AdClient.Callback<Ad[]>() {
             @Override
             public void onSuccess(Ad[] ads) {
                 if (ads.length == 0) {
@@ -180,12 +187,12 @@ class AdLoader {
     private void showAd(Ad ad) {
         if (activity.isFinishing()) return;
 
-        client.trackImpression(ad.id);
+        client.trackImpression(ad.id, deviceId);
 
         AdDialog dialog = new AdDialog(activity, ad, new AdDialog.AdDialogListener() {
             @Override
             public void onClicked(String url) {
-                client.trackClick(ad.id);
+                client.trackClick(ad.id, deviceId);
                 if (callback != null) callback.onAdClicked(url);
             }
 
