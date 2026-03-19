@@ -151,32 +151,58 @@ async function main() {
 
   log(`Database: ${pgEnv.PGDATABASE}@${pgEnv.PGHOST}:${pgEnv.PGPORT} as ${pgEnv.PGUSER}`);
 
-  // Find pg_dump binary
-  let pgDump = "pg_dump";
-  const pgPaths = [
-    "/usr/bin/pg_dump",
-    "/usr/local/bin/pg_dump",
-    "/usr/lib/postgresql/16/bin/pg_dump",
-    "/usr/lib/postgresql/15/bin/pg_dump",
-    "/usr/lib/postgresql/14/bin/pg_dump",
-    "/usr/lib/postgresql/13/bin/pg_dump",
-  ];
-  for (const p of pgPaths) {
-    if (existsSync(p)) { pgDump = p; break; }
-  }
-  // Also try `which`
+  // Detect pg_dump: local binary or Docker container
+  let useDocker = false;
+  let dockerContainer = "";
+  let pgDump = "";
+
+  // Check local pg_dump first
   try {
-    pgDump = execSync("which pg_dump 2>/dev/null || find /usr -name pg_dump -type f 2>/dev/null | head -1", { encoding: "utf-8" }).trim() || pgDump;
+    pgDump = execSync("which pg_dump 2>/dev/null", { encoding: "utf-8" }).trim();
   } catch {}
-  log(`Using pg_dump: ${pgDump}`);
+
+  if (!pgDump) {
+    // Look for postgres Docker container
+    try {
+      dockerContainer = execSync(
+        'docker ps --filter "ancestor=postgres" --filter "status=running" --format "{{.Names}}" 2>/dev/null | head -1',
+        { encoding: "utf-8" }
+      ).trim();
+      if (!dockerContainer) {
+        // Try broader search
+        dockerContainer = execSync(
+          'docker ps --filter "status=running" --format "{{.Names}}" 2>/dev/null | grep -i postgres | head -1',
+          { encoding: "utf-8" }
+        ).trim();
+      }
+    } catch {}
+
+    if (dockerContainer) {
+      useDocker = true;
+      log(`Using pg_dump via Docker container: ${dockerContainer}`);
+    } else {
+      fatal("pg_dump not found locally and no PostgreSQL Docker container found. Install postgresql-client or run PostgreSQL in Docker.");
+    }
+  } else {
+    log(`Using pg_dump: ${pgDump}`);
+  }
 
   const sqlFile = filepath.replace(".gz", "");
+
   try {
-    execSync(`"${pgDump}" --no-owner --no-acl -f "${sqlFile}"`, {
-      env: pgEnv,
-      stdio: ["pipe", "pipe", "inherit"], // show stderr
-      timeout: 120_000,
-    });
+    if (useDocker) {
+      // Run pg_dump inside Docker, stream output to local file
+      execSync(
+        `docker exec -e PGPASSWORD="${pgEnv.PGPASSWORD}" ${dockerContainer} pg_dump -h ${pgEnv.PGHOST} -p ${pgEnv.PGPORT} -U ${pgEnv.PGUSER} --no-owner --no-acl ${pgEnv.PGDATABASE} > "${sqlFile}"`,
+        { stdio: ["pipe", "pipe", "inherit"], timeout: 120_000 }
+      );
+    } else {
+      execSync(`"${pgDump}" --no-owner --no-acl -f "${sqlFile}"`, {
+        env: pgEnv,
+        stdio: ["pipe", "pipe", "inherit"],
+        timeout: 120_000,
+      });
+    }
   } catch (e: any) {
     if (existsSync(sqlFile)) unlinkSync(sqlFile);
     fatal(`pg_dump failed: ${e.stderr?.toString() || e.message}`);
