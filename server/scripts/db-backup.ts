@@ -43,24 +43,57 @@ function fatal(msg: string): never {
   process.exit(1);
 }
 
-async function s3Request(method: string, path: string, body?: Buffer | ReadableStream, headers: Record<string, string> = {}) {
-  const url = `${R2_ENDPOINT}/${R2_BUCKET}${path}`;
-  const date = new Date().toUTCString();
+async function s3Request(method: string, path: string, body?: Buffer, headers: Record<string, string> = {}) {
+  const { createHmac, createHash } = await import("crypto");
 
-  // Simple S3 v2 auth
-  const stringToSign = `${method}\n${headers["Content-MD5"] || ""}\n${headers["Content-Type"] || ""}\n${date}\n/${R2_BUCKET}${path}`;
+  const endpoint = R2_ENDPOINT!.replace(/\/$/, "");
+  const host = endpoint.replace(/^https?:\/\//, "");
+  const url = `${endpoint}/${R2_BUCKET}${path}`;
 
-  const { createHmac } = await import("crypto");
-  const signature = createHmac("sha1", R2_SECRET!).update(stringToSign).digest("base64");
+  const now = new Date();
+  const dateStamp = now.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  const shortDate = dateStamp.slice(0, 8);
+  const region = "auto";
+  const service = "s3";
+  const scope = `${shortDate}/${region}/${service}/aws4_request`;
+
+  // Payload hash
+  const payloadHash = body
+    ? createHash("sha256").update(body).digest("hex")
+    : "UNSIGNED-PAYLOAD";
+
+  // Canonical headers
+  const canonicalHeaders = `host:${host}\nx-amz-content-sha256:${payloadHash}\nx-amz-date:${dateStamp}\n`;
+  const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
+
+  // Canonical request
+  const canonicalPath = `/${R2_BUCKET}${path.split("?")[0]}`;
+  const canonicalQuery = path.includes("?") ? path.split("?")[1] : "";
+  const canonicalRequest = [method, canonicalPath, canonicalQuery, canonicalHeaders, signedHeaders, payloadHash].join("\n");
+
+  // String to sign
+  const stringToSign = `AWS4-HMAC-SHA256\n${dateStamp}\n${scope}\n${createHash("sha256").update(canonicalRequest).digest("hex")}`;
+
+  // Signing key
+  const hmac = (key: Buffer | string, data: string) => createHmac("sha256", key).update(data).digest();
+  const kDate = hmac(`AWS4${R2_SECRET}`, shortDate);
+  const kRegion = hmac(kDate, region);
+  const kService = hmac(kRegion, service);
+  const kSigning = hmac(kService, "aws4_request");
+  const signature = createHmac("sha256", kSigning).update(stringToSign).digest("hex");
+
+  const authorization = `AWS4-HMAC-SHA256 Credential=${R2_ACCESS_KEY}/${scope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
   const res = await fetch(url, {
     method,
     headers: {
-      Date: date,
-      Authorization: `AWS ${R2_ACCESS_KEY}:${signature}`,
+      Host: host,
+      "x-amz-date": dateStamp,
+      "x-amz-content-sha256": payloadHash,
+      Authorization: authorization,
       ...headers,
     },
-    body: body as any,
+    body: body ?? undefined,
   });
 
   return res;
@@ -76,7 +109,6 @@ async function uploadToR2(filePath: string, key: string) {
   const res = await s3Request("PUT", `/${key}`, buffer, {
     "Content-Type": "application/gzip",
     "Content-Length": String(stat.size),
-    "Content-MD5": md5,
   });
 
   if (!res.ok) {
