@@ -13,8 +13,9 @@ export class SdkController {
   }
 
   async getAds(req: AuthenticatedRequest, res: Response) {
-    const deviceId = req.body?.deviceId || req.query?.deviceId || '';
-    const ads = await service.getAds(req.apiKeyData!.id, deviceId as string);
+    const deviceId = (req.body?.deviceId || req.query?.deviceId || '') as string;
+    const isVerified = req.body?.isVerified ?? true; // default true for backward compat
+    const ads = await service.getAds(req.apiKeyData!.id, deviceId, isVerified);
     res.json({ ads });
   }
 

@@ -37,6 +37,8 @@ model Ad {
   priority            Int          @default(0)
   maxImpressions      Int          @default(0) @map("max_impressions")     // 0 = unlimited per device
   broadcastToVerified Boolean      @default(false) @map("broadcast_to_verified") // show to already-verified users on return
+  targetAudience      String       @default("all") @map("target_audience")       // "all" | "verified" | "unverified"
+  scheduledAt         DateTime?    @map("scheduled_at")                           // null = normal, timestamp = push at that time
   createdAt           DateTime     @default(now()) @map("created_at")
 
   apiKey      ApiKey       @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)

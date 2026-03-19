@@ -41,6 +41,8 @@ router.post(
       priority: z.number().optional(),
       maxImpressions: z.number().min(0).optional(),
       broadcastToVerified: z.boolean().optional(),
+      targetAudience: z.enum(['all', 'verified', 'unverified']).optional(),
+      scheduledAt: z.string().nullable().optional(),
     }),
   ),
   (req, res) => ctrl.createAd(req, res),
