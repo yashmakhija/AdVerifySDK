@@ -38,7 +38,15 @@ const EMPTY_FORM = {
   priority: 1,
   maxImpressions: 0,
   broadcastToVerified: false,
+  targetAudience: "all" as "all" | "verified" | "unverified",
+  scheduledAt: null as string | null,
 };
+
+const TARGET_OPTIONS = [
+  { value: "all", label: "All Users", desc: "Everyone sees this ad" },
+  { value: "verified", label: "Verified Only", desc: "PIN-verified devices only" },
+  { value: "unverified", label: "Unverified Only", desc: "Before PIN verification" },
+];
 
 const AD_LAYOUTS = [
   { value: "card", label: "Card", desc: "Centered dialog with image" },
@@ -128,6 +136,8 @@ export default function AdsPage() {
       priority: ad.priority,
       maxImpressions: ad.maxImpressions ?? 0,
       broadcastToVerified: ad.broadcastToVerified ?? false,
+      targetAudience: (ad.targetAudience as "all" | "verified" | "unverified") ?? "all",
+      scheduledAt: ad.scheduledAt ?? null,
     };
     setForm(data);
     setStep("form");
@@ -140,6 +150,8 @@ export default function AdsPage() {
       apiKeyId: Number(form.apiKeyId),
       priority: Number(form.priority),
       maxImpressions: Number(form.maxImpressions),
+      // Default scheduledAt to now on create so ad is immediately active
+      scheduledAt: form.scheduledAt || new Date().toISOString(),
     };
 
     if (editingId) {
@@ -158,6 +170,19 @@ export default function AdsPage() {
     setEditingId(null);
     setStep("form");
     try { localStorage.removeItem(STORAGE_KEY); } catch {}
+  }
+
+  async function pushAd(id: number, delayHours: number = 0) {
+    const scheduledAt = delayHours > 0
+      ? new Date(Date.now() + delayHours * 60 * 60 * 1000).toISOString()
+      : new Date().toISOString();
+    await api(`/admin/ads/${id}`, {
+      method: "PATCH",
+      token,
+      body: { scheduledAt, broadcastToVerified: true, isActive: true },
+    });
+    toast.show(delayHours > 0 ? `Ad scheduled in ${delayHours}h` : "Ad pushed to all devices now");
+    load();
   }
 
   async function toggleAd(id: number, isActive: boolean) {
@@ -245,6 +270,19 @@ export default function AdsPage() {
                 </div>
               </div>
 
+              {/* Push bar */}
+              {ad.isActive && (
+                <div className="flex items-center gap-1.5 border-t border-white/[0.06] px-3.5 py-2">
+                  <Radio className="h-3 w-3 text-zinc-600 shrink-0" />
+                  <span className="text-[10px] text-zinc-600 mr-auto">Push ad to devices:</span>
+                  <button onClick={() => pushAd(ad.id, 0)} className="rounded-md bg-white/[0.06] border border-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-zinc-400 hover:bg-white/[0.1] hover:text-white transition-all">Now</button>
+                  <button onClick={() => pushAd(ad.id, 1)} className="rounded-md bg-white/[0.06] border border-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-zinc-400 hover:bg-white/[0.1] hover:text-white transition-all">1h</button>
+                  <button onClick={() => pushAd(ad.id, 6)} className="rounded-md bg-white/[0.06] border border-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-zinc-400 hover:bg-white/[0.1] hover:text-white transition-all">6h</button>
+                  <button onClick={() => pushAd(ad.id, 24)} className="rounded-md bg-white/[0.06] border border-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-zinc-400 hover:bg-white/[0.1] hover:text-white transition-all">24h</button>
+                </div>
+              )}
+
+              {/* Actions */}
               <div className="flex border-t border-white/[0.06] divide-x divide-white/[0.06]">
                 <button onClick={() => openEdit(ad)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[11px] font-medium text-zinc-500 transition-colors hover:bg-white/[0.03] hover:text-zinc-300"><Pencil className="h-3 w-3" /> Edit</button>
                 <button onClick={() => toggleAd(ad.id, ad.isActive)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[11px] font-medium text-zinc-500 transition-colors hover:bg-white/[0.03] hover:text-zinc-300">
@@ -347,6 +385,28 @@ export default function AdsPage() {
               >
                 <span className={`pointer-events-none inline-block h-5 w-5 rounded-full shadow-sm transition-transform mt-0.5 ${form.broadcastToVerified ? "translate-x-5 bg-black" : "translate-x-0.5 bg-zinc-500"}`} />
               </button>
+            </div>
+
+            {/* Target audience */}
+            <div>
+              <label className="mb-1.5 block text-[13px] font-medium text-zinc-400">Who should see this ad?</label>
+              <div className="grid grid-cols-3 gap-2">
+                {TARGET_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => updateForm({ targetAudience: opt.value as "all" | "verified" | "unverified" })}
+                    className={`rounded-lg border p-2.5 text-left transition-all ${
+                      form.targetAudience === opt.value
+                        ? "border-white bg-white/[0.08] text-white"
+                        : "border-white/[0.06] bg-white/[0.02] text-zinc-500 hover:border-white/[0.1]"
+                    }`}
+                  >
+                    <p className="text-[11px] font-semibold">{opt.label}</p>
+                    <p className="text-[8px] text-zinc-600 mt-0.5">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Mobile: Next → Preview button */}

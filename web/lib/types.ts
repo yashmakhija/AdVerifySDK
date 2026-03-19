@@ -20,6 +20,8 @@ export interface Ad {
   priority: number;
   maxImpressions: number;
   broadcastToVerified: boolean;
+  targetAudience: 'all' | 'verified' | 'unverified';
+  scheduledAt: string | null;
   createdAt: string;
   apiKey?: { appName: string };
   _count?: { impressions: number; clicks: number };
