@@ -18,6 +18,8 @@ export interface Ad {
   buttonText: string;
   isActive: boolean;
   priority: number;
+  maxImpressions: number;
+  broadcastToVerified: boolean;
   createdAt: string;
   apiKey?: { appName: string };
   _count?: { impressions: number; clicks: number };

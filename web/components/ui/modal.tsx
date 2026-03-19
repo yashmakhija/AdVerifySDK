@@ -10,9 +10,10 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  wide?: boolean;
 }
 
-export function Modal({ isOpen, onClose, title, children }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, wide }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm p-0 sm:items-center sm:p-5"
       onClick={(e) => e.target === overlayRef.current && onClose()}
     >
-      <div className="w-full rounded-t-2xl border border-white/[0.08] bg-[#111] shadow-2xl sm:max-w-md sm:rounded-2xl max-h-[90vh] overflow-y-auto animate-in">
+      <div className={`w-full rounded-t-2xl border border-white/[0.08] bg-[#111] shadow-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto animate-in ${wide ? "sm:max-w-3xl" : "sm:max-w-md"}`}>
         <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
           <h3 className="text-[14px] font-semibold text-white">{title}</h3>
           <button
