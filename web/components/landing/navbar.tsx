@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Menu, X, ArrowRight, Shield } from "lucide-react";
 
 const LINKS = [
   { label: "Features", href: "#features" },
@@ -16,66 +15,78 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-zinc-200/50 bg-white/85 backdrop-blur-xl backdrop-saturate-150">
-      <div className="mx-auto flex h-[56px] max-w-6xl items-center justify-between px-5 md:px-8">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-950 shadow-sm shadow-zinc-950/20">
-            <span className="text-[11px] font-bold text-white leading-none">A</span>
-          </div>
-          <span className="text-[15px] font-semibold tracking-tight text-zinc-950">
-            AdVerify
-          </span>
-        </Link>
-
-        <div className="hidden items-center gap-8 md:flex">
-          {LINKS.map(({ label, href }) => (
-            <Link
-              key={label}
-              href={href}
-              className="text-[13px] font-medium text-zinc-400 transition-colors hover:text-zinc-950"
-            >
-              {label}
-            </Link>
-          ))}
-        </div>
-
-        <div className="hidden md:flex items-center gap-3">
-          <Link href="/login">
-            <Button size="sm" className="h-8 px-4 text-[13px] shadow-sm shadow-zinc-950/10">
-              Dashboard
-            </Button>
+    <div className="sticky top-0 z-50 w-full px-3 sm:px-5 pt-3">
+      <nav className="mx-auto max-w-5xl rounded-2xl border border-white/[0.08] bg-white/[0.05] backdrop-blur-2xl backdrop-saturate-150 shadow-lg shadow-black/20">
+        <div className="flex h-[52px] items-center justify-between px-4 sm:px-5">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white transition-transform duration-200 group-hover:scale-105">
+              <Shield className="h-3.5 w-3.5 text-black" />
+            </div>
+            <span className="text-[14px] font-bold tracking-tight text-white">
+              AdVerify
+            </span>
           </Link>
-        </div>
 
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 md:hidden"
-        >
-          {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-        </button>
-      </div>
-
-      {mobileOpen && (
-        <div className="border-t border-zinc-100 bg-white/95 backdrop-blur-xl px-5 pb-5 pt-3 md:hidden animate-in">
-          <div className="space-y-1">
+          {/* Desktop links — centered */}
+          <div className="hidden items-center gap-0.5 md:flex absolute left-1/2 -translate-x-1/2">
             {LINKS.map(({ label, href }) => (
               <Link
                 key={label}
                 href={href}
-                onClick={() => setMobileOpen(false)}
-                className="block rounded-lg px-3 py-2.5 text-[14px] font-medium text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-950"
+                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-zinc-400 transition-all duration-200 hover:text-white hover:bg-white/[0.06]"
               >
                 {label}
               </Link>
             ))}
           </div>
-          <Link href="/login" onClick={() => setMobileOpen(false)} className="mt-3 block">
-            <Button size="sm" className="w-full text-[13px]">
+
+          {/* Desktop CTA */}
+          <div className="hidden md:flex items-center">
+            <Link
+              href="/login"
+              className="group flex items-center gap-1.5 rounded-full bg-white px-4 py-[6px] text-[13px] font-semibold text-black transition-all duration-200 hover:bg-zinc-200 active:scale-[0.97]"
+            >
               Dashboard
-            </Button>
-          </Link>
+              <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+
+          {/* Mobile toggle */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 transition-colors hover:text-white hover:bg-white/[0.08] md:hidden"
+          >
+            {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
         </div>
-      )}
-    </nav>
+
+        {/* Mobile menu */}
+        {mobileOpen && (
+          <div className="border-t border-white/[0.06] px-4 pb-4 pt-2 md:hidden animate-in">
+            <div className="space-y-0.5">
+              {LINKS.map(({ label, href }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center rounded-xl px-3 py-2.5 text-[14px] font-medium text-zinc-400 transition-colors hover:bg-white/[0.04] hover:text-white"
+                >
+                  {label}
+                </Link>
+              ))}
+            </div>
+            <div className="mt-3 pt-3 border-t border-white/[0.06]">
+              <Link href="/login" onClick={() => setMobileOpen(false)}>
+                <button className="group flex w-full items-center justify-center gap-2 rounded-full bg-white py-2.5 text-[13px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98]">
+                  Dashboard
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                </button>
+              </Link>
+            </div>
+          </div>
+        )}
+      </nav>
+    </div>
   );
 }

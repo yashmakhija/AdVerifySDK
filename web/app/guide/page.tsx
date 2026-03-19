@@ -30,35 +30,39 @@ export default function PublicDocsPage() {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
 
   return (
-    <>
+    <div className="bg-black min-h-screen">
       <Navbar />
 
-      <section className="w-full bg-white border-b border-zinc-200">
-        <div className="mx-auto max-w-5xl px-5 py-16 md:py-20">
+      {/* Hero header */}
+      <section className="relative w-full border-b border-white/[0.06] overflow-hidden">
+        <div className="absolute inset-0 bg-dot-dark mask-fade-b opacity-50" />
+        <div className="relative mx-auto max-w-5xl px-5 pt-10 pb-12 sm:pt-14 sm:pb-16 md:pt-16 md:pb-20">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-400 hover:text-zinc-700 transition-colors mb-6"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-600 hover:text-zinc-300 transition-colors mb-6"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to home
           </Link>
 
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-zinc-400 mb-3">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-zinc-600 mb-3">
             Documentation
           </p>
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl text-zinc-950">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white">
             Integration Guide
           </h1>
-          <p className="mt-3 text-[15px] text-zinc-500 leading-relaxed max-w-lg">
+          <p className="mt-3 text-[14px] sm:text-[15px] text-zinc-500 leading-relaxed max-w-lg">
             Everything you need to add AdVerify SDK to your Android app — from
             admin panel setup to MT Manager integration.
           </p>
         </div>
       </section>
 
-      <section className="w-full bg-zinc-50 min-h-screen">
-        <div className="mx-auto max-w-5xl px-5 py-10">
-          <div className="mb-8 flex gap-1 overflow-x-auto rounded-xl border border-zinc-200 bg-white p-1">
+      {/* Content */}
+      <section className="w-full">
+        <div className="mx-auto max-w-5xl px-4 sm:px-5 py-6 sm:py-10">
+          {/* Tabs */}
+          <div className="mb-6 sm:mb-8 flex gap-1 overflow-x-auto scrollbar-hide rounded-xl border border-white/[0.06] bg-white/[0.02] p-1">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -67,20 +71,21 @@ export default function PublicDocsPage() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "flex items-center gap-2 whitespace-nowrap rounded-lg px-3.5 py-2 text-[13px] font-medium transition-colors",
+                    "flex items-center gap-1.5 sm:gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-[12px] sm:text-[13px] font-medium transition-all",
                     isActive
-                      ? "bg-zinc-950 text-white"
-                      : "text-zinc-500 hover:bg-zinc-50 hover:text-zinc-700"
+                      ? "bg-white text-black"
+                      : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
                   )}
                 >
                   <Icon className="h-3.5 w-3.5" />
-                  {tab.label}
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.label.split(" ")[0]}</span>
                 </button>
               );
             })}
           </div>
 
-          <div className="space-y-5 max-w-4xl">
+          <div className="space-y-4 sm:space-y-5 max-w-4xl">
             {activeTab === "overview" && <OverviewTab />}
             {activeTab === "admin" && <AdminTab />}
             {activeTab === "mt-manager" && <MtManagerTab />}
@@ -92,9 +97,13 @@ export default function PublicDocsPage() {
       </section>
 
       <Footer />
-    </>
+    </div>
   );
 }
+
+/* ════════════════════════════════
+   TAB CONTENT
+   ════════════════════════════════ */
 
 function OverviewTab() {
   const steps = [
@@ -122,16 +131,16 @@ function OverviewTab() {
       <Card title="Complete Flow">
         <div className="relative">
           {steps.map((step, i) => (
-            <div key={step.n} className="flex gap-4 pb-5 last:pb-0">
+            <div key={step.n} className="flex gap-3 sm:gap-4 pb-5 last:pb-0">
               <div className="flex flex-col items-center">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-950 text-[11px] font-bold text-white">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-[11px] font-bold text-black">
                   {step.n}
                 </div>
-                {i < steps.length - 1 && <div className="mt-1.5 h-full w-px bg-zinc-200" />}
+                {i < steps.length - 1 && <div className="mt-1.5 h-full w-px bg-white/[0.08]" />}
               </div>
-              <div className="pt-0.5">
-                <p className="text-sm font-semibold text-zinc-950">{step.title}</p>
-                <p className="mt-0.5 text-[13px] leading-relaxed text-zinc-500">{step.desc}</p>
+              <div className="pt-0.5 min-w-0">
+                <p className="text-[13px] sm:text-sm font-semibold text-white">{step.title}</p>
+                <p className="mt-0.5 text-[12px] sm:text-[13px] leading-relaxed text-zinc-500">{step.desc}</p>
               </div>
             </div>
           ))}
@@ -139,17 +148,17 @@ function OverviewTab() {
       </Card>
 
       <Card title="Architecture">
-        <CodeBlock>{`┌──────────────────┐        proxy         ┌──────────────────┐
-│  Admin Panel      │ ──────────────────▸ │  Backend Server   │
-│  (Next.js)        │                     │  (Express + DB)   │
-└──────────────────┘                      └──────────────────┘
-                                                   │
-                          ┌────────────────────────┤
-                          ▼                        ▼
-                   ┌─────────────┐       ┌─────────────────┐
-                   │ Android App  │       │ Link Shortener   │
-                   │ (SDK inside) │       │ (Your existing)  │
-                   └─────────────┘       └─────────────────┘`}</CodeBlock>
+        <CodeBlock>{`┌──────────────────┐     proxy      ┌──────────────────┐
+│  Admin Panel      │ ─────────────▸ │  Backend Server   │
+│  (Next.js)        │                │  (Express + DB)   │
+└──────────────────┘                 └──────────────────┘
+                                              │
+                     ┌────────────────────────┤
+                     ▼                        ▼
+              ┌─────────────┐       ┌─────────────────┐
+              │ Android App  │       │ Link Shortener   │
+              │ (SDK inside) │       │ (Your existing)  │
+              └─────────────┘       └─────────────────┘`}</CodeBlock>
       </Card>
     </>
   );
@@ -159,16 +168,16 @@ function AdminTab() {
   return (
     <>
       <Card title="Step 1 — Create an API Key">
-        <P>Go to <Chip>API Keys</Chip> → click <strong>New Key</strong>.</P>
+        <P>Go to <Chip>API Keys</Chip> → click <strong className="text-white">New Key</strong>.</P>
         <BulletList items={[
-          <><strong className="text-zinc-950">App Name</strong> — a display name like &quot;My Cool App&quot;</>,
-          <><strong className="text-zinc-950">Package Name</strong> — the Android package, e.g. <Chip>com.example.myapp</Chip></>,
+          <><strong className="text-white">App Name</strong> — a display name like &quot;My Cool App&quot;</>,
+          <><strong className="text-white">Package Name</strong> — the Android package, e.g. <Chip>com.example.myapp</Chip></>,
         ]} />
         <P className="mt-3">Copy the generated API key — you&apos;ll need it for the SDK and link shortener.</P>
       </Card>
 
       <Card title="Step 2 — Create Ads">
-        <P>Go to <Chip>Ads</Chip> → click <strong>New Ad</strong>.</P>
+        <P>Go to <Chip>Ads</Chip> → click <strong className="text-white">New Ad</strong>.</P>
         <BulletList items={[
           "Select which app this ad belongs to",
           "Set title, description, image URL, redirect URL",
@@ -180,12 +189,12 @@ function AdminTab() {
       <Card title="Step 3 — Configure PIN Verification">
         <P>Go to <Chip>PIN Config</Chip> → select your app.</P>
         <BulletList items={[
-          <><strong className="text-zinc-950">Enable PIN</strong> — toggle on</>,
-          <><strong className="text-zinc-950">PIN Message</strong> — text shown in the PIN dialog</>,
-          <><strong className="text-zinc-950">Max Attempts</strong> — tries before dialog auto-closes</>,
-          <><strong className="text-zinc-950">Get PIN URL</strong> — your link shortener URL with <Chip>{"{device_id}"}</Chip> placeholder</>,
-          <><strong className="text-zinc-950">Button Text</strong> — label on the &quot;Get PIN&quot; button</>,
-          <><strong className="text-zinc-950">PIN Expiry</strong> — choose &quot;Never&quot; (one-time forever) or set hours until PIN expires. Expired users must get a new PIN.</>,
+          <><strong className="text-white">Enable PIN</strong> — toggle on</>,
+          <><strong className="text-white">PIN Message</strong> — text shown in the PIN dialog</>,
+          <><strong className="text-white">Max Attempts</strong> — tries before dialog auto-closes</>,
+          <><strong className="text-white">Get PIN URL</strong> — your link shortener URL with <Chip>{"{device_id}"}</Chip> placeholder</>,
+          <><strong className="text-white">Button Text</strong> — label on the &quot;Get PIN&quot; button</>,
+          <><strong className="text-white">PIN Expiry</strong> — choose &quot;Never&quot; (one-time forever) or set hours until PIN expires.</>,
         ]} />
         <CodeBlock>{`Example Get PIN URL:
 https://your-shortener.com/get-pin?device={device_id}
@@ -205,22 +214,22 @@ function MtManagerTab() {
         <a
           href="/adverify.dex"
           download="adverify.dex"
-          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-zinc-950 px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-zinc-800"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-[13px] font-semibold text-black transition-colors hover:bg-zinc-200"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
           Download adverify.dex
-          <span className="text-zinc-400 text-[11px]">(~25KB)</span>
+          <span className="text-zinc-500 text-[11px]">(~25KB)</span>
         </a>
       </Card>
 
       <Card title="What You Need">
         <BulletList items={[
-          <><strong className="text-zinc-950">adverify.dex</strong> — downloaded above</>,
-          <><strong className="text-zinc-950">Your API key</strong> — from the admin panel</>,
-          <><strong className="text-zinc-950">Your server URL</strong> — where your backend is hosted</>,
-          <><strong className="text-zinc-950">MT Manager</strong> — installed on your Android device</>,
+          <><strong className="text-white">adverify.dex</strong> — downloaded above</>,
+          <><strong className="text-white">Your API key</strong> — from the admin panel</>,
+          <><strong className="text-white">Your server URL</strong> — where your backend is hosted</>,
+          <><strong className="text-white">MT Manager</strong> — installed on your Android device</>,
         ]} />
       </Card>
 
@@ -238,7 +247,7 @@ function MtManagerTab() {
 
       <Card title="Step 3 — Find Launcher Activity">
         <P>Open <Chip>AndroidManifest.xml</Chip> and find the activity with MAIN + LAUNCHER:</P>
-        <CodeBlock>{`<activity android:name="com.example.app.MainActivity">
+        <CodeBlock lang="xml">{`<activity android:name="com.example.app.MainActivity">
     <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
@@ -248,8 +257,8 @@ function MtManagerTab() {
       </Card>
 
       <Card title="Step 4 — Add Smali Hook (3 Lines Only)">
-        <P>Navigate to the launcher Activity&apos;s smali file → find <Chip>onCreate</Chip> → add these 3 lines <strong>right after</strong> <Chip>invoke-super</Chip>:</P>
-        <CodeBlock>{`const-string v0, "YOUR_API_KEY"
+        <P>Navigate to the launcher Activity&apos;s smali file → find <Chip>onCreate</Chip> → add these 3 lines <strong className="text-white">right after</strong> <Chip>invoke-super</Chip>:</P>
+        <CodeBlock lang="smali">{`const-string v0, "YOUR_API_KEY"
 
 const-string v1, "https://your-server.com"
 
@@ -264,7 +273,7 @@ invoke-static {p0, v0, v1}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Acti
 
       <Card title="Step 5 — Full Example">
         <P>Complete <Chip>onCreate</Chip> after adding the hook:</P>
-        <CodeBlock>{`.method protected onCreate(Landroid/os/Bundle;)V
+        <CodeBlock lang="smali">{`.method protected onCreate(Landroid/os/Bundle;)V
     .locals 2
 
     invoke-super {p0, p1}, Landroid/app/Activity;->onCreate(Landroid/os/Bundle;)V
@@ -282,7 +291,7 @@ invoke-static {p0, v0, v1}, Lcom/adverify/sdk/AdVerify;->start(Landroid/app/Acti
 
       <Card title="Step 6 — Check Permissions">
         <P>In <Chip>AndroidManifest.xml</Chip>, make sure these exist:</P>
-        <CodeBlock>{`<!-- Required — add if not present -->
+        <CodeBlock lang="xml">{`<!-- Required — add if not present -->
 <uses-permission android:name="android.permission.INTERNET" />
 
 <!-- Required if server uses HTTP not HTTPS -->
@@ -326,7 +335,7 @@ before opening the URL in the user's browser.`}</CodeBlock>
       </Card>
 
       <Card title="Step 2 — Call Generate PIN API">
-        <P>When the user completes the action, call this <strong>public</strong> endpoint (no auth needed):</P>
+        <P>When the user completes the action, call this <strong className="text-white">public</strong> endpoint:</P>
         <CodeBlock>{`POST https://your-server.com/api/sdk/generate-pin
 Content-Type: application/json
 
@@ -349,7 +358,7 @@ Content-Type: application/json
       </Card>
 
       <Card title="Node.js Example">
-        <CodeBlock>{`const res = await fetch(
+        <CodeBlock lang="javascript">{`const res = await fetch(
   "https://your-server.com/api/sdk/generate-pin",
   {
     method: "POST",
@@ -365,7 +374,7 @@ const { pin } = await res.json();
       </Card>
 
       <Card title="PHP Example">
-        <CodeBlock>{`$data = json_encode([
+        <CodeBlock lang="php">{`$data = json_encode([
     "apiKey"   => "a1b2c3d4e5f6...",
     "deviceId" => $_GET["device"]
 ]);
@@ -384,12 +393,12 @@ echo "Your PIN: " . $result->pin;`}</CodeBlock>
 
       <Card title="How PINs Work">
         <BulletList items={[
-          <><strong className="text-zinc-950">Per-device</strong> — each device gets its own unique PIN bound to their Android ID</>,
-          <><strong className="text-zinc-950">Anyone can generate</strong> — users tap &quot;Get PIN&quot; in the app, no admin needed</>,
-          <><strong className="text-zinc-950">Cannot be shared</strong> — PIN for Device A won&apos;t work on Device B</>,
-          <><strong className="text-zinc-950">Idempotent</strong> — requesting PIN for the same device returns the same unused PIN</>,
-          <><strong className="text-zinc-950">Expiry control</strong> — admin sets per app: never expire, or expire after X hours. Expired PINs require user to get a new one.</>,
-          <>You can <strong className="text-zinc-950">revoke</strong> a device from the admin panel → User PINs</>,
+          <><strong className="text-white">Per-device</strong> — each device gets its own unique PIN bound to their Android ID</>,
+          <><strong className="text-white">Anyone can generate</strong> — users tap &quot;Get PIN&quot; in the app, no admin needed</>,
+          <><strong className="text-white">Cannot be shared</strong> — PIN for Device A won&apos;t work on Device B</>,
+          <><strong className="text-white">Idempotent</strong> — requesting PIN for the same device returns the same unused PIN</>,
+          <><strong className="text-white">Expiry control</strong> — admin sets per app: never expire, or expire after X hours.</>,
+          <>You can <strong className="text-white">revoke</strong> a device from the admin panel → User PINs</>,
         ]} />
       </Card>
     </>
@@ -401,7 +410,7 @@ function StudioTab() {
     <>
       <Card title="Module Setup">
         <P>Copy the <Chip>adverify</Chip> folder into your project root, then:</P>
-        <CodeBlock>{`// settings.gradle
+        <CodeBlock lang="gradle">{`// settings.gradle
 include ':adverify'
 
 // app/build.gradle
@@ -416,7 +425,7 @@ dependencies {
       </Card>
 
       <Card title="Option A — Application Class (Recommended)">
-        <CodeBlock>{`public class MyApp extends Application {
+        <CodeBlock lang="java">{`public class MyApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
@@ -431,13 +440,13 @@ AdVerify.show(activity);`}</CodeBlock>
 
       <Card title="Option B — Single Call (No Application Class)">
         <P>Same method used in MT Manager — init + show in one call:</P>
-        <CodeBlock>{`// In any Activity's onCreate
+        <CodeBlock lang="java">{`// In any Activity's onCreate
 AdVerify.start(this, "YOUR_API_KEY",
     "https://your-server.com");`}</CodeBlock>
       </Card>
 
       <Card title="With Callback">
-        <CodeBlock>{`AdVerify.show(activity, new AdVerifyCallback() {
+        <CodeBlock lang="java">{`AdVerify.show(activity, new AdVerifyCallback() {
     @Override
     public void onAdShown() {
         // Ad displayed
@@ -501,7 +510,7 @@ function ApiTab() {
       </Card>
 
       <Card title="Generate PIN — Request / Response">
-        <CodeBlock>{`POST /api/sdk/generate-pin
+        <CodeBlock lang="http">{`POST /api/sdk/generate-pin
 Content-Type: application/json
 
 {
@@ -525,7 +534,7 @@ Content-Type: application/json
       </Card>
 
       <Card title="Verify PIN — Request / Response">
-        <CodeBlock>{`POST /api/sdk/verify-pin
+        <CodeBlock lang="http">{`POST /api/sdk/verify-pin
 x-api-key: your-api-key
 Content-Type: application/json
 
@@ -547,30 +556,78 @@ Content-Type: application/json
   );
 }
 
+/* ════════════════════════════════
+   SHARED COMPONENTS
+   ════════════════════════════════ */
+
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 md:p-6">
-      <h2 className="mb-4 text-sm font-semibold text-zinc-950">{title}</h2>
+    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 sm:p-5 md:p-6">
+      <h2 className="mb-3 sm:mb-4 text-[13px] sm:text-sm font-semibold text-white">{title}</h2>
       {children}
     </div>
   );
 }
 
-function CodeBlock({ children }: { children: string }) {
+function CodeBlock({ children, lang }: { children: string; lang?: string }) {
+  return <CodeSnippet code={children} lang={lang} />;
+}
+
+function CodeSnippet({ code, lang }: { code: string; lang?: string }) {
+  const id = code.slice(0, 30).replace(/\W/g, "");
+
+  function handleCopy() {
+    navigator.clipboard.writeText(code);
+    const btn = document.getElementById(`copy-${id}`);
+    if (btn) {
+      btn.textContent = "Copied!";
+      setTimeout(() => { btn.textContent = "Copy"; }, 2000);
+    }
+  }
+
   return (
-    <pre className="mt-3 overflow-x-auto rounded-lg bg-zinc-950 p-4 text-[12px] leading-relaxed text-zinc-400 font-mono">
-      <code>{children}</code>
-    </pre>
+    <div className="group relative mt-3 rounded-xl border border-white/[0.08] bg-[#08080a] overflow-hidden">
+      {/* Top accent line */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-zinc-700/50 to-transparent" />
+
+      {/* Header bar */}
+      <div className="flex items-center justify-between px-3 sm:px-4 py-2 border-b border-white/[0.05]">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1">
+            <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
+            <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
+            <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
+          </div>
+          {lang && (
+            <span className="text-[10px] font-medium text-zinc-600 uppercase tracking-wider">{lang}</span>
+          )}
+        </div>
+        <button
+          id={`copy-${id}`}
+          onClick={handleCopy}
+          className="flex items-center gap-1 rounded-md bg-white/[0.05] border border-white/[0.06] px-2.5 py-1 text-[10px] font-medium text-zinc-500 transition-all hover:bg-white/[0.08] hover:text-zinc-300 active:scale-95"
+        >
+          Copy
+        </button>
+      </div>
+
+      {/* Code content */}
+      <div className="overflow-x-auto p-3 sm:p-4">
+        <pre className="text-[11px] sm:text-[12px] leading-[1.7] text-zinc-400 font-mono">
+          <code>{code}</code>
+        </pre>
+      </div>
+    </div>
   );
 }
 
 function P({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <p className={cn("text-[13px] leading-relaxed text-zinc-500", className)}>{children}</p>;
+  return <p className={cn("text-[12px] sm:text-[13px] leading-relaxed text-zinc-500", className)}>{children}</p>;
 }
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <code className="rounded-md bg-zinc-100 px-1.5 py-0.5 text-[12px] font-mono text-zinc-700">
+    <code className="rounded-md bg-white/[0.06] border border-white/[0.06] px-1.5 py-0.5 text-[11px] font-mono text-zinc-300">
       {children}
     </code>
   );
@@ -578,7 +635,7 @@ function Chip({ children }: { children: React.ReactNode }) {
 
 function BulletList({ items }: { items: React.ReactNode[] }) {
   return (
-    <ul className="mt-3 list-disc space-y-1.5 pl-5 text-[13px] text-zinc-500">
+    <ul className="mt-3 list-disc space-y-1.5 pl-5 text-[12px] sm:text-[13px] text-zinc-500">
       {items.map((item, i) => <li key={i}>{item}</li>)}
     </ul>
   );
@@ -586,9 +643,9 @@ function BulletList({ items }: { items: React.ReactNode[] }) {
 
 function Warning({ title, items }: { title: string; items: React.ReactNode[] }) {
   return (
-    <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
-      <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-amber-700">{title}</p>
-      <ul className="list-disc space-y-1 pl-4 text-[13px] text-amber-700">
+    <div className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/[0.05] p-3 sm:p-4">
+      <p className="mb-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-amber-400">{title}</p>
+      <ul className="list-disc space-y-1 pl-4 text-[12px] sm:text-[13px] text-amber-300/80">
         {items.map((item, i) => <li key={i}>{item}</li>)}
       </ul>
     </div>
@@ -598,10 +655,10 @@ function Warning({ title, items }: { title: string; items: React.ReactNode[] }) 
 function OptionRow({ letter, text }: { letter: string; text: React.ReactNode }) {
   return (
     <div className="flex items-start gap-2">
-      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-zinc-100 text-[10px] font-bold text-zinc-600">
+      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-white/[0.06] text-[10px] font-bold text-zinc-400">
         {letter}
       </span>
-      <p className="text-[13px] text-zinc-500">{text}</p>
+      <p className="text-[12px] sm:text-[13px] text-zinc-500">{text}</p>
     </div>
   );
 }
@@ -610,31 +667,40 @@ function EndpointTable({ endpoints, showAuth }: {
   endpoints: { m: string; p: string; d: string; a?: string }[];
   showAuth?: boolean;
 }) {
+  const methodColor: Record<string, string> = {
+    GET: "text-emerald-400 bg-emerald-400/10",
+    POST: "text-blue-400 bg-blue-400/10",
+    PATCH: "text-amber-400 bg-amber-400/10",
+    DELETE: "text-red-400 bg-red-400/10",
+  };
+
   return (
-    <div className="mt-4 overflow-x-auto">
-      <table className="w-full text-left text-[13px]">
-        <thead className="border-b border-zinc-100 text-[11px] uppercase text-zinc-400 tracking-widest">
+    <div className="mt-4 overflow-x-auto -mx-4 sm:-mx-5 md:-mx-6 px-4 sm:px-5 md:px-6">
+      <table className="w-full min-w-[500px] text-left text-[12px] sm:text-[13px]">
+        <thead className="border-b border-white/[0.06] text-[10px] sm:text-[11px] uppercase text-zinc-600 tracking-widest">
           <tr>
-            <th className="pb-2.5 pr-3 font-medium">Method</th>
+            <th className="pb-2.5 pr-3 font-medium w-16">Method</th>
             <th className="pb-2.5 pr-3 font-medium">Endpoint</th>
             <th className="pb-2.5 pr-3 font-medium">Description</th>
             {showAuth && <th className="pb-2.5 font-medium">Auth</th>}
           </tr>
         </thead>
-        <tbody className="divide-y divide-zinc-50 text-zinc-500">
+        <tbody className="divide-y divide-white/[0.04] text-zinc-500">
           {endpoints.map(({ m, p, d, a }) => (
-            <tr key={`${m}-${p}`} className="hover:bg-zinc-50/50 transition-colors">
-              <td className="py-2.5 pr-3 font-mono text-[11px] text-zinc-500">
-                {m}
+            <tr key={`${m}-${p}`} className="hover:bg-white/[0.02] transition-colors">
+              <td className="py-2 pr-3">
+                <span className={`inline-block rounded-md px-1.5 py-0.5 font-mono text-[9px] sm:text-[10px] font-bold ${methodColor[m] || ""}`}>
+                  {m}
+                </span>
               </td>
-              <td className="py-2.5 pr-3 font-mono text-[11px] text-zinc-950">{p}</td>
-              <td className="py-2.5 pr-3">{d}</td>
+              <td className="py-2 pr-3 font-mono text-[10px] sm:text-[11px] text-zinc-300">{p}</td>
+              <td className="py-2 pr-3">{d}</td>
               {showAuth && (
-                <td className="py-2.5 text-[12px]">
+                <td className="py-2 text-[11px]">
                   {a === "Public" ? (
-                    <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-600">Public</span>
+                    <span className="rounded-md bg-emerald-400/10 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-medium text-emerald-400">Public</span>
                   ) : (
-                    <span className="font-mono text-zinc-400">{a}</span>
+                    <span className="font-mono text-zinc-600 text-[10px]">{a}</span>
                   )}
                 </td>
               )}

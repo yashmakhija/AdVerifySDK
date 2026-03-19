@@ -8,7 +8,7 @@ import { Footer } from "@/components/landing/footer";
 
 export default function Home() {
   return (
-    <>
+    <div className="bg-black">
       <Navbar />
       <HeroSection />
       <FeaturesSection />
@@ -16,6 +16,6 @@ export default function Home() {
       <DocsSection />
       <CtaSection />
       <Footer />
-    </>
+    </div>
   );
 }

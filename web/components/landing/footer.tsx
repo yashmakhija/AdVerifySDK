@@ -2,14 +2,14 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="bg-white border-t border-zinc-100">
+    <footer className="bg-black border-t border-white/[0.06]">
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <div className="flex flex-col gap-4 py-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-zinc-950">
-              <span className="text-[9px] font-bold text-white leading-none">A</span>
+            <div className="flex h-5 w-5 items-center justify-center rounded bg-white">
+              <span className="text-[8px] font-extrabold text-black leading-none">A</span>
             </div>
-            <span className="text-[13px] text-zinc-400">
+            <span className="text-[13px] text-zinc-600">
               &copy; {new Date().getFullYear()} AdVerify. Open-source ad serving SDK.
             </span>
           </div>
@@ -23,7 +23,7 @@ export function Footer() {
               <Link
                 key={label}
                 href={href}
-                className="text-[13px] text-zinc-400 transition-colors hover:text-zinc-600"
+                className="text-[13px] text-zinc-600 transition-colors hover:text-zinc-300"
               >
                 {label}
               </Link>
