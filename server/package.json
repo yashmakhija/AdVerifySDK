@@ -7,7 +7,11 @@
     "start": "node dist/app.js",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:backup": "tsx scripts/db-backup.ts",
+    "db:backup:test": "bash scripts/setup-backup-cron.sh --test",
+    "db:backup:cron": "bash scripts/setup-backup-cron.sh",
+    "db:backup:cron:remove": "bash scripts/setup-backup-cron.sh --remove"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",

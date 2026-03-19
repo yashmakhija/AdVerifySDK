@@ -1,0 +1,173 @@
+/**
+ * Database Backup → Cloudflare R2
+ *
+ * Takes a pg_dump snapshot and uploads it to R2 (S3-compatible).
+ * Keeps last N backups and cleans up older ones.
+ *
+ * Usage:
+ *   npx tsx scripts/db-backup.ts
+ *   npx tsx scripts/db-backup.ts --keep 30
+ *
+ * Required env vars:
+ *   DATABASE_URL       - PostgreSQL connection string
+ *   R2_ENDPOINT        - e.g. https://<account-id>.r2.cloudflarestorage.com
+ *   R2_ACCESS_KEY_ID   - R2 API token access key
+ *   R2_SECRET_ACCESS_KEY - R2 API token secret
+ *   R2_BUCKET          - Bucket name (default: adverify-backups)
+ */
+
+import { config } from "dotenv";
+import { execSync } from "child_process";
+import { createReadStream, statSync, unlinkSync, existsSync, mkdirSync } from "fs";
+import { createHash } from "crypto";
+import { basename, join } from "path";
+
+config();
+
+const DB_URL = process.env.DATABASE_URL;
+const R2_ENDPOINT = process.env.R2_ENDPOINT;
+const R2_ACCESS_KEY = process.env.R2_ACCESS_KEY_ID;
+const R2_SECRET = process.env.R2_SECRET_ACCESS_KEY;
+const R2_BUCKET = process.env.R2_BUCKET || "adverify-backups";
+const KEEP_BACKUPS = parseInt(process.argv.find((a) => a.startsWith("--keep="))?.split("=")[1] || "14");
+
+const TMP_DIR = join(process.cwd(), "tmp");
+const PREFIX = "adverify-db";
+
+function log(msg: string) {
+  console.log(`[backup] ${new Date().toISOString()} ${msg}`);
+}
+
+function fatal(msg: string): never {
+  console.error(`[backup] FATAL: ${msg}`);
+  process.exit(1);
+}
+
+async function s3Request(method: string, path: string, body?: Buffer | ReadableStream, headers: Record<string, string> = {}) {
+  const url = `${R2_ENDPOINT}/${R2_BUCKET}${path}`;
+  const date = new Date().toUTCString();
+
+  // Simple S3 v2 auth
+  const stringToSign = `${method}\n${headers["Content-MD5"] || ""}\n${headers["Content-Type"] || ""}\n${date}\n/${R2_BUCKET}${path}`;
+
+  const { createHmac } = await import("crypto");
+  const signature = createHmac("sha1", R2_SECRET!).update(stringToSign).digest("base64");
+
+  const res = await fetch(url, {
+    method,
+    headers: {
+      Date: date,
+      Authorization: `AWS ${R2_ACCESS_KEY}:${signature}`,
+      ...headers,
+    },
+    body: body as any,
+  });
+
+  return res;
+}
+
+async function uploadToR2(filePath: string, key: string) {
+  const stat = statSync(filePath);
+  const buffer = await import("fs").then((fs) => fs.readFileSync(filePath));
+  const md5 = createHash("md5").update(buffer).digest("base64");
+
+  log(`Uploading ${basename(filePath)} (${(stat.size / 1024 / 1024).toFixed(2)} MB) → r2://${R2_BUCKET}/${key}`);
+
+  const res = await s3Request("PUT", `/${key}`, buffer, {
+    "Content-Type": "application/gzip",
+    "Content-Length": String(stat.size),
+    "Content-MD5": md5,
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    fatal(`R2 upload failed: ${res.status} ${text}`);
+  }
+
+  log(`Upload complete.`);
+}
+
+async function listBackups(): Promise<string[]> {
+  const res = await s3Request("GET", `?prefix=${PREFIX}&max-keys=1000`);
+  if (!res.ok) return [];
+
+  const xml = await res.text();
+  const keys: string[] = [];
+  const regex = /<Key>([^<]+)<\/Key>/g;
+  let match;
+  while ((match = regex.exec(xml)) !== null) {
+    keys.push(match[1]);
+  }
+  return keys.sort();
+}
+
+async function deleteFromR2(key: string) {
+  log(`Deleting old backup: ${key}`);
+  await s3Request("DELETE", `/${key}`);
+}
+
+async function cleanup() {
+  const backups = await listBackups();
+  if (backups.length <= KEEP_BACKUPS) {
+    log(`${backups.length} backups exist, keeping all (limit: ${KEEP_BACKUPS})`);
+    return;
+  }
+
+  const toDelete = backups.slice(0, backups.length - KEEP_BACKUPS);
+  log(`Cleaning up ${toDelete.length} old backups...`);
+  for (const key of toDelete) {
+    await deleteFromR2(key);
+  }
+}
+
+async function main() {
+  // Validate env
+  if (!DB_URL) fatal("DATABASE_URL is not set");
+  if (!R2_ENDPOINT) fatal("R2_ENDPOINT is not set");
+  if (!R2_ACCESS_KEY) fatal("R2_ACCESS_KEY_ID is not set");
+  if (!R2_SECRET) fatal("R2_SECRET_ACCESS_KEY is not set");
+
+  // Ensure tmp dir
+  if (!existsSync(TMP_DIR)) mkdirSync(TMP_DIR, { recursive: true });
+
+  // Generate filename with timestamp
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
+  const filename = `${PREFIX}_${timestamp}.sql.gz`;
+  const filepath = join(TMP_DIR, filename);
+
+  // pg_dump
+  log("Taking database snapshot...");
+  try {
+    execSync(`pg_dump "${DB_URL}" --no-owner --no-acl | gzip > "${filepath}"`, {
+      stdio: ["pipe", "pipe", "pipe"],
+      timeout: 120_000,
+    });
+  } catch (e: any) {
+    fatal(`pg_dump failed: ${e.stderr?.toString() || e.message}`);
+  }
+
+  const size = statSync(filepath).size;
+  if (size < 100) {
+    unlinkSync(filepath);
+    fatal("pg_dump produced empty output — check DATABASE_URL");
+  }
+
+  log(`Snapshot: ${filename} (${(size / 1024).toFixed(1)} KB)`);
+
+  // Upload to R2
+  await uploadToR2(filepath, filename);
+
+  // Cleanup local file
+  unlinkSync(filepath);
+  log("Local temp file removed.");
+
+  // Cleanup old backups in R2
+  await cleanup();
+
+  log("Done.");
+}
+
+main().catch((e) => {
+  console.error("[backup] Unexpected error:", e);
+  process.exit(1);
+});
