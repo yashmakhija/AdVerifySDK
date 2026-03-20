@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { useAuthStore } from "@/lib/store";
+import { useAuthStore, usePlanGateStore } from "@/lib/store";
 import {
   LayoutDashboard,
   KeyRound,
   Megaphone,
   Lock,
+  LockKeyhole,
   UserCheck,
   FileCode2,
   Smartphone,
@@ -49,6 +50,8 @@ const MANAGE_NAV = [
   { href: "/activity", label: "Activity", icon: Activity },
 ];
 
+const FREE_PAGES = ["/dashboard", "/billing", "/profile"];
+
 export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
   const logout = useAuthStore((s) => s.logout);
@@ -56,6 +59,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
   const email = useAuthStore((s) => s.email);
   const role = useAuthStore((s) => s.role);
   const avatar = useAuthStore((s) => s.avatar);
+  const planBlocked = usePlanGateStore((s) => s.planBlocked);
 
   return (
     <>
@@ -95,6 +99,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             {NAV.map((item) => {
               const isActive =
                 pathname === item.href || pathname.startsWith(item.href + "/");
+              const isLocked = planBlocked && !FREE_PAGES.includes(item.href);
               return (
                 <Link
                   key={item.href}
@@ -102,21 +107,29 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
                   onClick={onClose}
                   className={cn(
                     "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150",
-                    isActive
-                      ? "bg-white/[0.08] text-white"
-                      : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
+                    isLocked
+                      ? "text-zinc-700 hover:bg-white/[0.02]"
+                      : isActive
+                        ? "bg-white/[0.08] text-white"
+                        : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
                   )}
                 >
                   <item.icon
                     className={cn(
                       "h-[16px] w-[16px]",
-                      isActive ? "text-white" : "text-zinc-600"
+                      isLocked
+                        ? "text-zinc-700"
+                        : isActive
+                          ? "text-white"
+                          : "text-zinc-600"
                     )}
                   />
                   {item.label}
-                  {isActive && (
+                  {isLocked ? (
+                    <LockKeyhole className="ml-auto h-3 w-3 text-zinc-700" />
+                  ) : isActive ? (
                     <div className="ml-auto h-1.5 w-1.5 rounded-full bg-white" />
-                  )}
+                  ) : null}
                 </Link>
               );
             })}

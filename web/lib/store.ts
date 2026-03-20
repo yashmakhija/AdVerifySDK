@@ -87,3 +87,13 @@ export const useToastStore = create<ToastState>((set) => ({
   show: (message) => set({ message }),
   clearToast: () => set({ message: null }),
 }));
+
+interface PlanGateState {
+  planBlocked: boolean;
+  setPlanBlocked: (blocked: boolean) => void;
+}
+
+export const usePlanGateStore = create<PlanGateState>((set) => ({
+  planBlocked: false,
+  setPlanBlocked: (planBlocked) => set({ planBlocked }),
+}));

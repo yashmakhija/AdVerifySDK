@@ -1,12 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Receipt, CheckCircle2, Clock, XCircle, Download } from "lucide-react";
+import {
+  Receipt,
+  CheckCircle2,
+  Clock,
+  XCircle,
+  AlertTriangle,
+  Ban,
+  ShieldCheck,
+} from "lucide-react";
 import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
-import type { Purchase } from "@/lib/types";
+import type { Purchase, PlanStatus } from "@/lib/types";
 
 function statusVariant(status: string) {
   if (status === "active") return "success" as const;
@@ -30,24 +38,25 @@ function formatDate(dateStr: string) {
 
 export default function BillingPage() {
   const token = useAuthStore((s) => s.token)!;
-  const username = useAuthStore((s) => s.username);
-  const email = useAuthStore((s) => s.email);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [planStatus, setPlanStatus] = useState<PlanStatus | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const data = await api<Purchase[]>("/auth/purchases", { token });
-        setPurchases(Array.isArray(data) ? data : []);
+        const [p, s] = await Promise.all([
+          api<Purchase[]>("/auth/purchases", { token }).catch(() => []),
+          api<PlanStatus>("/auth/plan-status", { token }).catch(() => null),
+        ]);
+        setPurchases(Array.isArray(p) ? p : []);
+        setPlanStatus(s);
       } finally {
         setLoading(false);
       }
     }
     load();
   }, [token]);
-
-  const activePlan = purchases.find((p) => p.status === "active");
 
   return (
     <div>
@@ -62,23 +71,30 @@ export default function BillingPage() {
         </div>
       ) : (
         <>
-          {/* Current Plan */}
+          {/* Plan Status Card */}
           <div className="mb-6 rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-600 mb-3">
-              Current Plan
+              Plan Status
             </p>
-            {activePlan ? (
+
+            {/* Active */}
+            {planStatus?.status === "active" && (
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-[18px] font-bold text-white">
-                      {activePlan.plan?.name}
-                    </span>
-                    <Badge variant="success">Active</Badge>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
+                    <ShieldCheck className="h-5 w-5 text-emerald-400" />
                   </div>
-                  <p className="mt-1 text-[13px] text-zinc-500">
-                    ₹{activePlan.amount}/mo · Renews {formatDate(activePlan.expiresAt)}
-                  </p>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[16px] font-bold text-white">
+                        {planStatus.plan?.name}
+                      </span>
+                      <Badge variant="success">Active</Badge>
+                    </div>
+                    <p className="mt-0.5 text-[12px] text-zinc-500">
+                      {planStatus.daysLeft} days remaining · Expires {planStatus.expiresAt && formatDate(planStatus.expiresAt)}
+                    </p>
+                  </div>
                 </div>
                 <a
                   href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20have%20a%20question%20about%20my%20subscription."
@@ -89,13 +105,116 @@ export default function BillingPage() {
                   Contact Support
                 </a>
               </div>
-            ) : (
+            )}
+
+            {/* Expiring Soon */}
+            {planStatus?.status === "expiring_soon" && (
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <p className="text-[13px] text-zinc-500">
-                  No active plan. Contact admin to get started.
-                </p>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10">
+                    <AlertTriangle className="h-5 w-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[16px] font-bold text-white">
+                        {planStatus.plan?.name}
+                      </span>
+                      <Badge variant="destructive">Expiring Soon</Badge>
+                    </div>
+                    <p className="mt-0.5 text-[12px] text-amber-400/70">
+                      Expires in {planStatus.daysLeft} day{planStatus.daysLeft !== 1 ? "s" : ""} · Renew now to avoid disruption
+                    </p>
+                  </div>
+                </div>
                 <a
-                  href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20want%20to%20purchase%20a%20plan%20for%20AdVerify."
+                  href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20want%20to%20renew%20my%20AdVerify%20plan.%20It%20expires%20soon."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 rounded-xl bg-amber-500 px-4 py-2.5 text-[13px] font-semibold text-black transition-all hover:bg-amber-400 active:scale-[0.98] text-center"
+                >
+                  Renew Now
+                </a>
+              </div>
+            )}
+
+            {/* Grace Period */}
+            {planStatus?.status === "grace" && (
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/10">
+                    <AlertTriangle className="h-5 w-5 text-red-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[16px] font-bold text-white">
+                        Grace Period
+                      </span>
+                      <Badge variant="destructive">Expired</Badge>
+                    </div>
+                    <p className="mt-0.5 text-[12px] text-red-400/70">
+                      {planStatus.message} · Your API keys still work but will be suspended soon
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href="https://t.me/ShinmenTakezo?text=Hi%2C%20my%20AdVerify%20plan%20has%20expired.%20I%20want%20to%20renew."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 rounded-xl bg-red-500 px-4 py-2.5 text-[13px] font-semibold text-white transition-all hover:bg-red-400 active:scale-[0.98] text-center"
+                >
+                  Renew Now
+                </a>
+              </div>
+            )}
+
+            {/* Suspended */}
+            {planStatus?.status === "suspended" && (
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/15">
+                    <Ban className="h-5 w-5 text-red-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[16px] font-bold text-white">
+                        Suspended
+                      </span>
+                      <Badge variant="destructive">Keys Disabled</Badge>
+                    </div>
+                    <p className="mt-0.5 text-[12px] text-red-400/70">
+                      Your API keys are suspended. Renew your plan to reactivate everything instantly.
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href="https://t.me/ShinmenTakezo?text=Hi%2C%20my%20AdVerify%20API%20keys%20are%20suspended.%20I%20want%20to%20renew."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 rounded-xl bg-red-500 px-4 py-2.5 text-[13px] font-semibold text-white transition-all hover:bg-red-400 active:scale-[0.98] text-center"
+                >
+                  Renew Now
+                </a>
+              </div>
+            )}
+
+            {/* No Plan / Expired */}
+            {(!planStatus || planStatus.status === "expired") && (
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.04]">
+                    <Receipt className="h-5 w-5 text-zinc-500" />
+                  </div>
+                  <div>
+                    <span className="text-[16px] font-bold text-white">
+                      No Active Plan
+                    </span>
+                    <p className="mt-0.5 text-[12px] text-zinc-500">
+                      Get a plan to unlock API keys, ads, PINs, and all features
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20want%20to%20purchase%20an%20AdVerify%20plan."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="shrink-0 rounded-xl bg-white px-4 py-2.5 text-[13px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98] text-center"
