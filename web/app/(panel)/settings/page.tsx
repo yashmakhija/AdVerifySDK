@@ -48,10 +48,8 @@ const MODES = [
 
 export default function SettingsPage() {
   const token = useAuthStore((s) => s.token)!;
-  const role = useAuthStore((s) => s.role);
   const toast = useToastStore();
-  const isAdmin = role === "ADMIN";
-  const settingsPath = isAdmin ? "/admin/settings" : "/admin/my-settings";
+  const settingsPath = "/admin/my-settings";
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [settings, setSettings] = useState<PinUnlockSettings>({
     pinUnlockMode: "per_app",
@@ -112,12 +110,10 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-lg font-semibold tracking-tight text-white">
-          {isAdmin ? "Global Settings" : "PIN Settings"}
+          PIN Settings
         </h1>
         <p className="mt-0.5 text-[13px] text-zinc-500">
-          {isAdmin
-            ? "Default PIN unlock mode for unassigned keys"
-            : "Configure how PIN verification works across your apps"}
+          Configure how PIN verification works across your apps
         </p>
       </div>
 
