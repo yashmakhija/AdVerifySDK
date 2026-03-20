@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { AdminService } from '../services/admin.service';
 import { SettingsService } from '../services/settings.service';
-import { env } from '../config/env';
+import { AdminRequest } from '../types';
 
 const service = new AdminService();
 const settingsService = new SettingsService();
@@ -11,10 +11,14 @@ function paramId(req: Request, name: string): number {
 }
 
 export class AdminController {
-  async me(_req: Request, res: Response) {
+  async me(req: AdminRequest, res: Response) {
+    const user = req.user!;
     res.json({
       authenticated: true,
-      username: env.ADMIN_USERNAME,
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
     });
   }
 

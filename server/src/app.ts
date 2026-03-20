@@ -3,8 +3,11 @@ import cors from 'cors';
 import { env } from './config/env';
 import healthRoutes from './routes/health.routes';
 import sdkRoutes from './routes/sdk.routes';
+import authRoutes from './routes/auth.routes';
 import adminRoutes from './routes/admin.routes';
+import userRoutes from './routes/user.routes';
 import patcherRoutes from './routes/patcher.routes';
+import { seedAdmin } from './lib/seed-admin';
 
 const app = express();
 
@@ -34,11 +37,27 @@ app.get("/", (req, res) => {
   });
 });
 
+// Auth routes (public login)
+app.use('/api/auth', authRoutes);
+
 // API routes
 app.use('/api/sdk', sdkRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/patch', patcherRoutes);
 
-app.listen(env.PORT, () => {
-  console.log(`AdVerify Server running on http://localhost:${env.PORT}`);
-});
+// User management routes (admin only)
+app.use('/api/admin/manage', userRoutes);
+
+async function start() {
+  try {
+    await seedAdmin();
+  } catch (err) {
+    console.error('Failed to seed admin:', err);
+  }
+
+  app.listen(env.PORT, () => {
+    console.log(`AdVerify Server running on http://localhost:${env.PORT}`);
+  });
+}
+
+start();

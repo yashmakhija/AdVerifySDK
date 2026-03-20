@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 import { prisma } from '../lib/prisma';
 import { env } from '../config/env';
-import { AuthenticatedRequest } from '../types';
+import { AuthenticatedRequest, AdminRequest } from '../types';
 
 export async function sdkAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   const apiKey = req.headers['x-api-key'] as string | undefined;
@@ -22,21 +23,36 @@ export async function sdkAuth(req: AuthenticatedRequest, res: Response, next: Ne
   next();
 }
 
-export function adminAuth(req: Request, res: Response, next: NextFunction) {
+export async function adminAuth(req: AdminRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers['authorization'];
 
-  if (!authHeader?.startsWith('Basic ')) {
-    res.status(401).json({ error: 'Admin authentication required' });
+  if (!authHeader?.startsWith('Bearer ')) {
+    res.status(401).json({ error: 'Authentication required' });
     return;
   }
 
-  const decoded = Buffer.from(authHeader.slice(6), 'base64').toString('utf-8');
-  const [username, password] = decoded.split(':');
+  const token = authHeader.slice(7);
 
-  if (username !== env.ADMIN_USERNAME || password !== env.ADMIN_PASSWORD) {
-    res.status(403).json({ error: 'Invalid admin credentials' });
+  try {
+    const payload = jwt.verify(token, env.JWT_SECRET) as { userId: number };
+    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+
+    if (!user || !user.isActive) {
+      res.status(403).json({ error: 'Account is inactive or not found' });
+      return;
+    }
+
+    req.user = user;
+    next();
+  } catch {
+    res.status(401).json({ error: 'Invalid or expired token' });
+  }
+}
+
+export function requireAdmin(req: AdminRequest, res: Response, next: NextFunction) {
+  if (req.user?.role !== 'ADMIN') {
+    res.status(403).json({ error: 'Admin access required' });
     return;
   }
-
   next();
 }

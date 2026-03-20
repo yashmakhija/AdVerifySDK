@@ -1,34 +1,30 @@
 import { PrismaClient } from '@prisma/client';
-import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const apiKey = await prisma.apiKey.create({
-    data: {
-      key: crypto.randomBytes(16).toString('hex'),
-      appName: 'Demo App',
-      packageName: 'com.adverify.demo',
-      pinConfig: {
-        create: {
-          pinEnabled: false,
-          pinCode: '1234',
-          pinMessage: 'Enter PIN to continue',
-        },
-      },
-      ads: {
-        create: {
-          title: 'Welcome Ad',
-          description: 'This is a sample ad created by the seed script.',
-          adType: 'interstitial',
-          buttonText: 'Learn More',
-          redirectUrl: 'https://example.com',
-        },
-      },
-    },
-  });
+  const existingAdmin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
 
-  console.log(`Seed complete. API Key: ${apiKey.key}`);
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash(
+      process.env.ADMIN_PASSWORD || 'admin123',
+      12,
+    );
+    const admin = await prisma.user.create({
+      data: {
+        email: process.env.ADMIN_EMAIL || 'admin@adverify.com',
+        username: process.env.ADMIN_USERNAME || 'admin',
+        password: hashedPassword,
+        role: 'ADMIN',
+      },
+    });
+    console.log(`Admin created: ${admin.email}`);
+  } else {
+    console.log(`Admin already exists: ${existingAdmin.email}`);
+  }
+
+  console.log('Seed complete.');
 }
 
 main()

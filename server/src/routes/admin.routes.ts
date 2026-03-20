@@ -10,6 +10,7 @@ const ctrl = new AdminController();
 // Auth check — verifies token and returns user info
 router.get('/me', adminAuth, (req, res) => ctrl.me(req, res));
 
+// All subsequent routes require authentication
 router.use(adminAuth);
 
 // Dashboard

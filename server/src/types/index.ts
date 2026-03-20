@@ -1,6 +1,10 @@
 import { Request } from 'express';
-import { ApiKey } from '@prisma/client';
+import { ApiKey, User } from '@prisma/client';
 
 export interface AuthenticatedRequest extends Request {
   apiKeyData?: ApiKey;
+}
+
+export interface AdminRequest extends Request {
+  user?: User;
 }
