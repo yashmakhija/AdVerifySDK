@@ -1,19 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { PlayCircle, RefreshCw } from "lucide-react";
 import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { PageHeader } from "@/components/ui/page-header";
+
+const REFRESH_INTERVAL = 50 * 60 * 1000; // refresh link every 50 min (before 1h expiry)
 
 export default function TutorialPage() {
   const token = useAuthStore((s) => s.token)!;
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval>>();
 
-  async function load() {
-    setLoading(true);
+  const load = useCallback(async () => {
     setError(false);
     try {
       const data = await api<{ url: string }>("/auth/tutorial", { token });
@@ -23,11 +25,16 @@ export default function TutorialPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [token]);
 
   useEffect(() => {
     load();
-  }, []);
+    // Auto-refresh the signed URL before it expires
+    timerRef.current = setInterval(() => {
+      load();
+    }, REFRESH_INTERVAL);
+    return () => clearInterval(timerRef.current);
+  }, [load]);
 
   return (
     <div>
@@ -48,7 +55,7 @@ export default function TutorialPage() {
           </p>
           <p className="mt-1 text-[12px] text-zinc-600">
             {error
-              ? "The video link may have expired. Try refreshing."
+              ? "Something went wrong. Try again."
               : "Check back later — a tutorial video will be uploaded soon."}
           </p>
           {error && (
@@ -62,26 +69,14 @@ export default function TutorialPage() {
           )}
         </div>
       ) : (
-        <div className="rounded-xl border border-white/[0.06] bg-black overflow-hidden">
+        <div className="mx-auto max-w-2xl rounded-xl border border-white/[0.06] bg-black overflow-hidden">
           <video
             src={videoUrl}
             controls
             controlsList="nodownload"
-            className="w-full aspect-video bg-black"
+            className="w-full max-h-[75vh] bg-black"
             playsInline
           />
-          <div className="flex items-center justify-between px-4 py-3 border-t border-white/[0.06]">
-            <p className="text-[11px] text-zinc-600">
-              Video link expires after 1 hour
-            </p>
-            <button
-              onClick={load}
-              className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-500 transition-colors hover:text-white"
-            >
-              <RefreshCw className="h-3 w-3" />
-              Refresh link
-            </button>
-          </div>
         </div>
       )}
     </div>
