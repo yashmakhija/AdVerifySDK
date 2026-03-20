@@ -8,6 +8,8 @@ import { Modal, FormInput, FormSelect, ModalActions } from "@/components/ui/moda
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
+import { UserAvatar } from "@/components/ui/user-avatar";
+import { getRandomAvatar } from "@/lib/avatars";
 import type { User } from "@/lib/types";
 
 export default function UsersPage() {
@@ -33,7 +35,11 @@ export default function UsersPage() {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    await api("/admin/manage/users", { method: "POST", token, body: form });
+    await api("/admin/manage/users", {
+      method: "POST",
+      token,
+      body: { ...form, avatar: getRandomAvatar() },
+    });
     toast.show("User created");
     setModal(false);
     setForm({ email: "", username: "", password: "", role: "USER" });
@@ -106,7 +112,10 @@ export default function UsersPage() {
                   return (
                     <tr key={u.id} className="text-zinc-400 transition-colors hover:bg-white/[0.02]">
                       <td className="px-5 py-3.5">
-                        <span className="font-medium text-white">{u.username}</span>
+                        <div className="flex items-center gap-2.5">
+                          <UserAvatar src={u.avatar} name={u.username} size="sm" />
+                          <span className="font-medium text-white">{u.username}</span>
+                        </div>
                       </td>
                       <td className="px-5 py-3.5 text-zinc-500 text-[13px]">{u.email}</td>
                       <td className="px-5 py-3.5">
@@ -165,9 +174,12 @@ export default function UsersPage() {
                 <div key={u.id} className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
                   <div className="p-4 space-y-2">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <h3 className="font-medium text-white truncate">{u.username}</h3>
-                        <p className="text-[11px] text-zinc-600 mt-0.5">{u.email}</p>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <UserAvatar src={u.avatar} name={u.username} size="sm" />
+                        <div className="min-w-0">
+                          <h3 className="font-medium text-white truncate">{u.username}</h3>
+                          <p className="text-[11px] text-zinc-600 mt-0.5">{u.email}</p>
+                        </div>
                       </div>
                       <Badge variant={u.isActive ? "success" : "destructive"} className="shrink-0">
                         {u.isActive ? "Active" : "Inactive"}

@@ -15,9 +15,9 @@ function statusVariant(status: string) {
 }
 
 function statusIcon(status: string) {
-  if (status === "active") return <CheckCircle2 className="h-3.5 w-3.5" />;
-  if (status === "cancelled") return <XCircle className="h-3.5 w-3.5" />;
-  return <Clock className="h-3.5 w-3.5" />;
+  if (status === "active") return <CheckCircle2 className="h-4 w-4 text-emerald-400" />;
+  if (status === "cancelled") return <XCircle className="h-4 w-4 text-red-400" />;
+  return <Clock className="h-4 w-4 text-zinc-400" />;
 }
 
 function formatDate(dateStr: string) {
@@ -130,7 +130,7 @@ export default function BillingPage() {
                     {/* Header */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03]">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/[0.1] bg-white/[0.06]">
                           {statusIcon(p.status)}
                         </div>
                         <div>
@@ -155,7 +155,7 @@ export default function BillingPage() {
                     </div>
 
                     {/* Details grid */}
-                    <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-y-3 gap-x-4 text-[12px]">
+                    <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-y-3 gap-x-4 text-[12px]">
                       <div>
                         <p className="text-zinc-600 mb-0.5">Purchased</p>
                         <p className="text-zinc-400">{formatDate(p.purchasedAt)}</p>
@@ -168,6 +168,12 @@ export default function BillingPage() {
                         <p className="text-zinc-600 mb-0.5">Duration</p>
                         <p className="text-zinc-400">{p.plan?.durationDays || 30} days</p>
                       </div>
+                      {p.assignedBy && (
+                        <div>
+                          <p className="text-zinc-600 mb-0.5">Activated by</p>
+                          <p className="text-zinc-400">{p.assignedBy.username}</p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Admin note */}

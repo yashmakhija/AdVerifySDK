@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { StatCard } from "@/components/ui/stat-card";
-import { PageHeader } from "@/components/ui/page-header";
 import {
   KeyRound,
   Megaphone,
@@ -20,11 +19,47 @@ import {
   ShieldOff,
 } from "lucide-react";
 import type { Stats, PinStats } from "@/lib/types";
+import { UserAvatar } from "@/components/ui/user-avatar";
+
+const ADMIN_GREETINGS = [
+  "Command center ready",
+  "All systems operational",
+  "Good to see you, boss",
+  "Dashboard loaded — let's go",
+  "Back at the helm",
+  "Running the show",
+  "Your empire awaits",
+];
+
+const USER_GREETINGS = [
+  "Welcome back",
+  "Good to see you",
+  "Here's your overview",
+  "All caught up",
+  "Ready when you are",
+];
+
+function getTimeGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+}
 
 export default function DashboardPage() {
   const token = useAuthStore((s) => s.token);
+  const username = useAuthStore((s) => s.username);
+  const role = useAuthStore((s) => s.role);
+  const avatar = useAuthStore((s) => s.avatar);
   const [stats, setStats] = useState<Stats | null>(null);
   const [pinStats, setPinStats] = useState<PinStats | null>(null);
+
+  const greeting = useMemo(() => {
+    const isAdmin = role === "ADMIN";
+    const pool = isAdmin ? ADMIN_GREETINGS : USER_GREETINGS;
+    const tagline = pool[Math.floor(Math.random() * pool.length)];
+    return { time: getTimeGreeting(), tagline };
+  }, [role]);
 
   useEffect(() => {
     if (token) {
@@ -46,10 +81,18 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <PageHeader
-        title="Dashboard"
-        description="Overview of your AdVerify platform"
-      />
+      {/* Welcome */}
+      <div className="mb-6 flex items-center gap-3.5">
+        <UserAvatar src={avatar} name={username} size="md" />
+        <div>
+          <h1 className="text-lg font-bold tracking-tight text-white">
+            {greeting.time}, {username || "there"}
+          </h1>
+          <p className="mt-0.5 text-[13px] text-zinc-500">
+            {greeting.tagline}
+          </p>
+        </div>
+      </div>
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
         <StatCard

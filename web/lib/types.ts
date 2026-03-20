@@ -109,6 +109,7 @@ export interface User {
   id: number;
   email: string;
   username: string;
+  avatar: string | null;
   role: string;
   isActive: boolean;
   createdAt?: string;
@@ -129,7 +130,8 @@ export interface Purchase {
   cancelledAt: string | null;
   createdAt?: string;
   user?: { id: number; email: string; username: string };
-  plan?: { id: number; name: string; price: number; durationDays: number };
+  plan?: { id: number; name: string; price: number; durationDays: number; currency?: string };
+  assignedBy?: { id: number; username: string };
 }
 
 export interface ActivityLog {

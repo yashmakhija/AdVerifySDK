@@ -7,9 +7,11 @@ interface AuthState {
   username: string | null;
   email: string | null;
   role: string | null;
+  avatar: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   verify: () => Promise<boolean>;
+  setAvatar: (avatar: string) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -19,6 +21,7 @@ export const useAuthStore = create<AuthState>()(
       username: null,
       email: null,
       role: null,
+      avatar: null,
 
       login: async (email, password) => {
         const res = await fetch(`${API_BASE}/auth/login`, {
@@ -38,10 +41,11 @@ export const useAuthStore = create<AuthState>()(
           username: data.user.username,
           email: data.user.email,
           role: data.user.role,
+          avatar: data.user.avatar || null,
         });
       },
 
-      logout: () => set({ token: null, username: null, email: null, role: null }),
+      logout: () => set({ token: null, username: null, email: null, role: null, avatar: null }),
 
       verify: async () => {
         const token = get().token;
@@ -53,18 +57,20 @@ export const useAuthStore = create<AuthState>()(
           });
 
           if (!res.ok) {
-            set({ token: null, username: null, email: null, role: null });
+            set({ token: null, username: null, email: null, role: null, avatar: null });
             return false;
           }
 
           const data = await res.json();
-          set({ username: data.username, email: data.email, role: data.role });
+          set({ username: data.username, email: data.email, role: data.role, avatar: data.avatar || null });
           return true;
         } catch {
-          set({ token: null, username: null, email: null, role: null });
+          set({ token: null, username: null, email: null, role: null, avatar: null });
           return false;
         }
       },
+
+      setAvatar: (avatar) => set({ avatar }),
     }),
     { name: "adverify-auth" }
   )

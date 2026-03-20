@@ -22,6 +22,7 @@ import {
   Activity,
   Wallet,
 } from "lucide-react";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -46,6 +47,9 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
   const pathname = usePathname();
   const logout = useAuthStore((s) => s.logout);
   const username = useAuthStore((s) => s.username);
+  const email = useAuthStore((s) => s.email);
+  const role = useAuthStore((s) => s.role);
+  const avatar = useAuthStore((s) => s.avatar);
 
   return (
     <>
@@ -147,18 +151,33 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           </div>
         </nav>
 
-        {/* User / Logout */}
-        <div className="border-t border-white/[0.06] p-3">
-          {username && (
-            <div className="mb-2 px-3">
-              <p className="text-[11px] font-medium text-zinc-700 uppercase tracking-wider">
-                Signed in as
-              </p>
-              <p className="text-[13px] font-medium text-zinc-300 truncate">
-                {username}
-              </p>
+        {/* Profile + Logout */}
+        <div className="border-t border-white/[0.06] p-3 space-y-1.5">
+          <Link
+            href="/profile"
+            onClick={onClose}
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-150",
+              pathname === "/profile"
+                ? "bg-white/[0.08]"
+                : "hover:bg-white/[0.04]"
+            )}
+          >
+            <UserAvatar src={avatar} name={username} size="sm" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <p className="text-[13px] font-medium text-zinc-200 truncate">
+                  {username}
+                </p>
+                {role === "ADMIN" && (
+                  <span className="shrink-0 rounded bg-white/[0.08] px-1.5 py-px text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+                    Admin
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-zinc-600 truncate">{email}</p>
             </div>
-          )}
+          </Link>
           <button
             onClick={logout}
             className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-zinc-600 transition-all hover:bg-red-500/10 hover:text-red-400"
