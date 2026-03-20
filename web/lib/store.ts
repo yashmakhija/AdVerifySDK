@@ -8,6 +8,8 @@ interface AuthState {
   email: string | null;
   role: string | null;
   avatar: string | null;
+  planName: string | null;
+  planExpiresAt: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   verify: () => Promise<boolean>;
@@ -22,6 +24,8 @@ export const useAuthStore = create<AuthState>()(
       email: null,
       role: null,
       avatar: null,
+      planName: null,
+      planExpiresAt: null,
 
       login: async (email, password) => {
         const res = await fetch(`${API_BASE}/auth/login`, {
@@ -42,10 +46,12 @@ export const useAuthStore = create<AuthState>()(
           email: data.user.email,
           role: data.user.role,
           avatar: data.user.avatar || null,
+          planName: data.plan?.name || null,
+          planExpiresAt: data.plan?.expiresAt || null,
         });
       },
 
-      logout: () => set({ token: null, username: null, email: null, role: null, avatar: null }),
+      logout: () => set({ token: null, username: null, email: null, role: null, avatar: null, planName: null, planExpiresAt: null }),
 
       verify: async () => {
         const token = get().token;

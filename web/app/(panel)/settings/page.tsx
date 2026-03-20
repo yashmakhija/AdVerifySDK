@@ -27,9 +27,9 @@ const MODES = [
   {
     value: "global" as const,
     label: "Global Unlock",
-    short: "One PIN unlocks all",
+    short: "One PIN unlocks all your apps",
     description:
-      "One PIN on any app unlocks all apps for that device. Easiest for users.",
+      "One PIN on any of your apps unlocks all your other apps for that device.",
     icon: Globe,
     accent: "#10b981",
     accentLight: "rgba(16,185,129,0.1)",
@@ -39,7 +39,7 @@ const MODES = [
     label: "Global with Exclusions",
     short: "All except selected apps",
     description:
-      "One PIN unlocks all apps except specific ones you choose below.",
+      "One PIN unlocks all your apps except specific ones you choose below.",
     icon: ShieldBan,
     accent: "#f59e0b",
     accentLight: "rgba(245,158,11,0.1)",
@@ -48,7 +48,10 @@ const MODES = [
 
 export default function SettingsPage() {
   const token = useAuthStore((s) => s.token)!;
+  const role = useAuthStore((s) => s.role);
   const toast = useToastStore();
+  const isAdmin = role === "ADMIN";
+  const settingsPath = isAdmin ? "/admin/settings" : "/admin/my-settings";
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [settings, setSettings] = useState<PinUnlockSettings>({
     pinUnlockMode: "per_app",
@@ -59,7 +62,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     Promise.all([
-      api<PinUnlockSettings>("/admin/settings", { token }),
+      api<PinUnlockSettings>(settingsPath, { token }),
       api<ApiKey[]>("/admin/keys", { token }),
     ]).then(([s, k]) => {
       if (s?.pinUnlockMode) setSettings(s);
@@ -80,7 +83,7 @@ export default function SettingsPage() {
   async function handleSave() {
     setSaving(true);
     try {
-      await api("/admin/settings", {
+      await api(settingsPath, {
         method: "POST",
         token,
         body: settings,
@@ -109,10 +112,12 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-lg font-semibold tracking-tight text-white">
-          Settings
+          {isAdmin ? "Global Settings" : "PIN Settings"}
         </h1>
         <p className="mt-0.5 text-[13px] text-zinc-500">
-          Configure how PIN verification works across your apps
+          {isAdmin
+            ? "Default PIN unlock mode for unassigned keys"
+            : "Configure how PIN verification works across your apps"}
         </p>
       </div>
 

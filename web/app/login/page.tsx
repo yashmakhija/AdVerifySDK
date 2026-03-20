@@ -4,9 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/lib/store";
-import { api } from "@/lib/api";
 import { Shield, Loader2, ArrowLeft } from "lucide-react";
-import type { PlanStatus } from "@/lib/types";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,23 +40,11 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      // Check plan status to decide where to land
       const store = useAuthStore.getState();
-      if (store.role === "ADMIN") {
+      if (store.role === "ADMIN" || store.planName) {
         router.push("/dashboard");
       } else {
-        try {
-          const status = await api<PlanStatus>("/auth/plan-status", {
-            token: store.token!,
-          });
-          if (status.status === "active" || status.status === "expiring_soon") {
-            router.push("/dashboard");
-          } else {
-            router.push("/billing");
-          }
-        } catch {
-          router.push("/billing");
-        }
+        router.push("/billing");
       }
     } catch {
       setError("Invalid credentials");
