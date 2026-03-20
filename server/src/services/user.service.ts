@@ -240,6 +240,22 @@ export class UserService {
       },
     });
 
+    // Instantly reactivate suspended keys
+    const reactivated = await prisma.apiKey.updateMany({
+      where: { userId: data.userId, isActive: false, suspendedAt: { not: null } },
+      data: { isActive: true, suspendedAt: null },
+    });
+
+    if (reactivated.count > 0) {
+      await prisma.activityLog.create({
+        data: {
+          userId: data.userId,
+          action: 'keys_reactivated',
+          details: `${reactivated.count} API key(s) reactivated — plan renewed`,
+        },
+      });
+    }
+
     return purchase;
   }
 
