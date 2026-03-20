@@ -161,3 +161,11 @@ export interface Announcement {
   isActive: boolean;
   createdAt: string;
 }
+
+export interface PlanStatus {
+  status: "active" | "expiring_soon" | "grace" | "suspended" | "expired";
+  message: string;
+  daysLeft: number;
+  plan?: { id: number; name: string; price: number; durationDays: number };
+  expiresAt?: string;
+}

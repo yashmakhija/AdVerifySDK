@@ -24,8 +24,9 @@ import {
   PlayCircle,
   Info,
   X,
+  Ban,
 } from "lucide-react";
-import type { Stats, PinStats, Purchase, Announcement } from "@/lib/types";
+import type { Stats, PinStats, Announcement, PlanStatus } from "@/lib/types";
 import { UserAvatar } from "@/components/ui/user-avatar";
 
 const ADMIN_GREETINGS = [
@@ -51,11 +52,6 @@ function getTimeGreeting() {
   if (h < 12) return "Good morning";
   if (h < 17) return "Good afternoon";
   return "Good evening";
-}
-
-function getDaysUntil(dateStr: string) {
-  const diff = new Date(dateStr).getTime() - Date.now();
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
 const QUICK_START_STEPS = [
@@ -100,8 +96,7 @@ export default function DashboardPage() {
   const avatar = useAuthStore((s) => s.avatar);
   const [stats, setStats] = useState<Stats | null>(null);
   const [pinStats, setPinStats] = useState<PinStats | null>(null);
-  const [activePurchase, setActivePurchase] = useState<Purchase | null>(null);
-  const [purchaseLoaded, setPurchaseLoaded] = useState(false);
+  const [planStatus, setPlanStatus] = useState<PlanStatus | null>(null);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [dismissedIds, setDismissedIds] = useState<number[]>(() => {
     if (typeof window === "undefined") return [];
@@ -123,22 +118,12 @@ export default function DashboardPage() {
     if (token) {
       api<Stats>("/admin/stats", { token }).then(setStats).catch(() => {});
       api<PinStats>("/admin/user-pins/stats", { token }).then(setPinStats).catch(() => {});
-      api<Purchase[]>("/auth/purchases", { token })
-        .then((purchases) => {
-          const active = purchases?.find((p) => p.status === "active") || null;
-          setActivePurchase(active);
-        })
-        .catch(() => {})
-        .finally(() => setPurchaseLoaded(true));
+      api<PlanStatus>("/auth/plan-status", { token }).then(setPlanStatus).catch(() => {});
       api<Announcement[]>("/auth/announcements", { token })
         .then((data) => setAnnouncements(Array.isArray(data) ? data : []))
         .catch(() => {});
     }
   }, [token]);
-
-  const daysLeft = activePurchase?.expiresAt
-    ? getDaysUntil(activePurchase.expiresAt)
-    : null;
 
   const visibleAnnouncements = announcements.filter((a) => !dismissedIds.includes(a.id));
 
@@ -148,8 +133,6 @@ export default function DashboardPage() {
     localStorage.setItem("adverify-dismissed-announcements", JSON.stringify(updated));
   }
 
-  const showExpiryWarning = daysLeft !== null && daysLeft <= 7 && daysLeft > 0;
-  const showExpired = daysLeft !== null && daysLeft <= 0;
   const isNewUser = stats && stats.totalKeys === 0;
 
   if (!stats) {
@@ -232,35 +215,34 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Expiry Warning */}
-      {showExpiryWarning && (
-        <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3.5">
+      {/* Plan Status Banners */}
+      {planStatus?.status === "suspended" && (
+        <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-red-500/30 bg-red-500/[0.08] px-4 py-3.5">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10">
-              <AlertTriangle className="h-4 w-4 text-amber-400" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-500/15">
+              <Ban className="h-4 w-4 text-red-400" />
             </div>
             <div>
-              <p className="text-[13px] font-medium text-amber-300">
-                Your plan expires in {daysLeft} day{daysLeft !== 1 ? "s" : ""}
+              <p className="text-[13px] font-medium text-red-300">
+                Your API keys have been suspended
               </p>
-              <p className="text-[11px] text-amber-400/60">
-                {activePurchase?.plan?.name} · Renew to keep your ads and PINs active
+              <p className="text-[11px] text-red-400/60">
+                Your plan expired and the grace period is over. Renew to reactivate everything.
               </p>
             </div>
           </div>
           <a
-            href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20want%20to%20renew%20my%20AdVerify%20plan."
+            href="https://t.me/ShinmenTakezo?text=Hi%2C%20my%20AdVerify%20API%20keys%20are%20suspended.%20I%20want%20to%20renew%20my%20plan."
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 rounded-lg bg-amber-500 px-4 py-2 text-[13px] font-semibold text-black transition-all hover:bg-amber-400 active:scale-[0.98] text-center"
+            className="shrink-0 rounded-lg bg-red-500 px-4 py-2 text-[13px] font-semibold text-white transition-all hover:bg-red-400 active:scale-[0.98] text-center"
           >
             Renew Now
           </a>
         </div>
       )}
 
-      {/* Expired Banner */}
-      {showExpired && (
+      {planStatus?.status === "grace" && (
         <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-red-500/20 bg-red-500/[0.06] px-4 py-3.5">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-500/10">
@@ -268,10 +250,10 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-[13px] font-medium text-red-300">
-                Your plan has expired
+                {planStatus.message}
               </p>
               <p className="text-[11px] text-red-400/60">
-                {activePurchase?.plan?.name} · Renew to restore access
+                Your API keys still work but will be suspended soon. Renew now to avoid disruption.
               </p>
             </div>
           </div>
@@ -280,6 +262,58 @@ export default function DashboardPage() {
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 rounded-lg bg-red-500 px-4 py-2 text-[13px] font-semibold text-white transition-all hover:bg-red-400 active:scale-[0.98] text-center"
+          >
+            Renew Now
+          </a>
+        </div>
+      )}
+
+      {planStatus?.status === "expired" && (
+        <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-red-500/20 bg-red-500/[0.06] px-4 py-3.5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-500/10">
+              <AlertTriangle className="h-4 w-4 text-red-400" />
+            </div>
+            <div>
+              <p className="text-[13px] font-medium text-red-300">
+                No active plan
+              </p>
+              <p className="text-[11px] text-red-400/60">
+                Get a plan to start using AdVerify
+              </p>
+            </div>
+          </div>
+          <a
+            href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20want%20to%20purchase%20an%20AdVerify%20plan."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 rounded-lg bg-white px-4 py-2 text-[13px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98] text-center"
+          >
+            Get a Plan
+          </a>
+        </div>
+      )}
+
+      {planStatus?.status === "expiring_soon" && (
+        <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3.5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10">
+              <AlertTriangle className="h-4 w-4 text-amber-400" />
+            </div>
+            <div>
+              <p className="text-[13px] font-medium text-amber-300">
+                Plan expires in {planStatus.daysLeft} day{planStatus.daysLeft !== 1 ? "s" : ""}
+              </p>
+              <p className="text-[11px] text-amber-400/60">
+                {planStatus.plan?.name} · Renew to keep your ads and PINs active
+              </p>
+            </div>
+          </div>
+          <a
+            href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20want%20to%20renew%20my%20AdVerify%20plan."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 rounded-lg bg-amber-500 px-4 py-2 text-[13px] font-semibold text-black transition-all hover:bg-amber-400 active:scale-[0.98] text-center"
           >
             Renew Now
           </a>
