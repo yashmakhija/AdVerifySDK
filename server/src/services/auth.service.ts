@@ -35,6 +35,13 @@ export class AuthService {
 
     const token = jwt.sign({ userId: user.id }, env.JWT_SECRET, { expiresIn: '7d' });
 
+    // Include active plan info in login response
+    const activePurchase = await prisma.purchase.findFirst({
+      where: { userId: user.id, status: 'active' },
+      include: { plan: { select: { id: true, name: true, price: true, currency: true } } },
+      orderBy: { expiresAt: 'desc' },
+    });
+
     return {
       token,
       user: {
@@ -44,6 +51,10 @@ export class AuthService {
         avatar: user.avatar,
         role: user.role,
       },
+      plan: activePurchase ? {
+        name: activePurchase.plan.name,
+        expiresAt: activePurchase.expiresAt,
+      } : null,
     };
   }
 

@@ -157,6 +157,18 @@ export class AdminController {
     res.json(stats);
   }
 
+  // Per-user settings
+  async getMySettings(req: AdminRequest, res: Response) {
+    const settings = await settingsService.getUserSettings(req.user!.id);
+    res.json(settings);
+  }
+
+  async updateMySettings(req: AdminRequest, res: Response) {
+    const settings = await settingsService.updateUserSettings(req.user!.id, req.body);
+    res.json(settings);
+  }
+
+  // Global settings (admin only)
   async getSettings(_req: AdminRequest, res: Response) {
     const settings = await settingsService.getSettings();
     res.json(settings);

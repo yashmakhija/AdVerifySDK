@@ -280,6 +280,28 @@ export class UserService {
       },
     });
 
+    // If no other active purchase remains, suspend keys immediately
+    const remainingActive = await prisma.purchase.count({
+      where: { userId: purchase.userId, status: 'active' },
+    });
+
+    if (remainingActive === 0) {
+      const suspended = await prisma.apiKey.updateMany({
+        where: { userId: purchase.userId, isActive: true, suspendedAt: null },
+        data: { isActive: false, suspendedAt: new Date() },
+      });
+
+      if (suspended.count > 0) {
+        await prisma.activityLog.create({
+          data: {
+            userId: purchase.userId,
+            action: 'keys_suspended',
+            details: `${suspended.count} API key(s) suspended — plan cancelled, no active plan remaining`,
+          },
+        });
+      }
+    }
+
     return purchase;
   }
 

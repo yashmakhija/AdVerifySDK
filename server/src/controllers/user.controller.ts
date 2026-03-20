@@ -55,7 +55,12 @@ export class UserController {
   }
 
   async deleteUser(req: AdminRequest, res: Response) {
-    await service.deleteUser(paramId(req, 'id'));
+    const targetId = paramId(req, 'id');
+    if (targetId === req.user!.id) {
+      res.status(400).json({ error: 'Cannot delete your own account' });
+      return;
+    }
+    await service.deleteUser(targetId);
     res.json({ status: 'deleted' });
   }
 

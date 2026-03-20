@@ -15,15 +15,17 @@ enum UserRole {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  username  String   @unique
-  password  String
-  avatar    String   @default("")                                // profile picture URL
-  role      UserRole @default(USER)
-  isActive  Boolean  @default(true) @map("is_active")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  username       String   @unique
+  password       String
+  avatar         String   @default("")                                // profile picture URL
+  role           UserRole @default(USER)
+  isActive       Boolean  @default(true) @map("is_active")
+  pinUnlockMode  String   @default("per_app") @map("pin_unlock_mode") // "per_app" | "global" | "global_except"
+  excludedAppIds Int[]    @default([]) @map("excluded_app_ids")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
   purchases    Purchase[]    @relation("UserPurchases")
   assignedPurchases Purchase[] @relation("AssignedByAdmin")

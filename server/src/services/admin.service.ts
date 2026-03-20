@@ -77,7 +77,7 @@ export class AdminService {
         key,
         appName,
         packageName,
-        userId: scope.role === 'USER' ? scope.userId : null,
+        userId: scope.userId,
         pinConfig: { create: {} },
       },
     });

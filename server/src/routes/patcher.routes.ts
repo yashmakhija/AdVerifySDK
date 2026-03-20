@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { adminAuth } from '../middleware/auth';
+import { adminAuth, requireActivePlan } from '../middleware/auth';
 import { PatcherController } from '../controllers/patcher.controller';
 
 const router = Router();
@@ -11,7 +11,7 @@ const upload = multer({
   limits: { fileSize: 500 * 1024 * 1024 }, // 500MB
 });
 
-router.use(adminAuth);
+router.use(adminAuth, requireActivePlan);
 
 router.post('/', upload.single('apk'), (req, res) => ctrl.patchApk(req, res));
 router.get('/download/:id', (req, res) => ctrl.downloadPatched(req, res));
