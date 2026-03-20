@@ -225,7 +225,7 @@ export function HeroSection() {
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
             </span>
             <span className="text-[11px] sm:text-[12px] font-medium text-zinc-400">
-              Open-source Android SDK for ad serving & PIN verification
+              Android SDK for ad serving & PIN verification
             </span>
           </div>
 

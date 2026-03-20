@@ -9,24 +9,37 @@ import {
   KeyRound,
   Megaphone,
   Lock,
-  Users,
+  UserCheck,
   FileCode2,
   Smartphone,
   Settings,
   LogOut,
   X,
   Shield,
+  Users,
+  CreditCard,
+  Receipt,
+  Activity,
+  Wallet,
 } from "lucide-react";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/billing", label: "Billing", icon: Wallet },
   { href: "/keys", label: "API Keys", icon: KeyRound },
   { href: "/ads", label: "Ads", icon: Megaphone },
   { href: "/pin", label: "PIN Config", icon: Lock },
-  { href: "/user-pins", label: "User PINs", icon: Users },
+  { href: "/user-pins", label: "User PINs", icon: UserCheck },
   { href: "/settings", label: "Settings", icon: Settings },
   { href: "/mt-manager", label: "MT Manager", icon: Smartphone },
   { href: "/docs", label: "SDK Docs", icon: FileCode2 },
+];
+
+const MANAGE_NAV = [
+  { href: "/users", label: "Users", icon: Users },
+  { href: "/plans", label: "Plans", icon: CreditCard },
+  { href: "/purchases", label: "Purchases", icon: Receipt },
+  { href: "/activity", label: "Activity", icon: Activity },
 ];
 
 export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => void }) {
@@ -67,35 +80,71 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto dark-scroll">
-          {NAV.map((item) => {
-            const isActive =
-              pathname === item.href || pathname.startsWith(item.href + "/");
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={onClose}
-                className={cn(
-                  "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150",
-                  isActive
-                    ? "bg-white/[0.08] text-white"
-                    : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
-                )}
-              >
-                <item.icon
+        <nav className="flex-1 px-3 py-3 overflow-y-auto dark-scroll">
+          <div className="space-y-0.5">
+            {NAV.map((item) => {
+              const isActive =
+                pathname === item.href || pathname.startsWith(item.href + "/");
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onClose}
                   className={cn(
-                    "h-[16px] w-[16px]",
-                    isActive ? "text-white" : "text-zinc-600"
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150",
+                    isActive
+                      ? "bg-white/[0.08] text-white"
+                      : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
                   )}
-                />
-                {item.label}
-                {isActive && (
-                  <div className="ml-auto h-1.5 w-1.5 rounded-full bg-white" />
-                )}
-              </Link>
-            );
-          })}
+                >
+                  <item.icon
+                    className={cn(
+                      "h-[16px] w-[16px]",
+                      isActive ? "text-white" : "text-zinc-600"
+                    )}
+                  />
+                  {item.label}
+                  {isActive && (
+                    <div className="ml-auto h-1.5 w-1.5 rounded-full bg-white" />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+
+          <p className="px-3 pt-5 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-700">
+            Management
+          </p>
+          <div className="space-y-0.5">
+            {MANAGE_NAV.map((item) => {
+              const isActive =
+                pathname === item.href || pathname.startsWith(item.href + "/");
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onClose}
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150",
+                    isActive
+                      ? "bg-white/[0.08] text-white"
+                      : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
+                  )}
+                >
+                  <item.icon
+                    className={cn(
+                      "h-[16px] w-[16px]",
+                      isActive ? "text-white" : "text-zinc-600"
+                    )}
+                  />
+                  {item.label}
+                  {isActive && (
+                    <div className="ml-auto h-1.5 w-1.5 rounded-full bg-white" />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
         {/* User / Logout */}

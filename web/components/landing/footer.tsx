@@ -10,7 +10,7 @@ export function Footer() {
               <span className="text-[8px] font-extrabold text-black leading-none">A</span>
             </div>
             <span className="text-[13px] text-zinc-600">
-              &copy; {new Date().getFullYear()} AdVerify. Open-source ad serving SDK.
+              &copy; {new Date().getFullYear()} AdVerify. Ad serving & PIN verification SDK.
             </span>
           </div>
 
@@ -18,7 +18,7 @@ export function Footer() {
             {[
               { label: "Guide", href: "/guide" },
               { label: "Dashboard", href: "/login" },
-              { label: "GitHub", href: "#" },
+              { label: "Contact", href: "https://t.me/ShinmenTakezo" },
             ].map(({ label, href }) => (
               <Link
                 key={label}

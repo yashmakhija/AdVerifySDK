@@ -78,3 +78,75 @@ export interface PinStats {
   totalActive: number;
   totalExpired: number;
 }
+
+export interface PlanFeature {
+  text: string;
+  included: boolean;
+  addon?: string;
+}
+
+export interface Plan {
+  id: number;
+  name: string;
+  description?: string;
+  price: number;
+  originalPrice?: number;
+  currency: string;
+  durationDays: number;
+  badge?: string;
+  subtitle?: string;
+  maxApps: number;
+  maxAds: number;
+  maxSpots?: number;
+  isActive: boolean;
+  features: PlanFeature[];
+  createdAt?: string;
+  updatedAt?: string;
+  _count?: { purchases: number };
+}
+
+export interface User {
+  id: number;
+  email: string;
+  username: string;
+  role: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  purchases?: Purchase[];
+  activityLogs?: ActivityLog[];
+}
+
+export interface Purchase {
+  id: number;
+  userId: number;
+  planId: number;
+  amount: number;
+  status: string;
+  note: string | null;
+  purchasedAt: string;
+  expiresAt: string;
+  cancelledAt: string | null;
+  createdAt?: string;
+  user?: { id: number; email: string; username: string };
+  plan?: { id: number; name: string; price: number; durationDays: number };
+}
+
+export interface ActivityLog {
+  id: number;
+  userId: number;
+  action: string;
+  details: string | null;
+  ipAddress: string | null;
+  createdAt: string;
+  user?: { id: number; email: string; username: string };
+  performedBy?: { id: number; email: string; username: string };
+}
+
+export interface ManageStats {
+  totalUsers: number;
+  activeUsers: number;
+  totalPurchases: number;
+  activePurchases: number;
+  totalRevenue: number;
+}

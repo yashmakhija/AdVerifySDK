@@ -5,7 +5,9 @@ import { API_BASE } from "./api";
 interface AuthState {
   token: string | null;
   username: string | null;
-  login: (username: string, password: string) => void;
+  email: string | null;
+  role: string | null;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   verify: () => Promise<boolean>;
 }
@@ -15,32 +17,51 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       token: null,
       username: null,
+      email: null,
+      role: null,
 
-      login: (username, password) => {
-        set({ token: btoa(`${username}:${password}`), username });
+      login: async (email, password) => {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Invalid credentials");
+        }
+
+        const data = await res.json();
+        set({
+          token: data.token,
+          username: data.user.username,
+          email: data.user.email,
+          role: data.user.role,
+        });
       },
 
-      logout: () => set({ token: null, username: null }),
+      logout: () => set({ token: null, username: null, email: null, role: null }),
 
       verify: async () => {
         const token = get().token;
         if (!token) return false;
 
         try {
-          const res = await fetch(`${API_BASE}/admin/me`, {
-            headers: { Authorization: `Basic ${token}` },
+          const res = await fetch(`${API_BASE}/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` },
           });
 
           if (!res.ok) {
-            set({ token: null, username: null });
+            set({ token: null, username: null, email: null, role: null });
             return false;
           }
 
           const data = await res.json();
-          set({ username: data.username });
+          set({ username: data.username, email: data.email, role: data.role });
           return true;
         } catch {
-          set({ token: null, username: null });
+          set({ token: null, username: null, email: null, role: null });
           return false;
         }
       },
