@@ -3,9 +3,11 @@ import { z } from 'zod';
 import { validate } from '../middleware/validate';
 import { adminAuth } from '../middleware/auth';
 import { AuthController } from '../controllers/auth.controller';
+import { TutorialService } from '../services/tutorial.service';
 
 const router = Router();
 const ctrl = new AuthController();
+const tutorialService = new TutorialService();
 
 // Public — login with email/username + password
 router.post(
@@ -39,5 +41,15 @@ router.post(
   })),
   (req, res) => ctrl.changePassword(req, res),
 );
+
+// Tutorial — presigned R2 URL (expires in 1 hour)
+router.get('/tutorial', async (_req, res) => {
+  try {
+    const url = await tutorialService.getPresignedUrl();
+    res.json({ url });
+  } catch (error: any) {
+    res.status(404).json({ error: error.message });
+  }
+});
 
 export default router;

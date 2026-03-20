@@ -16,7 +16,7 @@ const envSchema = z.object({
   SHORTENER_SECRET: z.string().default('change-me-in-production'),
   SHORTENER_API_URL: z.string().default('https://api.paidappstore.com'),
   SHORTENER_FRONTEND_URL: z.string().default('https://paidappstore.com'),
-  // R2 backup config (optional — only needed for db:backup)
+  // Cloudflare R2
   R2_ENDPOINT: z.string().optional(),
   R2_ACCESS_KEY_ID: z.string().optional(),
   R2_SECRET_ACCESS_KEY: z.string().optional(),

@@ -1,11 +1,15 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import multer from 'multer';
 import { adminAuth, requireAdmin } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import { UserController } from '../controllers/user.controller';
+import { TutorialService } from '../services/tutorial.service';
 
 const router = Router();
 const ctrl = new UserController();
+const tutorialService = new TutorialService();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 500 * 1024 * 1024 } });
 
 // All routes require admin auth + admin role
 router.use(adminAuth, requireAdmin);
@@ -102,5 +106,19 @@ router.get('/activity-logs', (req, res) => ctrl.getActivityLogs(req, res));
 
 // ─── Stats ───
 router.get('/stats', (req, res) => ctrl.getUserStats(req, res));
+
+// ─── Tutorial ───
+router.post('/tutorial', upload.single('video'), async (req, res) => {
+  try {
+    if (!req.file) {
+      res.status(400).json({ error: 'Video file is required' });
+      return;
+    }
+    const result = await tutorialService.upload(req.file.buffer, req.file.mimetype);
+    res.json({ status: 'uploaded', key: result.key });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 export default router;
