@@ -24,7 +24,6 @@ export class AuthService {
       throw new Error('Invalid credentials');
     }
 
-    // Log login activity
     await prisma.activityLog.create({
       data: {
         userId: user.id,
@@ -42,8 +41,50 @@ export class AuthService {
         id: user.id,
         email: user.email,
         username: user.username,
+        avatar: user.avatar,
         role: user.role,
       },
     };
+  }
+
+  async updateProfile(userId: number, data: { avatar?: string }) {
+    return prisma.user.update({
+      where: { id: userId },
+      data,
+      select: { id: true, email: true, username: true, avatar: true, role: true },
+    });
+  }
+
+  async getMyPurchases(userId: number) {
+    return prisma.purchase.findMany({
+      where: { userId },
+      include: {
+        plan: true,
+        assignedBy: { select: { id: true, username: true } },
+      },
+      orderBy: { purchasedAt: 'desc' },
+    });
+  }
+
+  async changePassword(userId: number, currentPassword: string, newPassword: string) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new Error('User not found');
+
+    const valid = await bcrypt.compare(currentPassword, user.password);
+    if (!valid) throw new Error('Current password is incorrect');
+
+    const hashed = await bcrypt.hash(newPassword, 12);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashed },
+    });
+
+    await prisma.activityLog.create({
+      data: {
+        userId,
+        action: 'password_changed',
+        details: `Password changed by user`,
+      },
+    });
   }
 }

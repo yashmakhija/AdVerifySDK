@@ -10,6 +10,7 @@ export class UserService {
         id: true,
         email: true,
         username: true,
+        avatar: true,
         role: true,
         isActive: true,
         createdAt: true,
@@ -35,6 +36,7 @@ export class UserService {
         id: true,
         email: true,
         username: true,
+        avatar: true,
         role: true,
         isActive: true,
         createdAt: true,
@@ -80,6 +82,7 @@ export class UserService {
         id: true,
         email: true,
         username: true,
+        avatar: true,
         role: true,
         isActive: true,
         createdAt: true,
@@ -101,6 +104,7 @@ export class UserService {
     email?: string;
     username?: string;
     password?: string;
+    avatar?: string;
     isActive?: boolean;
   }) {
     const updateData: any = { ...data };
@@ -116,6 +120,7 @@ export class UserService {
         id: true,
         email: true,
         username: true,
+        avatar: true,
         role: true,
         isActive: true,
         createdAt: true,
@@ -196,6 +201,7 @@ export class UserService {
     userId: number;
     planId: number;
     assignedById: number;
+    note?: string;
   }) {
     const [plan, targetUser, adminUser] = await Promise.all([
       prisma.plan.findUnique({ where: { id: data.planId } }),
@@ -215,6 +221,7 @@ export class UserService {
         planId: data.planId,
         assignedById: data.assignedById,
         amount: plan.price,
+        note: data.note || '',
         purchasedAt: now,
         expiresAt,
       },

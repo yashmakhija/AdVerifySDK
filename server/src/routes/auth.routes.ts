@@ -17,7 +17,27 @@ router.post(
   (req, res) => ctrl.login(req, res),
 );
 
-// Protected — get current user info
-router.get('/me', adminAuth, (req, res) => ctrl.me(req, res));
+// Protected — requires Bearer token
+router.use(adminAuth);
+
+router.get('/me', (req, res) => ctrl.me(req, res));
+router.get('/purchases', (req, res) => ctrl.getMyPurchases(req, res));
+
+router.patch(
+  '/profile',
+  validate(z.object({
+    avatar: z.string().url().optional(),
+  })),
+  (req, res) => ctrl.updateProfile(req, res),
+);
+
+router.post(
+  '/change-password',
+  validate(z.object({
+    currentPassword: z.string().min(1),
+    newPassword: z.string().min(6),
+  })),
+  (req, res) => ctrl.changePassword(req, res),
+);
 
 export default router;

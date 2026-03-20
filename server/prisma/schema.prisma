@@ -19,6 +19,7 @@ model User {
   email     String   @unique
   username  String   @unique
   password  String
+  avatar    String   @default("")                                // profile picture URL
   role      UserRole @default(USER)
   isActive  Boolean  @default(true) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
@@ -62,6 +63,7 @@ model Purchase {
   planId       Int       @map("plan_id")
   assignedById Int?      @map("assigned_by_id")
   amount       Float
+  note         String    @default("")                            // admin remark e.g. "Paid ₹499 via UPI on 20 Mar 2026"
   status       String    @default("active") // "active" | "expired" | "cancelled"
   purchasedAt  DateTime  @default(now()) @map("purchased_at")
   expiresAt    DateTime  @map("expires_at")

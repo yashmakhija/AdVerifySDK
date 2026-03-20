@@ -29,6 +29,7 @@ router.patch(
     email: z.string().email().optional(),
     username: z.string().min(3).max(30).optional(),
     password: z.string().min(6).optional(),
+    avatar: z.string().url().optional(),
     isActive: z.boolean().optional(),
   })),
   (req, res) => ctrl.updateUser(req, res),
@@ -90,6 +91,7 @@ router.post(
   validate(z.object({
     userId: z.number(),
     planId: z.number(),
+    note: z.string().optional(),
   })),
   (req, res) => ctrl.createPurchase(req, res),
 );
