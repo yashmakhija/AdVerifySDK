@@ -50,7 +50,7 @@ const MANAGE_NAV = [
   { href: "/activity", label: "Activity", icon: Activity },
 ];
 
-const FREE_PAGES = ["/dashboard", "/billing", "/profile"];
+const FREE_PAGES = ["/billing", "/profile"];
 
 export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => void }) {
   const pathname = usePathname();

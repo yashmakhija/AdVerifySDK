@@ -10,7 +10,7 @@ import { usePlanGuard } from "@/lib/use-plan-guard";
 import { Menu, Shield } from "lucide-react";
 
 // Pages accessible without an active plan
-const FREE_PAGES = ["/dashboard", "/billing", "/profile"];
+const FREE_PAGES = ["/billing", "/profile"];
 
 export default function PanelLayout({
   children,
