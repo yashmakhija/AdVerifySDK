@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { adminAuth } from '../middleware/auth';
+import { adminAuth, requireActivePlan } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import { AdminController } from '../controllers/admin.controller';
 
@@ -10,8 +10,8 @@ const ctrl = new AdminController();
 // Auth check — verifies token and returns user info
 router.get('/me', adminAuth, (req, res) => ctrl.me(req, res));
 
-// All subsequent routes require authentication
-router.use(adminAuth);
+// All subsequent routes require authentication + active plan
+router.use(adminAuth, requireActivePlan);
 
 // Dashboard
 router.get('/stats', (req, res) => ctrl.getStats(req, res));

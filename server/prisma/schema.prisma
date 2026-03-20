@@ -28,6 +28,7 @@ model User {
   purchases    Purchase[]    @relation("UserPurchases")
   assignedPurchases Purchase[] @relation("AssignedByAdmin")
   activityLogs ActivityLog[]
+  apiKeys      ApiKey[]
 
   @@map("users")
 }
@@ -113,18 +114,22 @@ model Announcement {
 
 model ApiKey {
   id          Int          @id @default(autoincrement())
+  userId      Int?         @map("user_id")
   key         String       @unique
   appName     String       @map("app_name")
   packageName String       @default("") @map("package_name")
   isActive    Boolean      @default(true) @map("is_active")
+  suspendedAt DateTime?    @map("suspended_at")                  // set when purchase expires
   createdAt   DateTime     @default(now()) @map("created_at")
 
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
   ads         Ad[]
   pinConfig   PinConfig?
   userPins    UserPin[]
   impressions Impression[]
   clicks      Click[]
 
+  @@index([userId])
   @@map("api_keys")
 }
 

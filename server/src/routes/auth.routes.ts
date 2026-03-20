@@ -1,15 +1,18 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validate } from '../middleware/validate';
-import { adminAuth } from '../middleware/auth';
+import { adminAuth, requireActivePlan } from '../middleware/auth';
 import { AuthController } from '../controllers/auth.controller';
 import { TutorialService } from '../services/tutorial.service';
 import { UserService } from '../services/user.service';
+import { ExpiryService } from '../services/expiry.service';
+import { AdminRequest } from '../types';
 
 const router = Router();
 const ctrl = new AuthController();
 const tutorialService = new TutorialService();
 const userService = new UserService();
+const expiryService = new ExpiryService();
 
 // Public — login with email/username + password
 router.post(
@@ -44,14 +47,20 @@ router.post(
   (req, res) => ctrl.changePassword(req, res),
 );
 
+// Plan status — shows expiry warning to user
+router.get('/plan-status', async (req, res) => {
+  const status = await expiryService.getUserExpiryStatus((req as AdminRequest).user!.id);
+  res.json(status);
+});
+
 // Announcements — active only
 router.get('/announcements', async (_req, res) => {
   const announcements = await userService.getActiveAnnouncements();
   res.json(announcements);
 });
 
-// Tutorial — presigned R2 URL (expires in 1 hour)
-router.get('/tutorial', async (_req, res) => {
+// Tutorial — requires active plan
+router.get('/tutorial', requireActivePlan, async (_req, res) => {
   try {
     const url = await tutorialService.getPresignedUrl();
     res.json({ url });

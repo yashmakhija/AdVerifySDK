@@ -5,10 +5,12 @@ import { adminAuth, requireAdmin } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import { UserController } from '../controllers/user.controller';
 import { TutorialService } from '../services/tutorial.service';
+import { ExpiryService } from '../services/expiry.service';
 
 const router = Router();
 const ctrl = new UserController();
 const tutorialService = new TutorialService();
+const expiryService = new ExpiryService();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 500 * 1024 * 1024 } });
 
 // All routes require admin auth + admin role
@@ -119,6 +121,12 @@ router.post(
   (req, res) => ctrl.createAnnouncement(req, res),
 );
 router.delete('/announcements/:id', (req, res) => ctrl.deleteAnnouncement(req, res));
+
+// ─── Expiry Management ───
+router.post('/process-expirations', async (_req, res) => {
+  const result = await expiryService.processExpirations();
+  res.json(result);
+});
 
 // ─── Tutorial ───
 router.post('/tutorial', upload.single('video'), async (req, res) => {

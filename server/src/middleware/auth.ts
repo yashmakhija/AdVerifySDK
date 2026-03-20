@@ -56,3 +56,28 @@ export function requireAdmin(req: AdminRequest, res: Response, next: NextFunctio
   }
   next();
 }
+
+export async function requireActivePlan(req: AdminRequest, res: Response, next: NextFunction) {
+  const user = req.user!;
+
+  // Admins bypass plan check
+  if (user.role === 'ADMIN') {
+    next();
+    return;
+  }
+
+  const activePurchase = await prisma.purchase.findFirst({
+    where: { userId: user.id, status: 'active' },
+  });
+
+  if (!activePurchase) {
+    res.status(403).json({
+      error: 'No active plan',
+      code: 'PLAN_REQUIRED',
+      message: 'You need an active plan to access this feature. Please contact support or subscribe to a plan.',
+    });
+    return;
+  }
+
+  next();
+}

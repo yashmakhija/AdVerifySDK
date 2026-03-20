@@ -8,6 +8,7 @@ import adminRoutes from './routes/admin.routes';
 import userRoutes from './routes/user.routes';
 import patcherRoutes from './routes/patcher.routes';
 import { seedAdmin } from './lib/seed-admin';
+import { ExpiryService } from './services/expiry.service';
 
 const app = express();
 
@@ -54,6 +55,25 @@ async function start() {
   } catch (err) {
     console.error('Failed to seed admin:', err);
   }
+
+  // Run expiry check on startup and every hour
+  const expiryService = new ExpiryService();
+  try {
+    const result = await expiryService.processExpirations();
+    if (result.expired || result.suspended || result.reactivated) {
+      console.log(`Expiry check: ${result.expired} expired, ${result.suspended} suspended, ${result.reactivated} reactivated`);
+    }
+  } catch (err) {
+    console.error('Expiry check failed:', err);
+  }
+
+  setInterval(async () => {
+    try {
+      await expiryService.processExpirations();
+    } catch (err) {
+      console.error('Expiry check failed:', err);
+    }
+  }, 60 * 60 * 1000); // every hour
 
   app.listen(env.PORT, () => {
     console.log(`AdVerify Server running on http://localhost:${env.PORT}`);
