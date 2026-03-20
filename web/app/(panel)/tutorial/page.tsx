@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { PlayCircle, RefreshCw } from "lucide-react";
 import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
@@ -13,8 +13,6 @@ export default function TutorialPage() {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval>>(null);
-
   const load = useCallback(async () => {
     setError(false);
     try {
@@ -29,11 +27,8 @@ export default function TutorialPage() {
 
   useEffect(() => {
     load();
-    // Auto-refresh the signed URL before it expires
-    timerRef.current = setInterval(() => {
-      load();
-    }, REFRESH_INTERVAL);
-    return () => clearInterval(timerRef.current);
+    const timer = setInterval(() => load(), REFRESH_INTERVAL);
+    return () => clearInterval(timer);
   }, [load]);
 
   return (
