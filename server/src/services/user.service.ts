@@ -16,7 +16,10 @@ export class UserService {
         updatedAt: true,
         purchases: {
           where: { status: 'active' },
-          include: { plan: true },
+          include: {
+            plan: true,
+            assignedBy: { select: { id: true, email: true, username: true } },
+          },
           orderBy: { purchasedAt: 'desc' },
           take: 1,
         },
@@ -37,7 +40,10 @@ export class UserService {
         createdAt: true,
         updatedAt: true,
         purchases: {
-          include: { plan: true },
+          include: {
+            plan: true,
+            assignedBy: { select: { id: true, email: true, username: true } },
+          },
           orderBy: { purchasedAt: 'desc' },
         },
         activityLogs: {
@@ -53,8 +59,15 @@ export class UserService {
     username: string;
     password: string;
     role?: 'ADMIN' | 'USER';
+    createdById?: number;
   }) {
     const hashedPassword = await bcrypt.hash(data.password, 12);
+
+    let adminUsername = 'system';
+    if (data.createdById) {
+      const admin = await prisma.user.findUnique({ where: { id: data.createdById }, select: { username: true } });
+      adminUsername = admin?.username ?? 'unknown';
+    }
 
     const user = await prisma.user.create({
       data: {
@@ -77,7 +90,7 @@ export class UserService {
       data: {
         userId: user.id,
         action: 'account_created',
-        details: `Account created with role ${user.role}`,
+        details: `Account "${user.username}" (${user.role}) created by admin ${adminUsername}`,
       },
     });
 
@@ -173,6 +186,7 @@ export class UserService {
       include: {
         user: { select: { id: true, email: true, username: true } },
         plan: true,
+        assignedBy: { select: { id: true, email: true, username: true } },
       },
       orderBy: { purchasedAt: 'desc' },
     });
@@ -181,9 +195,16 @@ export class UserService {
   async createPurchase(data: {
     userId: number;
     planId: number;
+    assignedById: number;
   }) {
-    const plan = await prisma.plan.findUnique({ where: { id: data.planId } });
+    const [plan, targetUser, adminUser] = await Promise.all([
+      prisma.plan.findUnique({ where: { id: data.planId } }),
+      prisma.user.findUnique({ where: { id: data.userId }, select: { username: true, email: true } }),
+      prisma.user.findUnique({ where: { id: data.assignedById }, select: { username: true } }),
+    ]);
+
     if (!plan) throw new Error('Plan not found');
+    if (!targetUser) throw new Error('User not found');
 
     const now = new Date();
     const expiresAt = new Date(now.getTime() + plan.durationDays * 24 * 60 * 60 * 1000);
@@ -192,39 +213,47 @@ export class UserService {
       data: {
         userId: data.userId,
         planId: data.planId,
+        assignedById: data.assignedById,
         amount: plan.price,
         purchasedAt: now,
         expiresAt,
       },
-      include: { plan: true, user: { select: { id: true, email: true, username: true } } },
+      include: {
+        plan: true,
+        user: { select: { id: true, email: true, username: true } },
+        assignedBy: { select: { id: true, email: true, username: true } },
+      },
     });
 
     await prisma.activityLog.create({
       data: {
         userId: data.userId,
-        action: 'purchase',
-        details: `Purchased plan "${plan.name}" for $${plan.price} — expires ${expiresAt.toISOString().split('T')[0]}`,
+        action: 'plan_assigned',
+        details: `Plan "${plan.name}" (${plan.currency}${plan.price}/mo) assigned to ${targetUser.username} by admin ${adminUser?.username ?? 'unknown'} — valid ${now.toISOString().split('T')[0]} to ${expiresAt.toISOString().split('T')[0]}`,
       },
     });
 
     return purchase;
   }
 
-  async cancelPurchase(id: number) {
-    const purchase = await prisma.purchase.update({
-      where: { id },
-      data: {
-        status: 'cancelled',
-        cancelledAt: new Date(),
-      },
-      include: { plan: true },
-    });
+  async cancelPurchase(id: number, cancelledById: number) {
+    const [purchase, adminUser] = await Promise.all([
+      prisma.purchase.update({
+        where: { id },
+        data: { status: 'cancelled', cancelledAt: new Date() },
+        include: {
+          plan: true,
+          user: { select: { username: true } },
+        },
+      }),
+      prisma.user.findUnique({ where: { id: cancelledById }, select: { username: true } }),
+    ]);
 
     await prisma.activityLog.create({
       data: {
         userId: purchase.userId,
         action: 'plan_cancelled',
-        details: `Cancelled plan "${purchase.plan.name}"`,
+        details: `Plan "${purchase.plan.name}" cancelled for ${purchase.user.username} by admin ${adminUser?.username ?? 'unknown'}`,
       },
     });
 
