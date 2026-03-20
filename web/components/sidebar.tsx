@@ -122,39 +122,43 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             })}
           </div>
 
-          <p className="px-3 pt-5 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-700">
-            Management
-          </p>
-          <div className="space-y-0.5">
-            {MANAGE_NAV.map((item) => {
-              const isActive =
-                pathname === item.href || pathname.startsWith(item.href + "/");
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={onClose}
-                  className={cn(
-                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150",
-                    isActive
-                      ? "bg-white/[0.08] text-white"
-                      : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
-                  )}
-                >
-                  <item.icon
-                    className={cn(
-                      "h-[16px] w-[16px]",
-                      isActive ? "text-white" : "text-zinc-600"
-                    )}
-                  />
-                  {item.label}
-                  {isActive && (
-                    <div className="ml-auto h-1.5 w-1.5 rounded-full bg-white" />
-                  )}
-                </Link>
-              );
-            })}
-          </div>
+          {role === "ADMIN" && (
+            <>
+              <p className="px-3 pt-5 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-700">
+                Management
+              </p>
+              <div className="space-y-0.5">
+                {MANAGE_NAV.map((item) => {
+                  const isActive =
+                    pathname === item.href || pathname.startsWith(item.href + "/");
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={onClose}
+                      className={cn(
+                        "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150",
+                        isActive
+                          ? "bg-white/[0.08] text-white"
+                          : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
+                      )}
+                    >
+                      <item.icon
+                        className={cn(
+                          "h-[16px] w-[16px]",
+                          isActive ? "text-white" : "text-zinc-600"
+                        )}
+                      />
+                      {item.label}
+                      {isActive && (
+                        <div className="ml-auto h-1.5 w-1.5 rounded-full bg-white" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </nav>
 
         {/* Profile + Logout */}
