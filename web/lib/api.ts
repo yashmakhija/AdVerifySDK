@@ -1,5 +1,16 @@
 export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://ads.paidappstore.com/api';
 
+export class ApiError extends Error {
+  code: string;
+  status: number;
+
+  constructor(message: string, code: string, status: number) {
+    super(message);
+    this.code = code;
+    this.status = status;
+  }
+}
+
 export async function api<T = unknown>(path: string, opts: {
   method?: string;
   body?: unknown;
@@ -16,7 +27,11 @@ export async function api<T = unknown>(path: string, opts: {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || `HTTP ${res.status}`);
+    throw new ApiError(
+      err.error || err.message || `HTTP ${res.status}`,
+      err.code || '',
+      res.status
+    );
   }
 
   return res.json();

@@ -1,11 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { Sidebar } from "@/components/sidebar";
 import { ToastContainer } from "@/components/ui/toast";
+import { PlanRequiredCard } from "@/components/ui/plan-gate";
+import { usePlanGuard } from "@/lib/use-plan-guard";
 import { Menu, Shield } from "lucide-react";
+
+// Pages accessible without an active plan
+const FREE_PAGES = ["/dashboard", "/billing", "/profile"];
 
 export default function PanelLayout({
   children,
@@ -13,14 +18,21 @@ export default function PanelLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const token = useAuthStore((s) => s.token);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { blocked, checked } = usePlanGuard();
 
   useEffect(() => {
     if (!token) router.replace("/login");
   }, [token, router]);
 
   if (!token) return null;
+
+  const isFreePage = FREE_PAGES.some(
+    (p) => pathname === p || pathname.startsWith(p + "/")
+  );
+  const showBlocked = checked && blocked && !isFreePage;
 
   return (
     <div className="flex h-screen bg-[#09090b]">
@@ -45,7 +57,7 @@ export default function PanelLayout({
 
         <main className="flex-1 overflow-y-auto dark-scroll">
           <div className="mx-auto max-w-5xl px-4 py-5 sm:px-6 md:py-8">
-            {children}
+            {showBlocked ? <PlanRequiredCard /> : children}
           </div>
         </main>
       </div>
