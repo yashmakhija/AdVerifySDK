@@ -21,6 +21,7 @@ import {
   AlertTriangle,
   ArrowRight,
   Smartphone,
+  PlayCircle,
   Info,
   X,
 } from "lucide-react";
@@ -68,6 +69,14 @@ const QUICK_START_STEPS = [
   },
   {
     step: 2,
+    title: "Watch the Tutorial",
+    description: "Follow the video guide to set up everything step by step",
+    href: "/tutorial",
+    icon: PlayCircle,
+    cta: "Watch Video",
+  },
+  {
+    step: 3,
     title: "Patch your APK",
     description: "Use MT Manager to inject the AdVerify SDK into your app",
     href: "/mt-manager",
@@ -75,7 +84,7 @@ const QUICK_START_STEPS = [
     cta: "View Guide",
   },
   {
-    step: 3,
+    step: 4,
     title: "Create your first Ad",
     description: "Set up a card, fullscreen, or banner ad to serve to your users",
     href: "/ads",
@@ -283,7 +292,7 @@ export default function DashboardPage() {
           <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] overflow-hidden">
             <div className="px-5 py-4 border-b border-white/[0.06]">
               <h2 className="text-[14px] font-semibold text-white">
-                Get started in 3 steps
+                Get started in 4 steps
               </h2>
               <p className="mt-0.5 text-[12px] text-zinc-600">
                 Set up your first app with AdVerify
