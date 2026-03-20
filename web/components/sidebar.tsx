@@ -21,6 +21,9 @@ import {
   Receipt,
   Activity,
   Wallet,
+  Bell,
+  PlayCircle,
+  Upload,
 } from "lucide-react";
 import { UserAvatar } from "@/components/ui/user-avatar";
 
@@ -33,6 +36,7 @@ const NAV = [
   { href: "/user-pins", label: "User PINs", icon: UserCheck },
   { href: "/settings", label: "Settings", icon: Settings },
   { href: "/mt-manager", label: "MT Manager", icon: Smartphone },
+  { href: "/tutorial", label: "Tutorial", icon: PlayCircle },
   { href: "/docs", label: "SDK Docs", icon: FileCode2 },
 ];
 
@@ -40,6 +44,8 @@ const MANAGE_NAV = [
   { href: "/users", label: "Users", icon: Users },
   { href: "/plans", label: "Plans", icon: CreditCard },
   { href: "/purchases", label: "Purchases", icon: Receipt },
+  { href: "/announcements", label: "Announcements", icon: Bell },
+  { href: "/tutorial-manage", label: "Tutorial", icon: Upload },
   { href: "/activity", label: "Activity", icon: Activity },
 ];
 

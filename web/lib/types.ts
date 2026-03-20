@@ -152,3 +152,12 @@ export interface ManageStats {
   activePurchases: number;
   totalRevenue: number;
 }
+
+export interface Announcement {
+  id: number;
+  title: string;
+  content: string;
+  type: "info" | "update" | "warning";
+  isActive: boolean;
+  createdAt: string;
+}
