@@ -4,10 +4,12 @@ import { validate } from '../middleware/validate';
 import { adminAuth } from '../middleware/auth';
 import { AuthController } from '../controllers/auth.controller';
 import { TutorialService } from '../services/tutorial.service';
+import { UserService } from '../services/user.service';
 
 const router = Router();
 const ctrl = new AuthController();
 const tutorialService = new TutorialService();
+const userService = new UserService();
 
 // Public — login with email/username + password
 router.post(
@@ -41,6 +43,12 @@ router.post(
   })),
   (req, res) => ctrl.changePassword(req, res),
 );
+
+// Announcements — active only
+router.get('/announcements', async (_req, res) => {
+  const announcements = await userService.getActiveAnnouncements();
+  res.json(announcements);
+});
 
 // Tutorial — presigned R2 URL (expires in 1 hour)
 router.get('/tutorial', async (_req, res) => {

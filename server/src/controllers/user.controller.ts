@@ -121,4 +121,21 @@ export class UserController {
     const stats = await service.getUserStats();
     res.json(stats);
   }
+
+  // ─── Announcements ───
+
+  async getAnnouncements(_req: AdminRequest, res: Response) {
+    const announcements = await service.getAnnouncements();
+    res.json(announcements);
+  }
+
+  async createAnnouncement(req: AdminRequest, res: Response) {
+    const announcement = await service.createAnnouncement(req.body);
+    res.status(201).json(announcement);
+  }
+
+  async deleteAnnouncement(req: AdminRequest, res: Response) {
+    await service.deleteAnnouncement(paramId(req, 'id'));
+    res.json({ status: 'deleted' });
+  }
 }

@@ -107,6 +107,19 @@ router.get('/activity-logs', (req, res) => ctrl.getActivityLogs(req, res));
 // ─── Stats ───
 router.get('/stats', (req, res) => ctrl.getUserStats(req, res));
 
+// ─── Announcements ───
+router.get('/announcements', (req, res) => ctrl.getAnnouncements(req, res));
+router.post(
+  '/announcements',
+  validate(z.object({
+    title: z.string().min(1),
+    content: z.string().min(1),
+    type: z.enum(['info', 'update', 'warning']).optional(),
+  })),
+  (req, res) => ctrl.createAnnouncement(req, res),
+);
+router.delete('/announcements/:id', (req, res) => ctrl.deleteAnnouncement(req, res));
+
 // ─── Tutorial ───
 router.post('/tutorial', upload.single('video'), async (req, res) => {
   try {

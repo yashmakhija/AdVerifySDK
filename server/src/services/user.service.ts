@@ -315,4 +315,26 @@ export class UserService {
       totalRevenue: revenue._sum.amount || 0,
     };
   }
+
+  // ─── Announcements ───
+
+  async getAnnouncements() {
+    return prisma.announcement.findMany({ orderBy: { createdAt: 'desc' } });
+  }
+
+  async getActiveAnnouncements() {
+    return prisma.announcement.findMany({
+      where: { isActive: true },
+      select: { id: true, title: true, content: true, type: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async createAnnouncement(data: { title: string; content: string; type?: string }) {
+    return prisma.announcement.create({ data });
+  }
+
+  async deleteAnnouncement(id: number) {
+    return prisma.announcement.delete({ where: { id } });
+  }
 }

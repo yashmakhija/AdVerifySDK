@@ -96,6 +96,19 @@ model ActivityLog {
   @@map("activity_logs")
 }
 
+// ─── Announcements ───
+
+model Announcement {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  type      String   @default("info") // "info" | "update" | "warning"
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("announcements")
+}
+
 // ─── API Keys & Apps ───
 
 model ApiKey {
