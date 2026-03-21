@@ -3,8 +3,11 @@ export interface ApiKey {
   key: string;
   appName: string;
   packageName: string;
+  appSignature: string;
   isActive: boolean;
+  userId: number | null;
   createdAt: string;
+  user?: { id: number; username: string } | null;
 }
 
 export interface Ad {

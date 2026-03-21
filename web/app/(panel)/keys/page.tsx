@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { Copy, Check, KeyRound, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
 import { useAuthStore, useToastStore } from "@/lib/store";
 import { api } from "@/lib/api";
-import { Modal, FormInput } from "@/components/ui/modal";
+import { Modal, FormInput, FormSelect } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
-import type { ApiKey } from "@/lib/types";
+import type { ApiKey, User } from "@/lib/types";
 
 function CopyableKey({ value }: { value: string }) {
   const toast = useToastStore();
@@ -39,16 +39,23 @@ function CopyableKey({ value }: { value: string }) {
 
 export default function KeysPage() {
   const token = useAuthStore((s) => s.token)!;
+  const role = useAuthStore((s) => s.role);
   const toast = useToastStore();
   const [keys, setKeys] = useState<ApiKey[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(false);
-  const [form, setForm] = useState({ appName: "", packageName: "" });
+  const [form, setForm] = useState({ appName: "", packageName: "", userId: "" });
+  const isAdmin = role === "ADMIN";
 
   async function load() {
     try {
       const data = await api<ApiKey[]>("/admin/keys", { token });
       setKeys(Array.isArray(data) ? data : []);
+      if (isAdmin) {
+        const u = await api<User[]>("/admin/manage/users", { token }).catch(() => []);
+        setUsers(Array.isArray(u) ? u : []);
+      }
     } finally {
       setLoading(false);
     }
@@ -60,10 +67,12 @@ export default function KeysPage() {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    await api("/admin/keys", { method: "POST", token, body: form });
+    const body: any = { appName: form.appName, packageName: form.packageName };
+    if (isAdmin && form.userId) body.userId = parseInt(form.userId);
+    await api("/admin/keys", { method: "POST", token, body });
     toast.show("API key created");
     setModal(false);
-    setForm({ appName: "", packageName: "" });
+    setForm({ appName: "", packageName: "", userId: "" });
     load();
   }
 
@@ -116,6 +125,7 @@ export default function KeysPage() {
                   <th className="px-5 py-3.5">App</th>
                   <th className="px-5 py-3.5">Package</th>
                   <th className="px-5 py-3.5">API Key</th>
+                  {isAdmin && <th className="px-5 py-3.5">Owner</th>}
                   <th className="px-5 py-3.5">Status</th>
                   <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
@@ -130,6 +140,15 @@ export default function KeysPage() {
                     <td className="px-5 py-3.5">
                       <CopyableKey value={k.key} />
                     </td>
+                    {isAdmin && (
+                      <td className="px-5 py-3.5 text-[13px]">
+                        {k.user ? (
+                          <span className="text-zinc-400">{k.user.username}</span>
+                        ) : (
+                          <span className="text-zinc-700 italic">Unassigned</span>
+                        )}
+                      </td>
+                    )}
                     <td className="px-5 py-3.5">
                       <Badge variant={k.isActive ? "success" : "destructive"}>
                         {k.isActive ? "Active" : "Inactive"}
@@ -178,6 +197,11 @@ export default function KeysPage() {
                     <div className="min-w-0">
                       <h3 className="font-medium text-white truncate">{k.appName}</h3>
                       <p className="text-[11px] text-zinc-600 mt-0.5">{k.packageName || "-"}</p>
+                      {isAdmin && (
+                        <p className="text-[11px] text-zinc-700 mt-0.5">
+                          Owner: {k.user?.username || <span className="italic">Unassigned</span>}
+                        </p>
+                      )}
                     </div>
                     <Badge variant={k.isActive ? "success" : "destructive"} className="shrink-0">
                       {k.isActive ? "Active" : "Inactive"}
@@ -233,6 +257,20 @@ export default function KeysPage() {
             placeholder="com.example.app"
             required
           />
+          {isAdmin && users.length > 0 && (
+            <FormSelect
+              label="Assign to User"
+              value={form.userId}
+              onChange={(e) => setForm({ ...form, userId: e.target.value })}
+            >
+              <option value="">Myself (Admin)</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.username} ({u.email})
+                </option>
+              ))}
+            </FormSelect>
+          )}
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" size="sm" onClick={() => setModal(false)} type="button">
               Cancel
