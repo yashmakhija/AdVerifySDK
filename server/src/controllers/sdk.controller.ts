@@ -60,7 +60,7 @@ export class SdkController {
 
     const keyData = await prisma.apiKey.findUnique({
       where: { key: apiKey, isActive: true },
-      include: { pinConfig: { select: { shortenerApiSecret: true } } },
+      include: { user: { select: { shortenerApiSecret: true } } },
     });
 
     if (!keyData) {
@@ -68,8 +68,8 @@ export class SdkController {
       return;
     }
 
-    // Validate shortener secret: per-app secret takes priority, fall back to system secret
-    const expectedSecret = keyData.pinConfig?.shortenerApiSecret || env.SHORTENER_SECRET;
+    // Validate shortener secret: user's secret takes priority, fall back to system secret
+    const expectedSecret = keyData.user?.shortenerApiSecret || env.SHORTENER_SECRET;
     if (!authHeader || authHeader !== `Bearer ${expectedSecret}`) {
       res.status(401).json({ error: 'Unauthorized' });
       return;

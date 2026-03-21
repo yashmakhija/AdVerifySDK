@@ -36,26 +36,49 @@ export class SettingsService {
   }
 
   // Per-user settings
-  async getUserSettings(userId: number): Promise<PinUnlockSettings> {
+  async getUserSettings(userId: number) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { pinUnlockMode: true, excludedAppIds: true },
+      select: {
+        pinUnlockMode: true,
+        excludedAppIds: true,
+        shortenerApiUrl: true,
+        shortenerApiSecret: true,
+        shortenerFrontendUrl: true,
+      },
     });
 
     return {
       pinUnlockMode: (user?.pinUnlockMode ?? 'per_app') as PinUnlockSettings['pinUnlockMode'],
       excludedAppIds: user?.excludedAppIds ?? [],
+      shortenerApiUrl: user?.shortenerApiUrl ?? '',
+      shortenerApiSecret: user?.shortenerApiSecret ?? '',
+      shortenerFrontendUrl: user?.shortenerFrontendUrl ?? '',
     };
   }
 
-  async updateUserSettings(userId: number, data: PinUnlockSettings) {
+  async updateUserSettings(userId: number, data: Partial<PinUnlockSettings & {
+    shortenerApiUrl?: string;
+    shortenerApiSecret?: string;
+    shortenerFrontendUrl?: string;
+  }>) {
+    const updateData: any = {};
+    if (data.pinUnlockMode !== undefined) updateData.pinUnlockMode = data.pinUnlockMode;
+    if (data.excludedAppIds !== undefined) updateData.excludedAppIds = data.excludedAppIds;
+    if (data.shortenerApiUrl !== undefined) updateData.shortenerApiUrl = data.shortenerApiUrl;
+    if (data.shortenerApiSecret !== undefined) updateData.shortenerApiSecret = data.shortenerApiSecret;
+    if (data.shortenerFrontendUrl !== undefined) updateData.shortenerFrontendUrl = data.shortenerFrontendUrl;
+
     return prisma.user.update({
       where: { id: userId },
-      data: {
-        pinUnlockMode: data.pinUnlockMode,
-        excludedAppIds: data.excludedAppIds,
+      data: updateData,
+      select: {
+        pinUnlockMode: true,
+        excludedAppIds: true,
+        shortenerApiUrl: true,
+        shortenerApiSecret: true,
+        shortenerFrontendUrl: true,
       },
-      select: { pinUnlockMode: true, excludedAppIds: true },
     });
   }
 }

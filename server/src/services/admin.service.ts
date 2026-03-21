@@ -212,7 +212,6 @@ export class AdminService {
     data: {
       pinEnabled?: boolean; pinMessage?: string; maxAttempts?: number; getPinUrl?: string;
       getPinBtnText?: string; enterPinBtnText?: string; expiryMode?: string; expiryHours?: number;
-      shortenerApiUrl?: string; shortenerApiSecret?: string; shortenerFrontendUrl?: string;
     },
     scope: UserScope,
   ) {

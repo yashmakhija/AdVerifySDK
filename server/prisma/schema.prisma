@@ -22,9 +22,12 @@ model User {
   avatar         String   @default("")                                // profile picture URL
   role           UserRole @default(USER)
   isActive       Boolean  @default(true) @map("is_active")
-  pinUnlockMode  String   @default("per_app") @map("pin_unlock_mode") // "per_app" | "global" | "global_except"
-  excludedAppIds Int[]    @default([]) @map("excluded_app_ids")
-  createdAt      DateTime @default(now()) @map("created_at")
+  pinUnlockMode        String   @default("per_app") @map("pin_unlock_mode") // "per_app" | "global" | "global_except"
+  excludedAppIds       Int[]    @default([]) @map("excluded_app_ids")
+  shortenerApiUrl      String   @default("") @map("shortener_api_url")
+  shortenerApiSecret   String   @default("") @map("shortener_api_secret")
+  shortenerFrontendUrl String   @default("") @map("shortener_frontend_url")
+  createdAt            DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   purchases    Purchase[]    @relation("UserPurchases")
@@ -174,10 +177,6 @@ model PinConfig {
   tutorialUrl   String  @default("https://t.me/EllieTutorials/36") @map("tutorial_url")
   pinInfoItems  Json    @default("[]") @map("pin_info_items")
   joinLinks     Json    @default("[]") @map("join_links")
-  // Custom shortener config (empty = use system default)
-  shortenerApiUrl      String @default("") @map("shortener_api_url")
-  shortenerApiSecret   String @default("") @map("shortener_api_secret")
-  shortenerFrontendUrl String @default("") @map("shortener_frontend_url")
 
   apiKey        ApiKey  @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
 
