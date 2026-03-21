@@ -51,11 +51,6 @@ export class SdkController {
 
   async generatePin(req: Request, res: Response) {
     const authHeader = req.headers.authorization;
-    if (!authHeader || authHeader !== `Bearer ${env.SHORTENER_SECRET}`) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
-
     const { apiKey, deviceId } = req.body;
 
     if (!apiKey || !deviceId) {
@@ -65,10 +60,18 @@ export class SdkController {
 
     const keyData = await prisma.apiKey.findUnique({
       where: { key: apiKey, isActive: true },
+      include: { pinConfig: { select: { shortenerApiSecret: true } } },
     });
 
     if (!keyData) {
       res.status(403).json({ error: 'Invalid API key' });
+      return;
+    }
+
+    // Validate shortener secret: per-app secret takes priority, fall back to system secret
+    const expectedSecret = keyData.pinConfig?.shortenerApiSecret || env.SHORTENER_SECRET;
+    if (!authHeader || authHeader !== `Bearer ${expectedSecret}`) {
+      res.status(401).json({ error: 'Unauthorized' });
       return;
     }
 
@@ -93,7 +96,7 @@ export class SdkController {
         select: { key: true },
       });
 
-      const url = await service.createVerifyLink(apiKey!.key, deviceId);
+      const url = await service.createVerifyLink(req.apiKeyData!.id, apiKey!.key, deviceId);
       res.json({ url });
     } catch (e: any) {
       res.status(500).json({ error: e.message || 'Failed to create link' });

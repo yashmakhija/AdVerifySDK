@@ -41,8 +41,9 @@ export class PatcherController {
       // Patch the APK
       const result = await patcher.patchApk(req.file.path, 'PLACEHOLDER', env.BASE_URL);
 
-      // Create API key + PIN config
-      const apiKeyRecord = await admin.createKey(result.appName, result.packageName);
+      // Create API key + PIN config (patcher runs as system/admin)
+      const systemScope = { userId: 1, role: 'ADMIN' as const };
+      const apiKeyRecord = await admin.createKey(result.appName, result.packageName, systemScope);
 
       // Update PIN config with user's settings
       const expiryMode = req.body.expiryMode || 'never';
@@ -56,7 +57,7 @@ export class PatcherController {
         expiryHours,
         maxAttempts,
         pinMessage,
-      });
+      }, systemScope);
 
       // Re-patch with the real API key (now that we have it)
       const finalResult = await patcher.patchApk(req.file.path, apiKeyRecord.key, env.BASE_URL);

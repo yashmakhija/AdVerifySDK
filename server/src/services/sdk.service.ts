@@ -338,8 +338,13 @@ export class SdkService {
     return true;
   }
 
-  async createVerifyLink(apiKey: string, deviceId: string): Promise<string> {
-    const res = await fetch(`${env.SHORTENER_API_URL}/api/v1/adverify/create`, {
+  async createVerifyLink(apiKeyId: number, apiKey: string, deviceId: string): Promise<string> {
+    // Load per-app shortener config, fall back to system defaults
+    const pinConfig = await prisma.pinConfig.findUnique({ where: { apiKeyId } });
+    const shortenerApiUrl = pinConfig?.shortenerApiUrl || env.SHORTENER_API_URL;
+    const shortenerFrontendUrl = pinConfig?.shortenerFrontendUrl || env.SHORTENER_FRONTEND_URL;
+
+    const res = await fetch(`${shortenerApiUrl}/api/v1/adverify/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ apiKey, deviceId }),
@@ -354,7 +359,7 @@ export class SdkService {
       throw new Error('Failed to create verification link');
     }
 
-    return `${env.SHORTENER_FRONTEND_URL}/verify/${data.data.code}`;
+    return `${shortenerFrontendUrl}/verify/${data.data.code}`;
   }
 
   async trackImpression(adId: number, apiKeyId: number, deviceId: string) {
