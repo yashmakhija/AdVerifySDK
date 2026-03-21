@@ -191,7 +191,7 @@ function AdminTab() {
         <BulletList items={[
           <><strong className="text-white">Enable PIN</strong> — toggle on</>,
           <><strong className="text-white">PIN Message</strong> — text shown in the PIN dialog</>,
-          <><strong className="text-white">Max Attempts</strong> — tries before dialog auto-closes</>,
+          <><strong className="text-white">Max Attempts</strong> — server locks device after this many wrong PINs (30 min cooldown)</>,
           <><strong className="text-white">Get PIN URL</strong> — your link shortener URL with <Chip>{"{device_id}"}</Chip> placeholder</>,
           <><strong className="text-white">Button Text</strong> — label on the &quot;Get PIN&quot; button</>,
           <><strong className="text-white">PIN Expiry</strong> — choose &quot;Never&quot; (one-time forever) or set hours until PIN expires.</>,
@@ -547,7 +547,10 @@ Content-Type: application/json
 { "verified": true,  "message": "PIN verified. App unlocked!" }
 
 ── Wrong PIN:
-{ "verified": false, "message": "Invalid PIN" }
+{ "verified": false, "message": "Invalid PIN. 2 attempts remaining." }
+
+── Locked (too many attempts):
+{ "verified": false, "message": "Too many attempts. Locked for 30 minutes.", "locked": true }
 
 ── Already verified:
 { "verified": true,  "message": "Already verified" }`}</CodeBlock>
