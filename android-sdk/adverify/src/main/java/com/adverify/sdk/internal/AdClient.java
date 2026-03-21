@@ -20,6 +20,7 @@ import com.adverify.sdk.internal.models.Ad;
 import com.adverify.sdk.internal.models.InitResponse;
 import com.adverify.sdk.internal.models.JoinLink;
 import com.adverify.sdk.internal.models.PinInfoItem;
+import com.adverify.sdk.internal.models.VerifyResult;
 
 /** HTTP client for communicating with the AdVerify server. */
 public class AdClient {
@@ -32,9 +33,15 @@ public class AdClient {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
+    private String appSignature = "";
+
     public AdClient(String apiKey, String baseUrl) {
         this.apiKey = apiKey;
         this.baseUrl = baseUrl;
+    }
+
+    public void setAppSignature(String signature) {
+        this.appSignature = signature != null ? signature : "";
     }
 
     public interface Callback<T> {
@@ -137,7 +144,7 @@ public class AdClient {
         });
     }
 
-    public void verifyPin(String pin, String deviceId, Callback<Boolean> callback) {
+    public void verifyPin(String pin, String deviceId, Callback<VerifyResult> callback) {
         executor.execute(() -> {
             try {
                 JSONObject body = new JSONObject();
@@ -145,8 +152,12 @@ public class AdClient {
                 body.put("deviceId", deviceId);
                 String json = post("/api/sdk/verify-pin", body.toString());
                 JSONObject obj = new JSONObject(json);
-                boolean verified = obj.optBoolean("verified", false);
-                mainHandler.post(() -> callback.onSuccess(verified));
+                VerifyResult result = new VerifyResult(
+                    obj.optBoolean("verified", false),
+                    obj.optString("message", ""),
+                    obj.optBoolean("locked", false)
+                );
+                mainHandler.post(() -> callback.onSuccess(result));
             } catch (Exception e) {
                 Log.e(TAG, "PIN verify failed", e);
                 mainHandler.post(() -> callback.onError(e.getMessage()));
@@ -196,14 +207,21 @@ public class AdClient {
         });
     }
 
+    private void setCommonHeaders(HttpURLConnection conn) {
+        conn.setRequestProperty("x-api-key", apiKey);
+        conn.setRequestProperty("Content-Type", "application/json");
+        if (!appSignature.isEmpty()) {
+            conn.setRequestProperty("x-app-signature", appSignature);
+        }
+        conn.setConnectTimeout(TIMEOUT_MS);
+        conn.setReadTimeout(TIMEOUT_MS);
+    }
+
     private String get(String path) throws Exception {
         URL url = new URL(baseUrl + path);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
-        conn.setRequestProperty("x-api-key", apiKey);
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setConnectTimeout(TIMEOUT_MS);
-        conn.setReadTimeout(TIMEOUT_MS);
+        setCommonHeaders(conn);
         return readResponse(conn);
     }
 
@@ -211,10 +229,7 @@ public class AdClient {
         URL url = new URL(baseUrl + path);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
-        conn.setRequestProperty("x-api-key", apiKey);
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setConnectTimeout(TIMEOUT_MS);
-        conn.setReadTimeout(TIMEOUT_MS);
+        setCommonHeaders(conn);
         conn.setDoOutput(true);
 
         try (OutputStream os = conn.getOutputStream()) {

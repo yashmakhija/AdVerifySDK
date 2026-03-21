@@ -10,6 +10,7 @@ import com.adverify.sdk.internal.models.Ad;
 import com.adverify.sdk.internal.models.InitResponse;
 import com.adverify.sdk.internal.models.JoinLink;
 import com.adverify.sdk.internal.models.PinInfoItem;
+import com.adverify.sdk.internal.models.VerifyResult;
 
 /** Coordinates the SDK flow: init -> check PIN status -> optional PIN -> show ad. */
 class AdLoader {
@@ -94,15 +95,19 @@ class AdLoader {
                 @Override
                 public void onPinSubmit(String pin, PinVerifyDialog dlg) {
                     dlg.setVerifyLoading(true);
-                    client.verifyPin(pin, deviceId, new AdClient.Callback<Boolean>() {
+                    client.verifyPin(pin, deviceId, new AdClient.Callback<VerifyResult>() {
                         @Override
-                        public void onSuccess(Boolean verified) {
+                        public void onSuccess(VerifyResult result) {
                             dlg.setVerifyLoading(false);
-                            if (verified) {
+                            if (result.verified) {
                                 dlg.dismiss();
                                 fetchAndShowAds();
+                            } else if (result.locked) {
+                                dlg.setLocked(result.message);
                             } else {
-                                dlg.showError("Invalid PIN. Try again.");
+                                String msg = (result.message != null && !result.message.isEmpty())
+                                    ? result.message : "Invalid PIN. Try again.";
+                                dlg.showError(msg);
                             }
                         }
 
@@ -136,11 +141,6 @@ class AdLoader {
                 @Override
                 public void onEnterPinClicked(PinVerifyDialog dlg) {
                     dlg.switchToPinState();
-                }
-
-                @Override
-                public void onMaxAttemptsReached() {
-                    if (callback != null) callback.onError("Max PIN attempts reached");
                 }
 
                 @Override

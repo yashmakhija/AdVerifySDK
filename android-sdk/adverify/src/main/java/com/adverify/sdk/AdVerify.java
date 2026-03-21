@@ -2,10 +2,15 @@ package com.adverify.sdk;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.provider.Settings;
 import android.util.Log;
 
 import com.adverify.sdk.internal.AdClient;
+
+import java.security.MessageDigest;
 
 /**
  * Main entry point for the AdVerify SDK.
@@ -24,6 +29,7 @@ public final class AdVerify {
     private static String sApiKey;
     private static String sBaseUrl;
     private static String sDeviceId;
+    private static String sAppSignature = "";
     private static boolean sInitialized;
 
     private AdVerify() {}
@@ -42,6 +48,7 @@ public final class AdVerify {
         sApiKey = apiKey;
         sBaseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
         sDeviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        sAppSignature = computeAppSignature(context);
         sInitialized = true;
 
         Log.d(TAG, "SDK initialized, deviceId=" + sDeviceId);
@@ -101,6 +108,7 @@ public final class AdVerify {
         }
 
         AdClient client = new AdClient(sApiKey, sBaseUrl);
+        client.setAppSignature(sAppSignature);
         new AdLoader(activity, client, sDeviceId, callback).load();
     }
 
@@ -112,5 +120,25 @@ public final class AdVerify {
         if (!sInitialized) {
             throw new IllegalStateException("AdVerify.init() must be called before show()");
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private static String computeAppSignature(Context context) {
+        try {
+            PackageInfo pi = context.getPackageManager().getPackageInfo(
+                context.getPackageName(), PackageManager.GET_SIGNATURES);
+            if (pi.signatures != null && pi.signatures.length > 0) {
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                byte[] digest = md.digest(pi.signatures[0].toByteArray());
+                StringBuilder hex = new StringBuilder();
+                for (byte b : digest) {
+                    hex.append(String.format("%02x", b));
+                }
+                return hex.toString();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to compute app signature", e);
+        }
+        return "";
     }
 }

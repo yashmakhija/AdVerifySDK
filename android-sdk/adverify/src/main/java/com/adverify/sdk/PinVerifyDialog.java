@@ -38,7 +38,6 @@ class PinVerifyDialog {
         void onPinSubmit(String pin, PinVerifyDialog dialog);
         void onGetPinClicked(PinVerifyDialog dialog);
         void onEnterPinClicked(PinVerifyDialog dialog);
-        void onMaxAttemptsReached();
         void onTutorialClicked();
         void onJoinClicked();
         void onExitClicked();
@@ -62,7 +61,6 @@ class PinVerifyDialog {
     private final Activity activity;
     private final String title;
     private final String message;
-    private final int maxAttempts;
     private final String getPinBtnText;
     private final String enterPinBtnText;
     private final PinInfoItem[] infoItems;
@@ -77,7 +75,6 @@ class PinVerifyDialog {
     private Button generateBtn;
     private Button enterPinBtn;
     private Button verifyBtn;
-    private int attempts = 0;
 
     PinVerifyDialog(Activity activity, String title, String message, int maxAttempts,
                     String getPinBtnText, String enterPinBtnText,
@@ -85,7 +82,6 @@ class PinVerifyDialog {
         this.activity = activity;
         this.title = title;
         this.message = message;
-        this.maxAttempts = maxAttempts;
         this.getPinBtnText = getPinBtnText;
         this.enterPinBtnText = enterPinBtnText;
         this.infoItems = infoItems;
@@ -96,6 +92,7 @@ class PinVerifyDialog {
         dialog = new Dialog(activity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
 
         ScrollView scroll = new ScrollView(activity);
         scroll.setFillViewport(true);
@@ -343,12 +340,6 @@ class PinVerifyDialog {
         verifyBtn.setOnClickListener(v -> {
             String pin = pinInput.getText().toString().trim();
             if (pin.isEmpty()) { showError("Please enter a PIN"); return; }
-            attempts++;
-            if (attempts >= maxAttempts) {
-                dialog.dismiss();
-                if (listener != null) listener.onMaxAttemptsReached();
-                return;
-            }
             if (listener != null) listener.onPinSubmit(pin, PinVerifyDialog.this);
         });
         pinState.addView(verifyBtn);
@@ -420,7 +411,25 @@ class PinVerifyDialog {
     void showError(String msg) {
         if (errorText != null) { errorText.setText(msg); errorText.setVisibility(View.VISIBLE); }
         if (pinInput != null) pinInput.setText("");
-        updateAttemptsText();
+    }
+
+    void setLocked(String message) {
+        if (pinInput != null) {
+            pinInput.setEnabled(false);
+            pinInput.setText("");
+            pinInput.setAlpha(0.4f);
+        }
+        if (verifyBtn != null) {
+            verifyBtn.setEnabled(false);
+            verifyBtn.setAlpha(0.4f);
+        }
+        if (errorText != null) {
+            errorText.setText(message != null && !message.isEmpty() ? message : "Too many attempts. Try again later.");
+            errorText.setVisibility(View.VISIBLE);
+        }
+        if (attemptsText != null) {
+            attemptsText.setVisibility(View.GONE);
+        }
     }
 
     void setGetPinLoading(boolean loading) {
@@ -731,15 +740,6 @@ class PinVerifyDialog {
             AlphaAnimation fadeIn = new AlphaAnimation(0f, 1f);
             fadeIn.setDuration(150);
             infoState.startAnimation(fadeIn);
-        }
-    }
-
-    private void updateAttemptsText() {
-        if (attemptsText == null) return;
-        int remaining = maxAttempts - attempts;
-        if (remaining > 0 && attempts > 0) {
-            attemptsText.setText(remaining + " attempt" + (remaining != 1 ? "s" : "") + " remaining");
-            attemptsText.setVisibility(View.VISIBLE);
         }
     }
 
