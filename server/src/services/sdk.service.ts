@@ -152,11 +152,42 @@ export class SdkService {
       return { verified: true, message: 'Already verified' };
     }
 
-    const userPin = await prisma.userPin.findFirst({
-      where: { apiKeyId, deviceId, pin, isUsed: false },
+    // Find the device's PIN record (any unused PIN for this device)
+    const devicePin = await prisma.userPin.findFirst({
+      where: { apiKeyId, deviceId, isUsed: false },
     });
 
-    if (!userPin) {
+    // Check if device is locked from too many attempts
+    if (devicePin?.lockedUntil && new Date() < devicePin.lockedUntil) {
+      const minutesLeft = Math.ceil((devicePin.lockedUntil.getTime() - Date.now()) / 60000);
+      return { verified: false, message: `Too many attempts. Try again in ${minutesLeft} minute${minutesLeft === 1 ? '' : 's'}.`, locked: true };
+    }
+
+    // Check if PIN matches
+    if (!devicePin || devicePin.pin !== pin) {
+      // Wrong PIN — increment attempts
+      if (devicePin) {
+        const newAttempts = devicePin.attempts + 1;
+        const maxAttempts = config.maxAttempts || 3;
+
+        if (newAttempts >= maxAttempts) {
+          // Lock for 30 minutes after max attempts
+          await prisma.userPin.update({
+            where: { id: devicePin.id },
+            data: { attempts: newAttempts, lockedUntil: new Date(Date.now() + 30 * 60 * 1000) },
+          });
+          return { verified: false, message: `Too many attempts. Locked for 30 minutes.`, locked: true };
+        }
+
+        await prisma.userPin.update({
+          where: { id: devicePin.id },
+          data: { attempts: newAttempts },
+        });
+
+        const remaining = maxAttempts - newAttempts;
+        return { verified: false, message: `Invalid PIN. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.` };
+      }
+
       return { verified: false, message: 'Invalid PIN' };
     }
 
@@ -164,9 +195,10 @@ export class SdkService {
       ? new Date(Date.now() + config.expiryHours * 60 * 60 * 1000)
       : null;
 
+    // Correct PIN — mark as used, reset attempts
     await prisma.userPin.update({
-      where: { id: userPin.id },
-      data: { isUsed: true, usedAt: new Date(), expiresAt },
+      where: { id: devicePin.id },
+      data: { isUsed: true, usedAt: new Date(), expiresAt, attempts: 0, lockedUntil: null },
     });
 
     return { verified: true, message: 'PIN verified. App unlocked!' };

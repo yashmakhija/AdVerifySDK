@@ -181,14 +181,16 @@ model PinConfig {
 
 // Each user/device gets a unique PIN — bound to Android ID at generation
 model UserPin {
-  id        Int       @id @default(autoincrement())
-  apiKeyId  Int       @map("api_key_id")
-  deviceId  String    @map("device_id")
-  pin       String
-  isUsed    Boolean   @default(false) @map("is_used")
-  createdAt DateTime  @default(now()) @map("created_at")
-  usedAt    DateTime? @map("used_at")
-  expiresAt DateTime? @map("expires_at") // null = never expires
+  id           Int       @id @default(autoincrement())
+  apiKeyId     Int       @map("api_key_id")
+  deviceId     String    @map("device_id")
+  pin          String
+  isUsed       Boolean   @default(false) @map("is_used")
+  attempts     Int       @default(0)                         // failed attempt count
+  lockedUntil  DateTime? @map("locked_until")                // null = not locked
+  createdAt    DateTime  @default(now()) @map("created_at")
+  usedAt       DateTime? @map("used_at")
+  expiresAt    DateTime? @map("expires_at")                  // null = never expires
 
   apiKey    ApiKey    @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
 
