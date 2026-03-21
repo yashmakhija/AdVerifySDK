@@ -91,12 +91,8 @@ export class SdkController {
     }
 
     try {
-      const apiKey = await prisma.apiKey.findUnique({
-        where: { id: req.apiKeyData!.id },
-        select: { key: true },
-      });
-
-      const url = await service.createVerifyLink(req.apiKeyData!.id, apiKey!.key, deviceId);
+      const keyData = req.apiKeyData!;
+      const url = await service.createVerifyLink(keyData.userId, keyData.key, deviceId);
       res.json({ url });
     } catch (e: any) {
       res.status(500).json({ error: e.message || 'Failed to create link' });

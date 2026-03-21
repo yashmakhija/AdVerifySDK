@@ -338,14 +338,13 @@ export class SdkService {
     return true;
   }
 
-  async createVerifyLink(apiKeyId: number, apiKey: string, deviceId: string): Promise<string> {
+  async createVerifyLink(userId: number | null, apiKey: string, deviceId: string): Promise<string> {
     // Load user's shortener config (one-time setup), fall back to system defaults
-    const key = await prisma.apiKey.findUnique({ where: { id: apiKeyId }, select: { userId: true } });
     let shortenerApiUrl = env.SHORTENER_API_URL;
     let shortenerFrontendUrl = env.SHORTENER_FRONTEND_URL;
-    if (key?.userId) {
+    if (userId) {
       const user = await prisma.user.findUnique({
-        where: { id: key.userId },
+        where: { id: userId },
         select: { shortenerApiUrl: true, shortenerFrontendUrl: true },
       });
       if (user?.shortenerApiUrl) shortenerApiUrl = user.shortenerApiUrl;
