@@ -119,8 +119,9 @@ model ApiKey {
   userId      Int?         @map("user_id")
   key         String       @unique
   appName     String       @map("app_name")
-  packageName String       @default("") @map("package_name")
-  isActive    Boolean      @default(true) @map("is_active")
+  packageName  String       @default("") @map("package_name")
+  appSignature String       @default("") @map("app_signature")
+  isActive     Boolean      @default(true) @map("is_active")
   suspendedAt DateTime?    @map("suspended_at")                  // set when purchase expires
   createdAt   DateTime     @default(now()) @map("created_at")
 

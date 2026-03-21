@@ -19,6 +19,15 @@ export async function sdkAuth(req: AuthenticatedRequest, res: Response, next: Ne
     return;
   }
 
+  // Validate app signature if configured on this API key
+  if (keyData.appSignature) {
+    const clientSig = req.headers['x-app-signature'] as string | undefined;
+    if (!clientSig || clientSig !== keyData.appSignature) {
+      res.status(403).json({ error: 'Invalid app signature' });
+      return;
+    }
+  }
+
   req.apiKeyData = keyData;
   next();
 }
