@@ -163,6 +163,15 @@ export class SdkService {
       return { verified: false, message: `Too many attempts. Try again in ${minutesLeft} minute${minutesLeft === 1 ? '' : 's'}.`, locked: true };
     }
 
+    // If lock expired, reset attempts for fresh start
+    if (devicePin?.lockedUntil && new Date() >= devicePin.lockedUntil) {
+      await prisma.userPin.update({
+        where: { id: devicePin.id },
+        data: { attempts: 0, lockedUntil: null },
+      });
+      devicePin.attempts = 0;
+    }
+
     // Check if PIN matches
     if (!devicePin || devicePin.pin !== pin) {
       // Wrong PIN — increment attempts
@@ -208,6 +217,19 @@ export class SdkService {
     const existing = await prisma.userPin.findFirst({
       where: { apiKeyId, deviceId, isUsed: false },
     });
+
+    // If locked, don't give a new PIN
+    if (existing?.lockedUntil && new Date() < existing.lockedUntil) {
+      throw new Error('Device is locked from too many attempts');
+    }
+
+    // If max attempts exhausted but lock expired, reset and generate new PIN
+    if (existing && existing.attempts > 0 && (!existing.lockedUntil || new Date() >= existing.lockedUntil)) {
+      await prisma.userPin.update({
+        where: { id: existing.id },
+        data: { attempts: 0, lockedUntil: null },
+      });
+    }
 
     if (existing) {
       return existing.pin;
