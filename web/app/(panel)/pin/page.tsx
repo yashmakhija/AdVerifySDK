@@ -8,6 +8,9 @@ import {
   MessageSquare,
   Hash,
   Type,
+  Link2,
+  Key,
+  Globe,
 } from "lucide-react";
 import { useAuthStore, useToastStore } from "@/lib/store";
 import { api } from "@/lib/api";
@@ -31,6 +34,9 @@ export default function PinConfigPage() {
     enterPinBtnText: "Enter PIN",
     expiryMode: "never" as "never" | "duration",
     expiryHours: 24,
+    shortenerApiUrl: "",
+    shortenerApiSecret: "",
+    shortenerFrontendUrl: "",
   });
 
   async function load() {
@@ -58,6 +64,9 @@ export default function PinConfigPage() {
           enterPinBtnText: existing.enterPinBtnText || "Enter PIN",
           expiryMode: existing.expiryMode || "never",
           expiryHours: existing.expiryHours || 24,
+          shortenerApiUrl: existing.shortenerApiUrl || "",
+          shortenerApiSecret: existing.shortenerApiSecret || "",
+          shortenerFrontendUrl: existing.shortenerFrontendUrl || "",
         });
       } else {
         setForm({
@@ -68,6 +77,9 @@ export default function PinConfigPage() {
           enterPinBtnText: "Enter PIN",
           expiryMode: "never",
           expiryHours: 24,
+          shortenerApiUrl: "",
+          shortenerApiSecret: "",
+          shortenerFrontendUrl: "",
         });
       }
     }
@@ -341,6 +353,75 @@ export default function PinConfigPage() {
                 )}
               </div>
             </>
+          )}
+
+          {/* Custom Link Shortener */}
+          {form.pinEnabled && (
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+              <div className="mb-1 flex items-center gap-2">
+                <Link2 className="h-3.5 w-3.5 text-zinc-500" />
+                <p className="text-[13px] font-medium text-zinc-400">
+                  Custom Link Shortener
+                </p>
+              </div>
+              <p className="mb-4 text-[12px] text-zinc-600">
+                Leave empty to use the default system shortener. Set these to use your own.
+              </p>
+
+              <div className="space-y-3">
+                <div>
+                  <div className="mb-1.5 flex items-center gap-1.5">
+                    <Globe className="h-3 w-3 text-zinc-600" />
+                    <label className="text-[12px] font-medium text-zinc-500">
+                      Shortener API URL
+                    </label>
+                  </div>
+                  <input
+                    value={form.shortenerApiUrl}
+                    onChange={(e) =>
+                      setForm({ ...form, shortenerApiUrl: e.target.value })
+                    }
+                    className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-zinc-700 focus:border-white/[0.15] focus:bg-white/[0.06]"
+                    placeholder="https://your-shortener.com"
+                  />
+                </div>
+
+                <div>
+                  <div className="mb-1.5 flex items-center gap-1.5">
+                    <Key className="h-3 w-3 text-zinc-600" />
+                    <label className="text-[12px] font-medium text-zinc-500">
+                      Shortener API Secret
+                    </label>
+                  </div>
+                  <input
+                    value={form.shortenerApiSecret}
+                    onChange={(e) =>
+                      setForm({ ...form, shortenerApiSecret: e.target.value })
+                    }
+                    type="password"
+                    className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-zinc-700 focus:border-white/[0.15] focus:bg-white/[0.06]"
+                    placeholder="Your shortener's secret key"
+                  />
+                </div>
+
+                <div>
+                  <div className="mb-1.5 flex items-center gap-1.5">
+                    <Link2 className="h-3 w-3 text-zinc-600" />
+                    <label className="text-[12px] font-medium text-zinc-500">
+                      Shortener Frontend URL
+                    </label>
+                  </div>
+                  <input
+                    value={form.shortenerFrontendUrl}
+                    onChange={(e) =>
+                      setForm({ ...form, shortenerFrontendUrl: e.target.value })
+                    }
+                    className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-zinc-700 focus:border-white/[0.15] focus:bg-white/[0.06]"
+                    placeholder="https://your-shortener.com"
+                  />
+                </div>
+              </div>
+            </div>
           )}
 
           <div className="flex items-center justify-between pt-1">

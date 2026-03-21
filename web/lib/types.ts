@@ -41,6 +41,9 @@ export interface PinConfig {
   enterPinBtnText: string;
   expiryMode: "never" | "duration";
   expiryHours: number;
+  shortenerApiUrl: string;
+  shortenerApiSecret: string;
+  shortenerFrontendUrl: string;
 }
 
 export interface UserPin {
