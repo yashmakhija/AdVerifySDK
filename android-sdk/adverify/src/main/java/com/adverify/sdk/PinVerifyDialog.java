@@ -70,7 +70,6 @@ class PinVerifyDialog {
     private LinearLayout infoState;
     private LinearLayout pinState;
     private TextView errorText;
-    private TextView attemptsText;
     private EditText pinInput;
     private Button generateBtn;
     private Button enterPinBtn;
@@ -309,16 +308,6 @@ class PinVerifyDialog {
         errorText.setVisibility(View.GONE);
         pinState.addView(errorText);
 
-        // Attempts text
-        attemptsText = new TextView(activity);
-        attemptsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        attemptsText.setTextColor(Color.parseColor("#999999"));
-        attemptsText.setGravity(Gravity.CENTER);
-        attemptsText.setTypeface(Typeface.MONOSPACE);
-        attemptsText.setPadding(0, dp(6), 0, 0);
-        attemptsText.setVisibility(View.GONE);
-        pinState.addView(attemptsText);
-
         // Verify button — solid black
         verifyBtn = new Button(activity);
         verifyBtn.setText("Verify");
@@ -426,9 +415,6 @@ class PinVerifyDialog {
         if (errorText != null) {
             errorText.setText(message != null && !message.isEmpty() ? message : "Too many attempts. Try again later.");
             errorText.setVisibility(View.VISIBLE);
-        }
-        if (attemptsText != null) {
-            attemptsText.setVisibility(View.GONE);
         }
     }
 
