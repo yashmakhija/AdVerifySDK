@@ -87,6 +87,10 @@ export class SdkService {
     };
   }
 
+  async getPinConfig(apiKeyId: number) {
+    return prisma.pinConfig.findUnique({ where: { apiKeyId } });
+  }
+
   async getAds(apiKeyId: number, deviceId?: string, isVerified?: boolean) {
     const now = new Date();
     const ads = await prisma.ad.findMany({

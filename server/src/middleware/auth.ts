@@ -12,7 +12,7 @@ export async function sdkAuth(req: AuthenticatedRequest, res: Response, next: Ne
     return;
   }
 
-  const keyData = await prisma.apiKey.findUnique({ where: { key: apiKey, isActive: true } });
+  const keyData = await prisma.apiKey.findUnique({ where: { key: apiKey, isActive: true, suspendedAt: null } });
 
   if (!keyData) {
     res.status(403).json({ error: 'Invalid or inactive API key' });

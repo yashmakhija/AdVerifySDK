@@ -257,8 +257,17 @@ export class AdminService {
   async getUserPins(scope: UserScope, apiKeyId?: number) {
     const keyIds = await this.userKeyIds(scope);
     const where: any = {};
-    if (apiKeyId) where.apiKeyId = apiKeyId;
-    if (keyIds) where.apiKeyId = apiKeyId ? apiKeyId : { in: keyIds };
+
+    if (apiKeyId) {
+      // Specific key requested — verify ownership for non-admin
+      if (keyIds && !keyIds.includes(apiKeyId)) {
+        return []; // User doesn't own this key
+      }
+      where.apiKeyId = apiKeyId;
+    } else if (keyIds) {
+      // No specific key — filter to user's keys only
+      where.apiKeyId = { in: keyIds };
+    }
 
     return prisma.userPin.findMany({
       where,

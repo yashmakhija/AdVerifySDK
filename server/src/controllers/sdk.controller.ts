@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { SdkService } from '../services/sdk.service';
 import { AuthenticatedRequest } from '../types';
 import { env } from '../config/env';
+import { prisma } from '../lib/prisma';
 
 const service = new SdkService();
 
@@ -14,8 +15,25 @@ export class SdkController {
 
   async getAds(req: AuthenticatedRequest, res: Response) {
     const deviceId = (req.body?.deviceId || req.query?.deviceId || '') as string;
-    const isVerified = req.body?.isVerified ?? true; // default true for backward compat
-    const ads = await service.getAds(req.apiKeyData!.id, deviceId, isVerified);
+    const apiKeyId = req.apiKeyData!.id;
+
+    // Server-side verification — never trust client
+    let isVerified = true;
+    if (deviceId) {
+      const status = await service.checkStatus(apiKeyId, deviceId);
+      isVerified = status.unlocked;
+
+      if (!isVerified) {
+        const pinConfig = await service.getPinConfig(apiKeyId);
+        if (pinConfig?.pinEnabled) {
+          const ads = await service.getAds(apiKeyId, deviceId, false);
+          res.json({ ads });
+          return;
+        }
+      }
+    }
+
+    const ads = await service.getAds(apiKeyId, deviceId, isVerified);
     res.json({ ads });
   }
 
@@ -31,9 +49,7 @@ export class SdkController {
     res.json(result);
   }
 
-  // Called by your link shortener when user completes the ad pages
   async generatePin(req: Request, res: Response) {
-    // Verify shortener secret — only your shortener backend can call this
     const authHeader = req.headers.authorization;
     if (!authHeader || authHeader !== `Bearer ${env.SHORTENER_SECRET}`) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -47,7 +63,7 @@ export class SdkController {
       return;
     }
 
-    const keyData = await require('../lib/prisma').prisma.apiKey.findUnique({
+    const keyData = await prisma.apiKey.findUnique({
       where: { key: apiKey, isActive: true },
     });
 
@@ -56,11 +72,14 @@ export class SdkController {
       return;
     }
 
-    const pin = await service.generatePin(keyData.id, deviceId);
-    res.json({ pin, deviceId });
+    try {
+      const pin = await service.generatePin(keyData.id, deviceId);
+      res.json({ pin, deviceId });
+    } catch (e: any) {
+      res.status(429).json({ error: e.message });
+    }
   }
 
-  // Called by SDK when user taps "Get PIN" — creates shortener link and returns URL
   async createLink(req: AuthenticatedRequest, res: Response) {
     const { deviceId } = req.body;
     if (!deviceId) {
@@ -69,7 +88,7 @@ export class SdkController {
     }
 
     try {
-      const apiKey = await require('../lib/prisma').prisma.apiKey.findUnique({
+      const apiKey = await prisma.apiKey.findUnique({
         where: { id: req.apiKeyData!.id },
         select: { key: true },
       });
@@ -83,12 +102,24 @@ export class SdkController {
 
   async trackImpression(req: AuthenticatedRequest, res: Response) {
     const { adId, deviceId } = req.body;
+    // Validate ad belongs to this API key
+    const ad = await prisma.ad.findFirst({ where: { id: adId, apiKeyId: req.apiKeyData!.id } });
+    if (!ad) {
+      res.status(403).json({ error: 'Ad not found' });
+      return;
+    }
     await service.trackImpression(adId, req.apiKeyData!.id, deviceId ?? '');
     res.json({ status: 'ok' });
   }
 
   async trackClick(req: AuthenticatedRequest, res: Response) {
     const { adId, deviceId } = req.body;
+    // Validate ad belongs to this API key
+    const ad = await prisma.ad.findFirst({ where: { id: adId, apiKeyId: req.apiKeyData!.id } });
+    if (!ad) {
+      res.status(403).json({ error: 'Ad not found' });
+      return;
+    }
     await service.trackClick(adId, req.apiKeyData!.id, deviceId ?? '');
     res.json({ status: 'ok' });
   }
