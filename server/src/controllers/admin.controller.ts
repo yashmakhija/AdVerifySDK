@@ -41,8 +41,8 @@ export class AdminController {
 
   async createKey(req: AdminRequest, res: Response) {
     try {
-      const { appName, packageName } = req.body;
-      const key = await service.createKey(appName, packageName ?? '', scope(req));
+      const { appName, packageName, userId } = req.body;
+      const key = await service.createKey(appName, packageName ?? '', scope(req), userId);
       res.json(key);
     } catch (error: any) {
       res.status(400).json({ error: error.message });

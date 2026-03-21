@@ -4,7 +4,7 @@ import { env } from '../config/env';
 
 type UserSettings = { pinUnlockMode: string; excludedAppIds: number[] };
 
-// Get settings for the user who owns the API key, fallback to global settings
+// Get settings for the user who owns the API key, fallback to safe defaults
 async function getSettingsForKey(apiKeyId: number): Promise<UserSettings> {
   const apiKey = await prisma.apiKey.findUnique({
     where: { id: apiKeyId },
@@ -22,12 +22,9 @@ async function getSettingsForKey(apiKeyId: number): Promise<UserSettings> {
     }
   }
 
-  // Fallback to global settings (for unassigned keys or admin keys)
-  const global = await prisma.globalSettings.findUnique({ where: { id: 1 } });
-  return {
-    pinUnlockMode: global?.pinUnlockMode ?? 'per_app',
-    excludedAppIds: global?.excludedAppIds ?? [],
-  };
+  // Unassigned keys: always use per_app mode to prevent cross-user leaks
+  // Global settings only apply to keys with a known owner
+  return { pinUnlockMode: 'per_app', excludedAppIds: [] };
 }
 
 export class SdkService {
@@ -292,10 +289,14 @@ export class SdkService {
       select: { userId: true },
     });
 
-    // Build filter: same user's keys only (or all if unassigned)
-    const keyFilter = apiKey?.userId
-      ? { apiKey: { userId: apiKey.userId } }
-      : {};
+    // If key has no owner, can't do global — fall back to per-app only
+    if (!apiKey?.userId) {
+      const config = await prisma.pinConfig.findUnique({ where: { apiKeyId } });
+      return this.isDeviceVerified(apiKeyId, deviceId, config);
+    }
+
+    // Build filter: same user's keys only
+    const keyFilter = { apiKey: { userId: apiKey.userId } };
 
     const verifiedPin = await prisma.userPin.findFirst({
       where: { deviceId, isUsed: true, ...keyFilter },

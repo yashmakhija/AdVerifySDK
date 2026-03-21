@@ -54,16 +54,19 @@ export class AdminService {
     });
   }
 
-  async createKey(appName: string, packageName: string, scope: UserScope) {
-    // Enforce plan limits for non-admin users
-    if (scope.role === 'USER') {
+  async createKey(appName: string, packageName: string, scope: UserScope, assignToUserId?: number) {
+    // Determine the owner: admin can assign to another user, regular users always own their own keys
+    const ownerId = scope.role === 'ADMIN' && assignToUserId != null ? assignToUserId : scope.userId;
+
+    // Enforce plan limits for the key owner
+    if (scope.role === 'USER' || assignToUserId != null) {
       const activePurchase = await prisma.purchase.findFirst({
-        where: { userId: scope.userId, status: 'active' },
+        where: { userId: ownerId, status: 'active' },
         include: { plan: true },
       });
 
       if (activePurchase && activePurchase.plan.maxApps > 0) {
-        const currentCount = await prisma.apiKey.count({ where: { userId: scope.userId } });
+        const currentCount = await prisma.apiKey.count({ where: { userId: ownerId } });
         if (currentCount >= activePurchase.plan.maxApps) {
           throw new Error(`Plan limit reached: max ${activePurchase.plan.maxApps} apps allowed`);
         }
@@ -77,7 +80,7 @@ export class AdminService {
         key,
         appName,
         packageName,
-        userId: scope.userId,
+        userId: ownerId,
         pinConfig: { create: {} },
       },
     });

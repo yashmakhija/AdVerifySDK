@@ -20,7 +20,7 @@ router.get('/stats', (req, res) => ctrl.getStats(req, res));
 router.get('/keys', (req, res) => ctrl.getKeys(req, res));
 router.post(
   '/keys',
-  validate(z.object({ appName: z.string().min(1), packageName: z.string().optional() })),
+  validate(z.object({ appName: z.string().min(1), packageName: z.string().optional(), userId: z.number().optional() })),
   (req, res) => ctrl.createKey(req, res),
 );
 router.patch('/keys/:id', (req, res) => ctrl.updateKey(req, res));
