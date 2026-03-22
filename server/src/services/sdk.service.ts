@@ -310,7 +310,10 @@ export class SdkService {
     if (!config || config.expiryMode === 'never') return true;
 
     if (verifiedPin.expiresAt && new Date() > verifiedPin.expiresAt) {
-      await prisma.userPin.delete({ where: { id: verifiedPin.id } });
+      // Clean up ALL expired PINs for this device across user's keys
+      await prisma.userPin.deleteMany({
+        where: { deviceId, isUsed: true, expiresAt: { lte: new Date() }, ...keyFilter },
+      });
       return false;
     }
 
@@ -331,7 +334,10 @@ export class SdkService {
     if (!config || config.expiryMode === 'never') return true;
 
     if (verifiedPin.expiresAt && new Date() > verifiedPin.expiresAt) {
-      await prisma.userPin.delete({ where: { id: verifiedPin.id } });
+      // Clean up ALL expired PINs for this device in one go (not just the latest)
+      await prisma.userPin.deleteMany({
+        where: { apiKeyId, deviceId, isUsed: true, expiresAt: { lte: new Date() } },
+      });
       return false;
     }
 
