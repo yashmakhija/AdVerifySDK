@@ -23,8 +23,10 @@ function statusVariant(status: string) {
 }
 
 function statusIcon(status: string) {
-  if (status === "active") return <CheckCircle2 className="h-4 w-4 text-emerald-400" />;
-  if (status === "cancelled") return <XCircle className="h-4 w-4 text-red-400" />;
+  if (status === "active")
+    return <CheckCircle2 className="h-4 w-4 text-emerald-400" />;
+  if (status === "cancelled")
+    return <XCircle className="h-4 w-4 text-red-400" />;
   return <Clock className="h-4 w-4 text-zinc-400" />;
 }
 
@@ -92,12 +94,13 @@ export default function BillingPage() {
                       <Badge variant="success">Active</Badge>
                     </div>
                     <p className="mt-0.5 text-[12px] text-zinc-500">
-                      {planStatus.daysLeft} days remaining · Expires {planStatus.expiresAt && formatDate(planStatus.expiresAt)}
+                      {planStatus.daysLeft} days remaining · Expires{" "}
+                      {planStatus.expiresAt && formatDate(planStatus.expiresAt)}
                     </p>
                   </div>
                 </div>
                 <a
-                  href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20have%20a%20question%20about%20my%20subscription."
+                  href="https://t.me/TakezoTheunrival?text=Hi%2C%20I%20have%20a%20question%20about%20my%20subscription."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-[13px] font-medium text-zinc-400 transition-all hover:bg-white/[0.06] hover:text-white text-center"
@@ -122,12 +125,14 @@ export default function BillingPage() {
                       <Badge variant="destructive">Expiring Soon</Badge>
                     </div>
                     <p className="mt-0.5 text-[12px] text-amber-400/70">
-                      Expires in {planStatus.daysLeft} day{planStatus.daysLeft !== 1 ? "s" : ""} · Renew now to avoid disruption
+                      Expires in {planStatus.daysLeft} day
+                      {planStatus.daysLeft !== 1 ? "s" : ""} · Renew now to
+                      avoid disruption
                     </p>
                   </div>
                 </div>
                 <a
-                  href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20want%20to%20renew%20my%20AdVerify%20plan.%20It%20expires%20soon."
+                  href="https://t.me/TakezoTheunrival?text=Hi%2C%20I%20want%20to%20renew%20my%20AdVerify%20plan.%20It%20expires%20soon."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="shrink-0 rounded-xl bg-amber-500 px-4 py-2.5 text-[13px] font-semibold text-black transition-all hover:bg-amber-400 active:scale-[0.98] text-center"
@@ -152,12 +157,13 @@ export default function BillingPage() {
                       <Badge variant="destructive">Expired</Badge>
                     </div>
                     <p className="mt-0.5 text-[12px] text-red-400/70">
-                      {planStatus.message} · Your API keys still work but will be suspended soon
+                      {planStatus.message} · Your API keys still work but will
+                      be suspended soon
                     </p>
                   </div>
                 </div>
                 <a
-                  href="https://t.me/ShinmenTakezo?text=Hi%2C%20my%20AdVerify%20plan%20has%20expired.%20I%20want%20to%20renew."
+                  href="https://t.me/TakezoTheunrival?text=Hi%2C%20my%20AdVerify%20plan%20has%20expired.%20I%20want%20to%20renew."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="shrink-0 rounded-xl bg-red-500 px-4 py-2.5 text-[13px] font-semibold text-white transition-all hover:bg-red-400 active:scale-[0.98] text-center"
@@ -182,12 +188,13 @@ export default function BillingPage() {
                       <Badge variant="destructive">Keys Disabled</Badge>
                     </div>
                     <p className="mt-0.5 text-[12px] text-red-400/70">
-                      Your API keys are suspended. Renew your plan to reactivate everything instantly.
+                      Your API keys are suspended. Renew your plan to reactivate
+                      everything instantly.
                     </p>
                   </div>
                 </div>
                 <a
-                  href="https://t.me/ShinmenTakezo?text=Hi%2C%20my%20AdVerify%20API%20keys%20are%20suspended.%20I%20want%20to%20renew."
+                  href="https://t.me/TakezoTheunrival?text=Hi%2C%20my%20AdVerify%20API%20keys%20are%20suspended.%20I%20want%20to%20renew."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="shrink-0 rounded-xl bg-red-500 px-4 py-2.5 text-[13px] font-semibold text-white transition-all hover:bg-red-400 active:scale-[0.98] text-center"
@@ -214,7 +221,7 @@ export default function BillingPage() {
                   </div>
                 </div>
                 <a
-                  href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20want%20to%20purchase%20an%20AdVerify%20plan."
+                  href="https://t.me/TakezoTheunrival?text=Hi%2C%20I%20want%20to%20purchase%20an%20AdVerify%20plan."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="shrink-0 rounded-xl bg-white px-4 py-2.5 text-[13px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98] text-center"
@@ -233,9 +240,12 @@ export default function BillingPage() {
           {purchases.length === 0 ? (
             <div className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] p-12 text-center">
               <Receipt className="mx-auto h-8 w-8 text-zinc-700" />
-              <p className="mt-3 text-sm font-medium text-zinc-400">No invoices yet</p>
+              <p className="mt-3 text-sm font-medium text-zinc-400">
+                No invoices yet
+              </p>
               <p className="mt-1 text-[12px] text-zinc-600">
-                Your payment history will appear here once your plan is activated
+                Your payment history will appear here once your plan is
+                activated
               </p>
             </div>
           ) : (
@@ -277,20 +287,28 @@ export default function BillingPage() {
                     <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-y-3 gap-x-4 text-[12px]">
                       <div>
                         <p className="text-zinc-600 mb-0.5">Purchased</p>
-                        <p className="text-zinc-400">{formatDate(p.purchasedAt)}</p>
+                        <p className="text-zinc-400">
+                          {formatDate(p.purchasedAt)}
+                        </p>
                       </div>
                       <div>
                         <p className="text-zinc-600 mb-0.5">Expires</p>
-                        <p className="text-zinc-400">{formatDate(p.expiresAt)}</p>
+                        <p className="text-zinc-400">
+                          {formatDate(p.expiresAt)}
+                        </p>
                       </div>
                       <div>
                         <p className="text-zinc-600 mb-0.5">Duration</p>
-                        <p className="text-zinc-400">{p.plan?.durationDays || 30} days</p>
+                        <p className="text-zinc-400">
+                          {p.plan?.durationDays || 30} days
+                        </p>
                       </div>
                       {p.assignedBy && (
                         <div>
                           <p className="text-zinc-600 mb-0.5">Activated by</p>
-                          <p className="text-zinc-400">{p.assignedBy.username}</p>
+                          <p className="text-zinc-400">
+                            {p.assignedBy.username}
+                          </p>
                         </div>
                       )}
                     </div>

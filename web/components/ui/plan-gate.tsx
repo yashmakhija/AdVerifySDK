@@ -17,7 +17,7 @@ export function PlanRequiredCard() {
       </p>
       <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
         <a
-          href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20want%20to%20purchase%20an%20AdVerify%20plan."
+          href="https://t.me/TakezoTheunrival?text=Hi%2C%20I%20want%20to%20purchase%20an%20AdVerify%20plan."
           target="_blank"
           rel="noopener noreferrer"
           className="rounded-xl bg-white px-5 py-2.5 text-[13px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98]"

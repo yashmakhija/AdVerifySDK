@@ -137,7 +137,7 @@ export default function LoginPage() {
         <p className="mt-5 text-center text-[12px] text-zinc-700">
           Admin access only.{" "}
           <a
-            href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20need%20admin%20credentials%20for%20AdVerify%20dashboard."
+            href="https://t.me/TakezoTheunrival?text=Hi%2C%20I%20need%20admin%20credentials%20for%20AdVerify%20dashboard."
             target="_blank"
             rel="noopener noreferrer"
             className="text-zinc-400 underline underline-offset-2 transition-colors hover:text-white"

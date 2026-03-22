@@ -71,8 +71,8 @@ export function PricingSection() {
               </div>
               <p className="mt-1.5 text-[12px] text-zinc-600">
                 Locked price for first{" "}
-                <span className="text-zinc-400 font-medium">20 members</span>{" "}
-                · increases after
+                <span className="text-zinc-400 font-medium">20 members</span> ·
+                increases after
               </p>
 
               {/* Divider */}
@@ -98,7 +98,7 @@ export function PricingSection() {
 
               {/* CTA */}
               <a
-                href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20want%20to%20purchase%20the%20early%20bird%20plan%20%E2%80%93%20Server%20PIN%20%2B%20Custom%20Ads%20(%E2%82%B9499%2Fmo)"
+                href="https://t.me/TakezoTheunrival?text=Hi%2C%20I%20want%20to%20purchase%20the%20early%20bird%20plan%20%E2%80%93%20Server%20PIN%20%2B%20Custom%20Ads%20(%E2%82%B9499%2Fmo)"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-7 block w-full rounded-xl bg-white py-3.5 text-center text-[14px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98]"
@@ -172,7 +172,9 @@ export function PricingSection() {
                         <Plus className="h-3 w-3" />
                       )}
                     </span>
-                    <span className={included ? "text-zinc-400" : "text-zinc-600"}>
+                    <span
+                      className={included ? "text-zinc-400" : "text-zinc-600"}
+                    >
                       {text}
                       {addon && (
                         <span className="ml-1.5 inline-block rounded border border-white/[0.06] bg-white/[0.03] px-1.5 py-px text-[10px] font-medium text-zinc-500">

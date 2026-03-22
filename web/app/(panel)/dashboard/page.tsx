@@ -82,7 +82,8 @@ const QUICK_START_STEPS = [
   {
     step: 4,
     title: "Create your first Ad",
-    description: "Set up a card, fullscreen, or banner ad to serve to your users",
+    description:
+      "Set up a card, fullscreen, or banner ad to serve to your users",
     href: "/ads",
     icon: Megaphone,
     cta: "Create Ad",
@@ -101,7 +102,9 @@ export default function DashboardPage() {
   const [dismissedIds, setDismissedIds] = useState<number[]>(() => {
     if (typeof window === "undefined") return [];
     try {
-      return JSON.parse(localStorage.getItem("adverify-dismissed-announcements") || "[]");
+      return JSON.parse(
+        localStorage.getItem("adverify-dismissed-announcements") || "[]",
+      );
     } catch {
       return [];
     }
@@ -116,21 +119,32 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (token) {
-      api<Stats>("/admin/stats", { token }).then(setStats).catch(() => {});
-      api<PinStats>("/admin/user-pins/stats", { token }).then(setPinStats).catch(() => {});
-      api<PlanStatus>("/auth/plan-status", { token }).then(setPlanStatus).catch(() => {});
+      api<Stats>("/admin/stats", { token })
+        .then(setStats)
+        .catch(() => {});
+      api<PinStats>("/admin/user-pins/stats", { token })
+        .then(setPinStats)
+        .catch(() => {});
+      api<PlanStatus>("/auth/plan-status", { token })
+        .then(setPlanStatus)
+        .catch(() => {});
       api<Announcement[]>("/auth/announcements", { token })
         .then((data) => setAnnouncements(Array.isArray(data) ? data : []))
         .catch(() => {});
     }
   }, [token]);
 
-  const visibleAnnouncements = announcements.filter((a) => !dismissedIds.includes(a.id));
+  const visibleAnnouncements = announcements.filter(
+    (a) => !dismissedIds.includes(a.id),
+  );
 
   function dismissAnnouncement(id: number) {
     const updated = [...dismissedIds, id];
     setDismissedIds(updated);
-    localStorage.setItem("adverify-dismissed-announcements", JSON.stringify(updated));
+    localStorage.setItem(
+      "adverify-dismissed-announcements",
+      JSON.stringify(updated),
+    );
   }
 
   const isNewUser = stats && stats.totalKeys === 0;
@@ -155,9 +169,7 @@ export default function DashboardPage() {
           <h1 className="text-lg font-bold tracking-tight text-white">
             {greeting.time}, {username || "there"}
           </h1>
-          <p className="mt-0.5 text-[13px] text-zinc-500">
-            {greeting.tagline}
-          </p>
+          <p className="mt-0.5 text-[13px] text-zinc-500">{greeting.tagline}</p>
         </div>
       </div>
 
@@ -190,11 +202,15 @@ export default function DashboardPage() {
                 key={a.id}
                 className={`flex items-start gap-3 rounded-xl border px-4 py-3 ${colors[a.type]}`}
               >
-                <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${iconColors[a.type]}`}>
+                <div
+                  className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${iconColors[a.type]}`}
+                >
                   <Info className="h-3.5 w-3.5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-[13px] font-medium ${textColors[a.type]}`}>
+                  <p
+                    className={`text-[13px] font-medium ${textColors[a.type]}`}
+                  >
                     {a.title}
                   </p>
                   {a.content && (
@@ -227,12 +243,13 @@ export default function DashboardPage() {
                 Your API keys have been suspended
               </p>
               <p className="text-[11px] text-red-400/60">
-                Your plan expired and the grace period is over. Renew to reactivate everything.
+                Your plan expired and the grace period is over. Renew to
+                reactivate everything.
               </p>
             </div>
           </div>
           <a
-            href="https://t.me/ShinmenTakezo?text=Hi%2C%20my%20AdVerify%20API%20keys%20are%20suspended.%20I%20want%20to%20renew%20my%20plan."
+            href="https://t.me/TakezoTheunrival?text=Hi%2C%20my%20AdVerify%20API%20keys%20are%20suspended.%20I%20want%20to%20renew%20my%20plan."
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 rounded-lg bg-red-500 px-4 py-2 text-[13px] font-semibold text-white transition-all hover:bg-red-400 active:scale-[0.98] text-center"
@@ -253,12 +270,13 @@ export default function DashboardPage() {
                 {planStatus.message}
               </p>
               <p className="text-[11px] text-red-400/60">
-                Your API keys still work but will be suspended soon. Renew now to avoid disruption.
+                Your API keys still work but will be suspended soon. Renew now
+                to avoid disruption.
               </p>
             </div>
           </div>
           <a
-            href="https://t.me/ShinmenTakezo?text=Hi%2C%20my%20AdVerify%20plan%20has%20expired.%20I%20want%20to%20renew."
+            href="https://t.me/TakezoTheunrival?text=Hi%2C%20my%20AdVerify%20plan%20has%20expired.%20I%20want%20to%20renew."
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 rounded-lg bg-red-500 px-4 py-2 text-[13px] font-semibold text-white transition-all hover:bg-red-400 active:scale-[0.98] text-center"
@@ -284,7 +302,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <a
-            href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20want%20to%20purchase%20an%20AdVerify%20plan."
+            href="https://t.me/TakezoTheunrival?text=Hi%2C%20I%20want%20to%20purchase%20an%20AdVerify%20plan."
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 rounded-lg bg-white px-4 py-2 text-[13px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98] text-center"
@@ -302,7 +320,8 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-[13px] font-medium text-amber-300">
-                Plan expires in {planStatus.daysLeft} day{planStatus.daysLeft !== 1 ? "s" : ""}
+                Plan expires in {planStatus.daysLeft} day
+                {planStatus.daysLeft !== 1 ? "s" : ""}
               </p>
               <p className="text-[11px] text-amber-400/60">
                 {planStatus.plan?.name} · Renew to keep your ads and PINs active
@@ -310,7 +329,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <a
-            href="https://t.me/ShinmenTakezo?text=Hi%2C%20I%20want%20to%20renew%20my%20AdVerify%20plan."
+            href="https://t.me/TakezoTheunrival?text=Hi%2C%20I%20want%20to%20renew%20my%20AdVerify%20plan."
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 rounded-lg bg-amber-500 px-4 py-2 text-[13px] font-semibold text-black transition-all hover:bg-amber-400 active:scale-[0.98] text-center"
@@ -333,34 +352,36 @@ export default function DashboardPage() {
               </p>
             </div>
             <div className="divide-y divide-white/[0.04]">
-              {QUICK_START_STEPS.map(({ step, title, description, href, icon: Icon, cta }) => (
-                <Link
-                  key={step}
-                  href={href}
-                  className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-white/[0.02]"
-                >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] transition-colors group-hover:border-white/[0.15] group-hover:bg-white/[0.06]">
-                    <Icon className="h-[18px] w-[18px] text-zinc-500 transition-colors group-hover:text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/[0.06] text-[10px] font-bold text-zinc-500">
-                        {step}
-                      </span>
-                      <h3 className="text-[13px] font-medium text-white">
-                        {title}
-                      </h3>
+              {QUICK_START_STEPS.map(
+                ({ step, title, description, href, icon: Icon, cta }) => (
+                  <Link
+                    key={step}
+                    href={href}
+                    className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-white/[0.02]"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] transition-colors group-hover:border-white/[0.15] group-hover:bg-white/[0.06]">
+                      <Icon className="h-[18px] w-[18px] text-zinc-500 transition-colors group-hover:text-white" />
                     </div>
-                    <p className="mt-0.5 text-[12px] text-zinc-600 pl-7">
-                      {description}
-                    </p>
-                  </div>
-                  <span className="hidden sm:flex shrink-0 items-center gap-1 text-[12px] font-medium text-zinc-600 transition-colors group-hover:text-white">
-                    {cta}
-                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                  </span>
-                </Link>
-              ))}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/[0.06] text-[10px] font-bold text-zinc-500">
+                          {step}
+                        </span>
+                        <h3 className="text-[13px] font-medium text-white">
+                          {title}
+                        </h3>
+                      </div>
+                      <p className="mt-0.5 text-[12px] text-zinc-600 pl-7">
+                        {description}
+                      </p>
+                    </div>
+                    <span className="hidden sm:flex shrink-0 items-center gap-1 text-[12px] font-medium text-zinc-600 transition-colors group-hover:text-white">
+                      {cta}
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  </Link>
+                ),
+              )}
             </div>
           </div>
         </div>
