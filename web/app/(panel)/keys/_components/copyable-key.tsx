@@ -19,7 +19,7 @@ export function CopyableKey({ value }: { value: string }) {
     <button
       onClick={copy}
       title="Click to copy"
-      className="group inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-1.5 font-mono text-[11px] text-zinc-500 transition-all hover:border-white/[0.1] hover:bg-white/[0.06] active:scale-[0.98] max-w-[220px]"
+      className="group inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-1.5 font-mono text-[11px] text-zinc-500 transition-all hover:border-white/[0.1] hover:bg-white/[0.06] active:scale-[0.98] max-w-full"
     >
       <span className="truncate">{value}</span>
       {copied ? (
