@@ -30,27 +30,32 @@ class AdLoader {
     }
 
     void load() {
+        LoadingDialog loadingDialog = new LoadingDialog(activity, "Loading…");
+        activity.runOnUiThread(loadingDialog::show);
+
         client.init(deviceId, new AdClient.Callback<InitResponse>() {
             @Override
             public void onSuccess(InitResponse config) {
-                if (config.pinEnabled && !config.pinVerified) {
-                    // Device not verified — show PIN dialog first
-                    showPinDialog(config);
-                } else if (!config.pinEnabled || config.hasBroadcastAds) {
-                    // PIN not enabled, OR device is verified AND there are broadcast ads
-                    // → fetch and show ads
-                    fetchAndShowAds();
-                } else {
-                    // Device is verified, no broadcast ads → nothing to show
-                    Log.d(TAG, "Device verified, no broadcast ads — skipping");
-                    if (callback != null) callback.onAdClosed();
-                }
+                activity.runOnUiThread(() -> {
+                    loadingDialog.dismiss();
+                    if (config.pinEnabled && !config.pinVerified) {
+                        showPinDialog(config);
+                    } else if (!config.pinEnabled || config.hasBroadcastAds) {
+                        fetchAndShowAds();
+                    } else {
+                        Log.d(TAG, "Device verified, no broadcast ads — skipping");
+                        if (callback != null) callback.onAdClosed();
+                    }
+                });
             }
 
             @Override
             public void onError(String message) {
-                Log.e(TAG, "Init error: " + message);
-                if (callback != null) callback.onError(message);
+                activity.runOnUiThread(() -> {
+                    loadingDialog.dismiss();
+                    Log.e(TAG, "Init error: " + message);
+                    if (callback != null) callback.onError(message);
+                });
             }
         });
     }
