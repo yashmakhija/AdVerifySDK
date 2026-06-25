@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, ArrowRight, Shield } from "lucide-react";
 
@@ -14,10 +14,17 @@ const LINKS = [
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <div className="sticky top-0 z-50 w-full px-3 sm:px-5 pt-3">
-      <nav className="mx-auto max-w-5xl rounded-2xl border border-white/[0.08] bg-white/[0.05] backdrop-blur-2xl backdrop-saturate-150 shadow-lg shadow-black/20">
+      <nav className={`mx-auto max-w-5xl rounded-2xl border backdrop-blur-2xl backdrop-saturate-150 shadow-lg transition-all duration-300 ${scrolled ? "border-white/[0.12] bg-white/[0.08] shadow-black/30" : "border-white/[0.08] bg-white/[0.05] shadow-black/20"}`}>
         <div className="flex h-[52px] items-center justify-between px-4 sm:px-5">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">

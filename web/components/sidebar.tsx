@@ -112,7 +112,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
                     isLocked
                       ? "text-zinc-700 hover:bg-white/[0.02]"
                       : isActive
-                        ? "bg-white/[0.08] text-white"
+                        ? "bg-white/[0.08] text-white shadow-[inset_2px_0_0_rgba(255,255,255,0.7)]"
                         : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
                   )}
                 >
@@ -154,7 +154,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
                       className={cn(
                         "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150",
                         isActive
-                          ? "bg-white/[0.08] text-white"
+                          ? "bg-white/[0.08] text-white shadow-[inset_2px_0_0_rgba(255,255,255,0.7)]"
                           : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
                       )}
                     >

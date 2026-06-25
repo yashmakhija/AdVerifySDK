@@ -151,10 +151,29 @@ export default function DashboardPage() {
 
   if (!stats) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="flex items-center gap-3 text-zinc-600">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-transparent" />
-          <span className="text-sm">Loading...</span>
+      <div>
+        {/* Skeleton header */}
+        <div className="mb-6 flex items-center gap-3.5">
+          <div className="h-10 w-10 rounded-full bg-white/[0.06] animate-pulse shrink-0" />
+          <div className="space-y-2">
+            <div className="h-4 w-36 rounded-md bg-white/[0.06] animate-pulse" />
+            <div className="h-3 w-28 rounded-md bg-white/[0.04] animate-pulse" />
+          </div>
+        </div>
+        {/* Skeleton stat grid */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 sm:p-5"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="h-2 w-16 rounded-full bg-white/[0.06] animate-pulse" />
+                <div className="h-8 w-8 rounded-lg bg-white/[0.06] animate-pulse" />
+              </div>
+              <div className="h-7 w-20 rounded-md bg-white/[0.06] animate-pulse" />
+            </div>
+          ))}
         </div>
       </div>
     );

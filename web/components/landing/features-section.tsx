@@ -73,21 +73,24 @@ export function FeaturesSection() {
           {FEATURES.map(({ icon: Icon, title, description, tag }) => (
             <div
               key={title}
-              className="group relative bg-black p-6 md:p-8 transition-colors duration-300 hover:bg-white/[0.02]"
+              className="group relative bg-black p-6 md:p-8 transition-all duration-300 hover:bg-white/[0.02] overflow-hidden"
             >
+              {/* Hover glow */}
+              <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,0.03)_0%,transparent_60%)]" />
+
               {/* Icon */}
-              <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03]">
+              <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] transition-all duration-300 group-hover:border-white/[0.15] group-hover:bg-white/[0.06]">
                 <Icon className="h-[18px] w-[18px] text-zinc-400 transition-colors group-hover:text-white" />
               </div>
 
               <h3 className="text-[15px] font-semibold text-white">{title}</h3>
 
-              <p className="mt-2.5 text-[13px] text-zinc-500 leading-relaxed">
+              <p className="mt-2.5 text-[13px] text-zinc-500 leading-relaxed group-hover:text-zinc-400 transition-colors duration-200">
                 {description}
               </p>
 
-              <div className="mt-4 inline-flex rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-1">
-                <span className="text-[11px] font-medium text-zinc-500">{tag}</span>
+              <div className="mt-4 inline-flex rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 transition-colors duration-200 group-hover:border-white/[0.1] group-hover:bg-white/[0.05]">
+                <span className="text-[11px] font-medium text-zinc-500 group-hover:text-zinc-400 transition-colors duration-200">{tag}</span>
               </div>
             </div>
           ))}

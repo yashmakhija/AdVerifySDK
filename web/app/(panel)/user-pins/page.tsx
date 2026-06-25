@@ -169,7 +169,8 @@ export default function UserPinsPage() {
 
       {pinStats && (
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
+          <div className="relative rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-[2px] opacity-50" style={{ background: "linear-gradient(90deg, #6366f1, transparent)" }} />
             <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
               {selectedDate ? format(selectedDate, "MMM d") : "Today"} Generated
             </p>
@@ -177,7 +178,8 @@ export default function UserPinsPage() {
               {pinStats.todayGenerated}
             </p>
           </div>
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
+          <div className="relative rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-[2px] opacity-50" style={{ background: "linear-gradient(90deg, #3b82f6, transparent)" }} />
             <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
               {selectedDate ? format(selectedDate, "MMM d") : "Today"} Used
             </p>
@@ -185,7 +187,8 @@ export default function UserPinsPage() {
               {pinStats.todayUsed}
             </p>
           </div>
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
+          <div className="relative rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-[2px] opacity-50" style={{ background: "linear-gradient(90deg, #10b981, transparent)" }} />
             <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
               Active PINs
             </p>
@@ -193,7 +196,8 @@ export default function UserPinsPage() {
               {pinStats.totalActive}
             </p>
           </div>
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
+          <div className="relative rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-[2px] opacity-50" style={{ background: "linear-gradient(90deg, #ef4444, transparent)" }} />
             <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
               Expired PINs
             </p>

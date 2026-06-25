@@ -8,6 +8,7 @@ import {
   Check,
   Loader2,
 } from "lucide-react";
+
 import { useAuthStore, useToastStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -94,10 +95,25 @@ export default function SettingsPage() {
 
   if (!loaded) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="flex items-center gap-3 text-zinc-400">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          <span className="text-sm">Loading...</span>
+      <div>
+        <div className="mb-8">
+          <div className="h-5 w-28 rounded-md bg-white/[0.06] animate-pulse" />
+          <div className="mt-1.5 h-3.5 w-56 rounded-md bg-white/[0.04] animate-pulse" />
+        </div>
+        <div className="mx-auto max-w-xl space-y-6">
+          <div>
+            <div className="mb-2.5 h-3.5 w-24 rounded-md bg-white/[0.06] animate-pulse" />
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+                  <div className="mx-auto mb-3 h-10 w-10 rounded-xl bg-white/[0.06] animate-pulse" />
+                  <div className="h-3.5 w-16 mx-auto rounded-md bg-white/[0.06] animate-pulse mb-1.5" />
+                  <div className="h-2.5 w-24 mx-auto rounded-md bg-white/[0.04] animate-pulse" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="h-16 rounded-xl bg-white/[0.02] border border-white/[0.06] animate-pulse" />
         </div>
       </div>
     );

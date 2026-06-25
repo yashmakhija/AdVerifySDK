@@ -42,7 +42,7 @@ export function HowItWorksSection() {
         {/* Steps */}
         <div className="relative grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-0 mb-20">
           {/* Connecting line (desktop) */}
-          <div className="hidden md:block absolute top-5 left-[12.5%] right-[12.5%] h-px bg-white/[0.06]" />
+          <div className="hidden md:block absolute top-5 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-white/[0.04] via-white/[0.12] to-white/[0.04]" />
 
           {STEPS.map(({ step, title, description }, i) => (
             <div
@@ -51,7 +51,7 @@ export function HowItWorksSection() {
               style={{ animationDelay: `${i * 100}ms` }}
             >
               {/* Step circle */}
-              <div className="relative z-10 mx-auto mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[13px] font-bold text-black ring-4 ring-black shadow-lg shadow-white/5">
+              <div className="relative z-10 mx-auto mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[13px] font-bold text-black ring-4 ring-black shadow-lg shadow-white/10 transition-transform duration-200 hover:scale-110">
                 {step}
               </div>
 
@@ -72,9 +72,9 @@ export function HowItWorksSection() {
             {/* Terminal header */}
             <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3">
               <div className="flex gap-1.5">
-                <div className="h-3 w-3 rounded-full bg-white/[0.06] border border-white/[0.08]" />
-                <div className="h-3 w-3 rounded-full bg-white/[0.06] border border-white/[0.08]" />
-                <div className="h-3 w-3 rounded-full bg-white/[0.06] border border-white/[0.08]" />
+                <div className="h-3 w-3 rounded-full bg-red-500/60" />
+                <div className="h-3 w-3 rounded-full bg-amber-500/60" />
+                <div className="h-3 w-3 rounded-full bg-emerald-500/60" />
               </div>
               <span className="ml-3 text-[11px] text-zinc-600 font-mono">MainActivity.smali</span>
             </div>
