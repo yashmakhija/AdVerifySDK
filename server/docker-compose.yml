@@ -1,0 +1,21 @@
+services:
+  adverify-backend:
+    image: ghcr.io/yashmakhija/adverify-backend:latest
+    container_name: adverify-backend
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:3042:3042"
+    volumes:
+      # persist user uploads across deploys/restarts
+      - ./uploads:/app/uploads
+    networks:
+      - db
+    depends_on: []
+
+networks:
+  # the EXISTING docker network that fma-postgres is attached to.
+  # Find it with:  docker inspect fma-postgres -f '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}{{end}}'
+  db:
+    external: true
+    name: fma-backend_fma-net
