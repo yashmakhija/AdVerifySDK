@@ -1,0 +1,58 @@
+name: Deploy Backend to VPS (server only)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "server/**"          # only deploy when the backend actually changes
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:          # allow manual runs from the Actions tab
+
+# Cancel an in-flight deploy if a newer commit is pushed
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: true
+
+env:
+  VPS_PATH: /root/adverifysdk   # where ONLY the server folder lives on the VPS
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p 22 -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Rsync ONLY the server folder to the VPS
+        run: |
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/deploy_key -p 22" \
+            --exclude='.git' \
+            --exclude='node_modules/' \
+            --exclude='.next/' \
+            --exclude='uploads/' \
+            --exclude='.env' \
+            --exclude='*.tsbuildinfo' \
+            ./server/ \
+            root@${{ secrets.VPS_HOST }}:${{ env.VPS_PATH }}/
+
+      - name: Install deps, run migrations, restart app
+        run: |
+          ssh -i ~/.ssh/deploy_key -p 22 root@${{ secrets.VPS_HOST }} << 'EOF'
+            set -e
+            cd ${{ env.VPS_PATH }}
+            bun install --frozen-lockfile
+            bunx prisma generate
+            bunx prisma migrate deploy
+            pm2 restart adverify --update-env || pm2 start "bun run src/app.ts" --name adverify
+            pm2 save
+          EOF
