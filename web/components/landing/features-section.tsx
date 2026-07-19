@@ -58,13 +58,16 @@ export function FeaturesSection() {
       <div className="mx-auto max-w-6xl px-5 md:px-8 py-24 md:py-32">
         {/* Header */}
         <div className="text-center mb-14 md:mb-20">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-600 mb-4">
+          <p
+            className="text-[11px] font-semibold uppercase tracking-[0.2em] mb-4"
+            style={{ color: "var(--brand)" }}
+          >
             Features
           </p>
           <h2 className="text-[clamp(1.5rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white leading-tight">
             Everything you need to
             <br className="hidden sm:block" />
-            <span className="text-zinc-600">serve ads and verify users</span>
+            <span className="text-brand-gradient">serve ads and verify users</span>
           </h2>
         </div>
 
@@ -76,8 +79,8 @@ export function FeaturesSection() {
               className="group relative bg-black p-6 md:p-8 transition-colors duration-300 hover:bg-white/[0.02]"
             >
               {/* Icon */}
-              <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03]">
-                <Icon className="h-[18px] w-[18px] text-zinc-400 transition-colors group-hover:text-white" />
+              <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] transition-colors duration-300 group-hover:border-[var(--brand)]/30 group-hover:bg-[var(--brand)]/10">
+                <Icon className="h-[18px] w-[18px] text-zinc-400 transition-colors group-hover:text-[var(--brand)]" />
               </div>
 
               <h3 className="text-[15px] font-semibold text-white">{title}</h3>

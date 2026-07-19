@@ -213,7 +213,12 @@ export function HeroSection() {
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-dot-dark mask-fade-b" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/4 h-[600px] w-[800px] md:h-[800px] md:w-[1200px] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_55%)]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-20 md:h-36 w-px bg-gradient-to-b from-white/20 to-transparent" />
+        {/* Brand-tinted glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/4 h-[520px] w-[720px] md:h-[720px] md:w-[1040px] bg-[radial-gradient(ellipse_at_center,var(--brand-glow)_0%,transparent_60%)]" />
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 h-20 md:h-36 w-px"
+          style={{ backgroundImage: "linear-gradient(to bottom, var(--brand), transparent)" }}
+        />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-5 md:px-8 pt-14 sm:pt-20 md:pt-32">
@@ -221,8 +226,8 @@ export function HeroSection() {
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 sm:px-4 py-1.5 backdrop-blur-sm animate-in">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60" style={{ backgroundColor: "var(--brand)" }} />
+              <span className="relative inline-flex h-2 w-2 rounded-full" style={{ backgroundColor: "var(--brand)" }} />
             </span>
             <span className="text-[11px] sm:text-[12px] font-medium text-zinc-400">
               Android SDK for ad serving & PIN verification
@@ -235,7 +240,7 @@ export function HeroSection() {
           >
             Monetize your app.
             <br />
-            <span className="text-zinc-500">Verify your users.</span>
+            <span className="text-brand-gradient">Verify your users.</span>
           </h1>
 
           <p
@@ -251,7 +256,10 @@ export function HeroSection() {
             style={{ animationDelay: "300ms" }}
           >
             <Link href="/login" className="w-full sm:w-auto">
-              <button className="group flex items-center gap-2 rounded-full bg-white px-6 py-2.5 sm:px-7 sm:py-3 text-[13px] sm:text-[14px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.97] shadow-lg shadow-white/5 w-full sm:w-auto justify-center">
+              <button
+                className="group flex items-center gap-2 rounded-full bg-white px-6 py-2.5 sm:px-7 sm:py-3 text-[13px] sm:text-[14px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.97] w-full sm:w-auto justify-center"
+                style={{ boxShadow: "0 14px 44px -12px var(--brand)" }}
+              >
                 Get Started
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </button>

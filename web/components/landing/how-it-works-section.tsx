@@ -30,12 +30,15 @@ export function HowItWorksSection() {
       <div className="mx-auto max-w-6xl px-5 md:px-8 py-24 md:py-32">
         {/* Header */}
         <div className="text-center mb-14 md:mb-20">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-600 mb-4">
+          <p
+            className="text-[11px] font-semibold uppercase tracking-[0.2em] mb-4"
+            style={{ color: "var(--brand)" }}
+          >
             How it works
           </p>
           <h2 className="text-[clamp(1.5rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white leading-tight">
             From zero to live
-            <span className="text-zinc-600"> in four steps</span>
+            <span className="text-brand-gradient"> in four steps</span>
           </h2>
         </div>
 
@@ -51,7 +54,13 @@ export function HowItWorksSection() {
               style={{ animationDelay: `${i * 100}ms` }}
             >
               {/* Step circle */}
-              <div className="relative z-10 mx-auto mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[13px] font-bold text-black ring-4 ring-black shadow-lg shadow-white/5">
+              <div
+                className="relative z-10 mx-auto mb-5 flex h-10 w-10 items-center justify-center rounded-full text-[13px] font-bold text-black ring-4 ring-black"
+                style={{
+                  backgroundImage: "linear-gradient(135deg, var(--brand), var(--brand-2))",
+                  boxShadow: "0 8px 24px -8px var(--brand)",
+                }}
+              >
                 {step}
               </div>
 

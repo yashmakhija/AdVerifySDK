@@ -21,7 +21,10 @@ export function Navbar() {
         <div className="flex h-[52px] items-center justify-between px-4 sm:px-5">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white transition-transform duration-200 group-hover:scale-105">
+            <div
+              className="flex h-7 w-7 items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-105"
+              style={{ backgroundImage: "linear-gradient(135deg, var(--brand), var(--brand-2))" }}
+            >
               <Shield className="h-3.5 w-3.5 text-black" />
             </div>
             <span className="text-[14px] font-bold tracking-tight text-white">

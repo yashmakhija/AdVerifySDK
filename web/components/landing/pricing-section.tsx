@@ -27,32 +27,47 @@ export function PricingSection() {
       <div className="mx-auto max-w-6xl px-5 md:px-8 py-24 md:py-32">
         {/* Header */}
         <div className="text-center mb-14 md:mb-20">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-600 mb-4">
+          <p
+            className="text-[11px] font-semibold uppercase tracking-[0.2em] mb-4"
+            style={{ color: "var(--brand)" }}
+          >
             Pricing
           </p>
           <h2 className="text-[clamp(1.5rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white leading-tight">
             Simple monthly pricing
             <br className="hidden sm:block" />
-            <span className="text-zinc-600">cancel anytime</span>
+            <span className="text-brand-gradient">cancel anytime</span>
           </h2>
         </div>
 
         {/* Cards */}
         <div className="mx-auto grid max-w-[720px] grid-cols-1 gap-6 md:grid-cols-2">
           {/* ── Early Bird ── */}
-          <div className="group relative rounded-2xl border border-white/[0.15] bg-black transition-colors duration-300 hover:border-white/[0.25]">
+          <div
+            className="group relative rounded-2xl border border-[var(--brand)]/30 bg-black transition-colors duration-300 hover:border-[var(--brand)]/50"
+            style={{ boxShadow: "0 24px 70px -30px var(--brand)" }}
+          >
             {/* Top glow */}
-            <div className="pointer-events-none absolute -top-px left-1/2 -translate-x-1/2 h-px w-2/3 bg-gradient-to-r from-transparent via-white/[0.3] to-transparent" />
+            <div
+              className="pointer-events-none absolute -top-px left-1/2 -translate-x-1/2 h-px w-2/3"
+              style={{ backgroundImage: "linear-gradient(to right, transparent, var(--brand), transparent)" }}
+            />
 
             {/* Badge */}
             <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
               <div className="flex items-center gap-2">
-                <Crown className="h-3.5 w-3.5 text-zinc-500" />
-                <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+                <Crown className="h-3.5 w-3.5" style={{ color: "var(--brand)" }} />
+                <span
+                  className="text-[11px] font-semibold uppercase tracking-[0.15em]"
+                  style={{ color: "var(--brand)" }}
+                >
                   Early Bird
                 </span>
               </div>
-              <span className="rounded-full bg-white px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-black">
+              <span
+                className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-black"
+                style={{ backgroundImage: "linear-gradient(135deg, var(--brand), var(--brand-2))" }}
+              >
                 20 Spots
               </span>
             </div>
@@ -88,7 +103,10 @@ export function PricingSection() {
                     key={feature}
                     className="flex items-start gap-2.5 text-[13px] text-zinc-400 leading-snug"
                   >
-                    <span className="mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-white text-black">
+                    <span
+                      className="mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] text-black"
+                      style={{ backgroundImage: "linear-gradient(135deg, var(--brand), var(--brand-2))" }}
+                    >
                       <Check className="h-3 w-3" strokeWidth={2.5} />
                     </span>
                     {feature}
@@ -101,7 +119,11 @@ export function PricingSection() {
                 href="https://t.me/TakezoTheunrival?text=Hi%2C%20I%20want%20to%20purchase%20the%20early%20bird%20plan%20%E2%80%93%20Server%20PIN%20%2B%20Custom%20Ads%20(%E2%82%B9499%2Fmo)"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-7 block w-full rounded-xl bg-white py-3.5 text-center text-[14px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98]"
+                className="mt-7 block w-full rounded-xl py-3.5 text-center text-[14px] font-semibold text-black transition-all hover:brightness-110 active:scale-[0.98]"
+                style={{
+                  backgroundImage: "linear-gradient(135deg, var(--brand), var(--brand-2))",
+                  boxShadow: "0 14px 40px -14px var(--brand)",
+                }}
               >
                 Get Early Access
               </a>
@@ -109,7 +131,10 @@ export function PricingSection() {
               {/* Spots bar */}
               <div className="mt-4 flex items-center gap-2.5">
                 <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/[0.06]">
-                  <div className="h-full w-[30%] rounded-full bg-white/[0.4]" />
+                  <div
+                    className="h-full w-[30%] rounded-full"
+                    style={{ backgroundImage: "linear-gradient(to right, var(--brand), var(--brand-2))" }}
+                  />
                 </div>
                 <span className="shrink-0 text-[10px] font-medium tracking-wide text-zinc-600">
                   filling up

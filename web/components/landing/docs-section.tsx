@@ -24,12 +24,15 @@ export function DocsSection() {
       <div className="mx-auto max-w-6xl px-5 md:px-8 py-24 md:py-32">
         {/* Header */}
         <div className="text-center mb-14 md:mb-20">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-600 mb-4">
+          <p
+            className="text-[11px] font-semibold uppercase tracking-[0.2em] mb-4"
+            style={{ color: "var(--brand)" }}
+          >
             Developer Experience
           </p>
           <h2 className="text-[clamp(1.5rem,3.5vw,2.75rem)] font-extrabold tracking-tight text-white leading-tight">
             Clean API.
-            <span className="text-zinc-600"> Simple integration.</span>
+            <span className="text-brand-gradient"> Simple integration.</span>
           </h2>
         </div>
 
