@@ -16,6 +16,13 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Design system
+
+Building UI? Read [`DESIGN.md`](./DESIGN.md) first — it's the source-of-truth for color tokens
+(light/dark), the amber brand accent, typography, layout, and component conventions. Rule of thumb:
+in the panel, use semantic tokens (`bg-background`, `text-foreground`, `border-border`, …) and the
+amber `--brand` for primary/active states — never hardcode `bg-black` / `text-white`.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
