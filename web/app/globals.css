@@ -140,6 +140,11 @@
   50% { opacity: 0.7; }
 }
 
+@keyframes loaderPulse {
+  0%, 100% { transform: scale(0.9); opacity: 0.55; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+
 @keyframes beam {
   0% { transform: translateY(-100%); }
   100% { transform: translateY(100vh); }
@@ -210,6 +215,9 @@ body {
   }
   .animate-float {
     animation: float 5s ease-in-out infinite;
+  }
+  .animate-loader {
+    animation: loaderPulse 1.2s ease-in-out infinite;
   }
   .animate-float-slow {
     animation: float-slow 7s ease-in-out infinite;

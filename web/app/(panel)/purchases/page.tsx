@@ -8,6 +8,7 @@ import { Modal, FormSelect, FormTextarea, ModalActions } from "@/components/ui/m
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
+import { Loader } from "@/components/ui/loader";
 import type { Purchase, User, Plan } from "@/lib/types";
 
 function statusVariant(status: string) {
@@ -91,9 +92,7 @@ export default function PurchasesPage() {
       />
 
       {loading ? (
-        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
-          Loading...
-        </div>
+        <Loader />
       ) : purchases.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-surface p-12 text-center">
           <Receipt className="mx-auto h-8 w-8 text-faint" />

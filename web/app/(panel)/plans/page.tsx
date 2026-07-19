@@ -8,6 +8,7 @@ import { Modal, FormInput, FormTextarea, ModalActions } from "@/components/ui/mo
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
+import { Loader } from "@/components/ui/loader";
 import type { Plan } from "@/lib/types";
 
 const EMPTY_FORM = {
@@ -114,9 +115,7 @@ export default function PlansPage() {
       />
 
       {loading ? (
-        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
-          Loading...
-        </div>
+        <Loader />
       ) : plans.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-surface p-12 text-center">
           <CreditCard className="mx-auto h-8 w-8 text-faint" />

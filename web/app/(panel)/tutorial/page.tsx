@@ -5,6 +5,7 @@ import { PlayCircle, RefreshCw } from "lucide-react";
 import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { PageHeader } from "@/components/ui/page-header";
+import { Loader } from "@/components/ui/loader";
 
 const REFRESH_INTERVAL = 50 * 60 * 1000; // refresh link every 50 min (before 1h expiry)
 
@@ -39,9 +40,7 @@ export default function TutorialPage() {
       />
 
       {loading ? (
-        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
-          Loading video...
-        </div>
+        <Loader label="Loading video" />
       ) : error || !videoUrl ? (
         <div className="rounded-xl border border-dashed border-border bg-surface p-12 text-center">
           <PlayCircle className="mx-auto h-8 w-8 text-faint" />

@@ -8,6 +8,7 @@ import { ToastContainer } from "@/components/ui/toast";
 import { PlanRequiredCard } from "@/components/ui/plan-gate";
 import { usePlanGuard } from "@/lib/use-plan-guard";
 import { BrandLogo } from "@/components/brand-logo";
+import { PanelSplash } from "@/components/panel-splash";
 import { Menu } from "lucide-react";
 
 // Pages accessible without an active plan
@@ -37,6 +38,7 @@ export default function PanelLayout({
 
   return (
     <div className="flex h-screen bg-background">
+      <PanelSplash />
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex flex-1 flex-col overflow-hidden">

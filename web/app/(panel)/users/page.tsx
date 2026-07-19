@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { getRandomAvatar } from "@/lib/avatars";
+import { Loader } from "@/components/ui/loader";
 import type { User } from "@/lib/types";
 
 export default function UsersPage() {
@@ -79,9 +80,7 @@ export default function UsersPage() {
       />
 
       {loading ? (
-        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
-          Loading...
-        </div>
+        <Loader />
       ) : users.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-surface p-12 text-center">
           <Users className="mx-auto h-8 w-8 text-faint" />

@@ -11,6 +11,7 @@ import {
 import { useAuthStore, useToastStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { Loader } from "@/components/ui/loader";
 import type { ApiKey, PinUnlockSettings } from "@/lib/types";
 
 const MODES = [
@@ -93,14 +94,7 @@ export default function SettingsPage() {
   }
 
   if (!loaded) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="flex items-center gap-3 text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          <span className="text-sm">Loading...</span>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   const activeMode = MODES.find((m) => m.value === settings.pinUnlockMode)!;

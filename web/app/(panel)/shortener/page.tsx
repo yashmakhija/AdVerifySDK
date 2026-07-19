@@ -12,6 +12,7 @@ import { useAuthStore, useToastStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
+import { Loader } from "@/components/ui/loader";
 import type { ShortenerConfig } from "@/lib/types";
 
 export default function ShortenerPage() {
@@ -66,14 +67,7 @@ export default function ShortenerPage() {
     form.shortenerApiUrl && form.shortenerApiSecret && form.shortenerFrontendUrl;
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="flex items-center gap-3 text-faint">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-transparent" />
-          <span className="text-sm">Loading...</span>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (

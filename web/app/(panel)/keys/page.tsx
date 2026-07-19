@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useAuthStore, useToastStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { PageHeader } from "@/components/ui/page-header";
+import { Loader } from "@/components/ui/loader";
 import { KeysTable } from "./_components/keys-table";
 import { KeysCards } from "./_components/keys-cards";
 import { CreateKeyModal } from "./_components/create-key-modal";
@@ -81,9 +82,7 @@ export default function KeysPage() {
       />
 
       {loading ? (
-        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
-          Loading...
-        </div>
+        <Loader />
       ) : keys.length === 0 ? (
         <EmptyState onCreateClick={() => setModal(true)} />
       ) : (

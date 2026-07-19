@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
+import { Loader } from "@/components/ui/loader";
 import type { Announcement } from "@/lib/types";
 
 const TYPE_CONFIG = {
@@ -81,9 +82,7 @@ export default function AnnouncementsPage() {
       />
 
       {loading ? (
-        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
-          Loading...
-        </div>
+        <Loader />
       ) : items.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-surface p-12 text-center">
           <Bell className="mx-auto h-8 w-8 text-faint" />

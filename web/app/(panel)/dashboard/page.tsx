@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { StatCard } from "@/components/ui/stat-card";
+import { Loader } from "@/components/ui/loader";
 import {
   KeyRound,
   Megaphone,
@@ -150,14 +151,7 @@ export default function DashboardPage() {
   const isNewUser = stats && stats.totalKeys === 0;
 
   if (!stats) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="flex items-center gap-3 text-faint">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-border-strong border-t-transparent" />
-          <span className="text-sm">Loading...</span>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (

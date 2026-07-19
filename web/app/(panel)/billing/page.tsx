@@ -14,6 +14,7 @@ import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
+import { Loader } from "@/components/ui/loader";
 import type { Purchase, PlanStatus } from "@/lib/types";
 
 function statusVariant(status: string) {
@@ -68,9 +69,7 @@ export default function BillingPage() {
       />
 
       {loading ? (
-        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
-          Loading...
-        </div>
+        <Loader />
       ) : (
         <>
           {/* Plan Status Card */}

@@ -6,6 +6,7 @@ import { useAuthStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
+import { Loader } from "@/components/ui/loader";
 import type { ActivityLog } from "@/lib/types";
 
 function actionVariant(action: string) {
@@ -75,9 +76,7 @@ export default function ActivityPage() {
       </div>
 
       {loading ? (
-        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
-          Loading...
-        </div>
+        <Loader />
       ) : filtered.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-surface p-12 text-center">
           <Activity className="mx-auto h-8 w-8 text-faint" />
