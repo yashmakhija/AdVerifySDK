@@ -57,12 +57,23 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -p 22 -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
 
+      - name: Copy docker-compose.yml to VPS
+        run: |
+          ssh -i ~/.ssh/deploy_key -p 22 root@${{ secrets.VPS_HOST }} "mkdir -p ${{ env.VPS_PATH }}/uploads"
+          scp -i ~/.ssh/deploy_key -P 22 \
+            ./server/docker-compose.yml \
+            root@${{ secrets.VPS_HOST }}:${{ env.VPS_PATH }}/docker-compose.yml
+
       - name: Pull new image and restart on VPS
         run: |
           ssh -i ~/.ssh/deploy_key -p 22 root@${{ secrets.VPS_HOST }} << 'EOF'
             set -e
             cd ${{ env.VPS_PATH }}
+            if [ ! -f .env ]; then
+              echo "ERROR: ${{ env.VPS_PATH }}/.env is missing. Create it once (production secrets) and re-run." >&2
+              exit 1
+            fi
             docker compose pull
-            docker compose up -d
+            docker compose up -d --remove-orphans
             docker image prune -f
           EOF
