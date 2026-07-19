@@ -16,6 +16,8 @@ const envSchema = z.object({
   SHORTENER_SECRET: z.string().default('change-me-in-production'),
   SHORTENER_API_URL: z.string().default('https://api.paidappstore.com'),
   SHORTENER_FRONTEND_URL: z.string().default('https://paidappstore.com'),
+  SAFELINK_BRIDGE_URL: z.string().default(''),
+  SAFELINK_BRIDGE_TIMEOUT_MS: z.coerce.number().default(10000),
   // Cloudflare R2
   R2_ENDPOINT: z.string().optional(),
   R2_ACCESS_KEY_ID: z.string().optional(),

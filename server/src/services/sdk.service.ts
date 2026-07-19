@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { prisma } from '../lib/prisma';
 import { env } from '../config/env';
+import { SafelinkService } from './safelink.service';
 
 type UserSettings = { pinUnlockMode: string; excludedAppIds: number[] };
 
@@ -372,7 +373,9 @@ export class SdkService {
       throw new Error('Failed to create verification link');
     }
 
-    return `${shortenerFrontendUrl}/verify/${data.data.code}`;
+    // Wrap in the wp-safelink ad page for monetization (no-op if not configured).
+    const verifyUrl = `${shortenerFrontendUrl}/verify/${data.data.code}`;
+    return SafelinkService.wrap(verifyUrl);
   }
 
   async trackImpression(adId: number, apiKeyId: number, deviceId: string) {
