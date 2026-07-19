@@ -53,41 +53,41 @@ export function AppSelector({
       <button
         type="button"
         onClick={() => { setOpen(!open); setSearch(""); }}
-        className="flex w-full items-center justify-between gap-2 rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-left transition-all hover:bg-white/[0.06] focus:outline-none focus:border-white/[0.15]"
+        className="flex w-full items-center justify-between gap-2 rounded-xl border border-border bg-surface-2 px-3.5 py-2.5 text-left transition-all hover:bg-surface-2 focus:outline-none focus:border-border-strong"
       >
         {selected ? (
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/[0.08] text-[10px] font-bold text-zinc-400">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-[10px] font-bold text-muted-foreground">
               {selected.appName.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-white truncate">{selected.appName}</p>
+              <p className="text-sm font-medium text-foreground truncate">{selected.appName}</p>
               {selected.packageName && (
-                <p className="text-[11px] text-zinc-600 truncate">{selected.packageName}</p>
+                <p className="text-[11px] text-faint truncate">{selected.packageName}</p>
               )}
             </div>
           </div>
         ) : (
-          <span className="text-sm text-zinc-600">{placeholder}</span>
+          <span className="text-sm text-faint">{placeholder}</span>
         )}
-        <ChevronDown className={`h-4 w-4 shrink-0 text-zinc-600 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-4 w-4 shrink-0 text-faint transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute z-50 mt-1.5 w-full rounded-xl border border-white/[0.08] bg-[#111] shadow-2xl shadow-black/40 overflow-hidden animate-in">
+        <div className="absolute z-50 mt-1.5 w-full rounded-xl border border-border bg-popover shadow-2xl shadow-black/40 overflow-hidden animate-in">
           {/* Search input */}
-          <div className="flex items-center gap-2 border-b border-white/[0.06] px-3 py-2">
-            <Search className="h-3.5 w-3.5 shrink-0 text-zinc-600" />
+          <div className="flex items-center gap-2 border-b border-border px-3 py-2">
+            <Search className="h-3.5 w-3.5 shrink-0 text-faint" />
             <input
               ref={inputRef}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search apps..."
-              className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-zinc-600"
+              className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-faint"
             />
             {search && (
-              <button onClick={() => setSearch("")} className="text-zinc-600 hover:text-zinc-400">
+              <button onClick={() => setSearch("")} className="text-faint hover:text-muted-foreground">
                 <X className="h-3 w-3" />
               </button>
             )}
@@ -96,7 +96,7 @@ export function AppSelector({
           {/* List */}
           <div className="max-h-[240px] overflow-y-auto dark-scroll py-1">
             {filtered.length === 0 ? (
-              <p className="px-3 py-6 text-center text-[13px] text-zinc-600">
+              <p className="px-3 py-6 text-center text-[13px] text-faint">
                 {keys.length === 0 ? "No apps yet. Create an API key first." : "No apps match your search."}
               </p>
             ) : (
@@ -113,27 +113,27 @@ export function AppSelector({
                     }}
                     className={`flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors ${
                       isSelected
-                        ? "bg-white/[0.06]"
-                        : "hover:bg-white/[0.04]"
+                        ? "bg-surface-2"
+                        : "hover:bg-surface-2"
                     }`}
                   >
                     <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[10px] font-bold ${
                       isSelected
-                        ? "bg-white text-black"
-                        : "bg-white/[0.06] text-zinc-500"
+                        ? "bg-[var(--brand)] text-black"
+                        : "bg-surface-2 text-muted-foreground"
                     }`}>
                       {k.appName.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-[13px] font-medium truncate ${isSelected ? "text-white" : "text-zinc-300"}`}>
+                      <p className={`text-[13px] font-medium truncate ${isSelected ? "text-foreground" : "text-foreground"}`}>
                         {k.appName}
                       </p>
                       {k.packageName && (
-                        <p className="text-[11px] text-zinc-600 truncate">{k.packageName}</p>
+                        <p className="text-[11px] text-faint truncate">{k.packageName}</p>
                       )}
                     </div>
                     {isSelected && (
-                      <Check className="h-3.5 w-3.5 shrink-0 text-white" />
+                      <Check className="h-3.5 w-3.5 shrink-0 text-foreground" />
                     )}
                   </button>
                 );
@@ -143,8 +143,8 @@ export function AppSelector({
 
           {/* Count footer */}
           {keys.length > 5 && (
-            <div className="border-t border-white/[0.04] px-3 py-1.5">
-              <p className="text-[11px] text-zinc-700">
+            <div className="border-t border-border px-3 py-1.5">
+              <p className="text-[11px] text-faint">
                 {filtered.length} of {keys.length} apps
               </p>
             </div>

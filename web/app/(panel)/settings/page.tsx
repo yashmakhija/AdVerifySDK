@@ -95,7 +95,7 @@ export default function SettingsPage() {
   if (!loaded) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="flex items-center gap-3 text-zinc-400">
+        <div className="flex items-center gap-3 text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span className="text-sm">Loading...</span>
         </div>
@@ -109,10 +109,10 @@ export default function SettingsPage() {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-lg font-semibold tracking-tight text-white">
+        <h1 className="text-lg font-semibold tracking-tight text-foreground">
           PIN Settings
         </h1>
-        <p className="mt-0.5 text-[13px] text-zinc-500">
+        <p className="mt-0.5 text-[13px] text-muted-foreground">
           Configure how PIN verification works across your apps
         </p>
       </div>
@@ -120,7 +120,7 @@ export default function SettingsPage() {
       <div className="mx-auto max-w-xl space-y-6">
         {/* Mode selector */}
         <div>
-          <label className="mb-2.5 block text-[13px] font-medium text-white">
+          <label className="mb-2.5 block text-[13px] font-medium text-foreground">
             PIN Unlock Mode
           </label>
           <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
@@ -143,34 +143,26 @@ export default function SettingsPage() {
                   }
                   className={`group relative flex flex-col items-center gap-2.5 rounded-xl border-2 px-3 py-5 text-center transition-all ${
                     isActive
-                      ? "border-white bg-white"
-                      : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.1]"
+                      ? "border-[var(--brand)] bg-[var(--brand)]/10"
+                      : "border-border bg-surface hover:border-border-strong"
                   }`}
                 >
                   <div
                     className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors`}
                     style={{
-                      backgroundColor: isActive ? "rgba(0,0,0,0.06)" : mode.accentLight,
+                      backgroundColor: mode.accentLight,
                     }}
                   >
                     <Icon
                       className="h-[18px] w-[18px]"
-                      style={{ color: isActive ? "#000" : mode.accent }}
+                      style={{ color: mode.accent }}
                     />
                   </div>
                   <div>
-                    <p
-                      className={`text-[13px] font-semibold leading-tight ${
-                        isActive ? "text-black" : "text-white"
-                      }`}
-                    >
+                    <p className="text-[13px] font-semibold leading-tight text-foreground">
                       {mode.label}
                     </p>
-                    <p
-                      className={`mt-0.5 text-[11px] leading-snug ${
-                        isActive ? "text-zinc-500" : "text-zinc-500"
-                      }`}
-                    >
+                    <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
                       {mode.short}
                     </p>
                   </div>
@@ -178,12 +170,12 @@ export default function SettingsPage() {
                   <div
                     className={`absolute right-2.5 top-2.5 flex h-4 w-4 items-center justify-center rounded-full transition-all ${
                       isActive
-                        ? "bg-black"
-                        : "border border-white/[0.08]"
+                        ? "bg-[var(--brand)]"
+                        : "border border-border"
                     }`}
                   >
                     {isActive && (
-                      <Check className="h-2.5 w-2.5 text-white" />
+                      <Check className="h-2.5 w-2.5 text-black" />
                     )}
                   </div>
                 </button>
@@ -204,7 +196,7 @@ export default function SettingsPage() {
             className="mt-0.5 h-4 w-4 shrink-0"
             style={{ color: activeMode.accent }}
           />
-          <p className="text-[13px] leading-relaxed text-zinc-400">
+          <p className="text-[13px] leading-relaxed text-muted-foreground">
             {activeMode.description}
           </p>
         </div>
@@ -212,21 +204,21 @@ export default function SettingsPage() {
         {/* Excluded apps */}
         {settings.pinUnlockMode === "global_except" && (
           <div>
-            <label className="mb-1 block text-[13px] font-medium text-white">
+            <label className="mb-1 block text-[13px] font-medium text-foreground">
               Excluded Apps
             </label>
-            <p className="mb-3 text-[12px] text-zinc-500">
+            <p className="mb-3 text-[12px] text-muted-foreground">
               Toggle apps that should require their own separate PIN
             </p>
 
             {keys.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-white/[0.08] py-8 text-center">
-                <p className="text-sm text-zinc-500">
+              <div className="rounded-xl border border-dashed border-border py-8 text-center">
+                <p className="text-sm text-muted-foreground">
                   No apps yet. Create an API key first.
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-white/[0.04] overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02]">
+              <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
                 {keys.map((k) => {
                   const isExcluded = settings.excludedAppIds.includes(k.id);
                   return (
@@ -234,12 +226,12 @@ export default function SettingsPage() {
                       key={k.id}
                       type="button"
                       onClick={() => toggleExcludedApp(k.id)}
-                      className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-white/[0.04] active:bg-white/[0.06]"
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-2 active:bg-surface-2"
                     >
                       {/* Toggle pill */}
                       <div
                         className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
-                          isExcluded ? "bg-red-500" : "bg-white/[0.08]"
+                          isExcluded ? "bg-red-500" : "bg-surface-2"
                         }`}
                       >
                         <div
@@ -250,11 +242,11 @@ export default function SettingsPage() {
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
+                        <p className="text-sm font-medium text-foreground truncate">
                           {k.appName}
                         </p>
                         {k.packageName && (
-                          <p className="text-[11px] text-zinc-500 truncate">
+                          <p className="text-[11px] text-muted-foreground truncate">
                             {k.packageName}
                           </p>
                         )}
@@ -276,7 +268,7 @@ export default function SettingsPage() {
             )}
 
             {settings.excludedAppIds.length > 0 && (
-              <p className="mt-2 text-[11px] text-zinc-500">
+              <p className="mt-2 text-[11px] text-muted-foreground">
                 {settings.excludedAppIds.length} app
                 {settings.excludedAppIds.length > 1 ? "s" : ""} will require
                 separate PIN verification
@@ -286,8 +278,8 @@ export default function SettingsPage() {
         )}
 
         {/* Save */}
-        <div className="flex items-center justify-between border-t border-white/[0.04] pt-5">
-          <p className="text-[12px] text-zinc-500 hidden sm:block">
+        <div className="flex items-center justify-between border-t border-border pt-5">
+          <p className="text-[12px] text-muted-foreground hidden sm:block">
             Changes apply to all future PIN checks
           </p>
           <Button

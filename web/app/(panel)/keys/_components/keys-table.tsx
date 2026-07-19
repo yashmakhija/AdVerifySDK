@@ -15,10 +15,10 @@ interface KeysTableProps {
 
 export function KeysTable({ keys, isAdmin, onToggle, onDelete }: KeysTableProps) {
   return (
-    <div className="hidden lg:block rounded-xl border border-white/[0.06] bg-white/[0.02]">
+    <div className="hidden lg:block rounded-xl border border-border bg-surface">
       <table className="w-full table-fixed text-left text-sm">
         <thead>
-          <tr className="border-b border-white/[0.06] text-[11px] font-medium uppercase tracking-wider text-zinc-600">
+          <tr className="border-b border-border text-[11px] font-medium uppercase tracking-wider text-faint">
             <th className="px-4 py-3 w-[14%]">App</th>
             <th className="px-4 py-3 w-[18%]">Package</th>
             <th className="px-4 py-3">API Key</th>
@@ -27,13 +27,13 @@ export function KeysTable({ keys, isAdmin, onToggle, onDelete }: KeysTableProps)
             <th className="px-4 py-3 w-[100px] text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/[0.04]">
+        <tbody className="divide-y divide-border">
           {keys.map((k) => (
-            <tr key={k.id} className="text-zinc-400 transition-colors hover:bg-white/[0.02]">
+            <tr key={k.id} className="text-muted-foreground transition-colors hover:bg-surface-2">
               <td className="px-4 py-3">
-                <span className="font-medium text-white truncate block">{k.appName}</span>
+                <span className="font-medium text-foreground truncate block">{k.appName}</span>
               </td>
-              <td className="px-4 py-3 text-zinc-500 text-[13px]">
+              <td className="px-4 py-3 text-muted-foreground text-[13px]">
                 <span className="truncate block">{k.packageName || "-"}</span>
               </td>
               <td className="px-4 py-3">
@@ -42,9 +42,9 @@ export function KeysTable({ keys, isAdmin, onToggle, onDelete }: KeysTableProps)
               {isAdmin && (
                 <td className="px-4 py-3 text-[13px]">
                   {k.user ? (
-                    <span className="text-zinc-400 truncate block">{k.user.username}</span>
+                    <span className="text-muted-foreground truncate block">{k.user.username}</span>
                   ) : (
-                    <span className="text-zinc-700 italic">—</span>
+                    <span className="text-faint italic">—</span>
                   )}
                 </td>
               )}

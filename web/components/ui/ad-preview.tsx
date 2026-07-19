@@ -19,7 +19,7 @@ export function AdPreview({ title, description, imageUrl, buttonText, adType }: 
 
   return (
     <div className="flex flex-col items-center w-full">
-      <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-600">
+      <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-faint">
         Preview &mdash; {layout}
       </p>
 
@@ -64,7 +64,7 @@ export function AdPreview({ title, description, imageUrl, buttonText, adType }: 
         </div>
       </div>
 
-      <p className="mt-2 text-[9px] sm:text-[10px] text-zinc-700 text-center">
+      <p className="mt-2 text-[9px] sm:text-[10px] text-faint text-center">
         {layout === "card" && "Matches current SDK dialog"}
         {layout === "fullscreen" && "Full screen — requires SDK update"}
         {layout === "banner" && "Bottom banner — requires SDK update"}

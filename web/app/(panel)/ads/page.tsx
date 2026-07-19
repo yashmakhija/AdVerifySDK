@@ -208,10 +208,10 @@ export default function AdsPage() {
 
       {/* Empty */}
       {ads.length === 0 && (
-        <div className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] p-12 text-center">
-          <Megaphone className="mx-auto h-8 w-8 text-zinc-700" />
-          <p className="mt-3 text-sm font-medium text-zinc-400">No ads yet</p>
-          <p className="mt-1 text-[12px] text-zinc-600">Create your first ad to start monetizing</p>
+        <div className="rounded-xl border border-dashed border-border bg-surface p-12 text-center">
+          <Megaphone className="mx-auto h-8 w-8 text-faint" />
+          <p className="mt-3 text-sm font-medium text-muted-foreground">No ads yet</p>
+          <p className="mt-1 text-[12px] text-faint">Create your first ad to start monetizing</p>
           <Button size="sm" className="mt-4" onClick={openCreate}>Create Ad</Button>
         </div>
       )}
@@ -220,12 +220,12 @@ export default function AdsPage() {
       {ads.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {ads.map((ad) => (
-            <div key={ad.id} className="group rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden transition-all hover:border-white/[0.1]">
-              <div className="relative aspect-[16/9] bg-white/[0.03] overflow-hidden">
+            <div key={ad.id} className="group rounded-xl border border-border bg-surface overflow-hidden transition-all hover:border-border-strong">
+              <div className="relative aspect-[16/9] bg-surface overflow-hidden">
                 {ad.imageUrl ? (
                   <img src={ad.imageUrl} alt={ad.title} className="h-full w-full object-cover" />
                 ) : (
-                  <div className="flex h-full items-center justify-center"><ImageIcon className="h-8 w-8 text-zinc-700" /></div>
+                  <div className="flex h-full items-center justify-center"><ImageIcon className="h-8 w-8 text-faint" /></div>
                 )}
                 <div className="absolute top-2 left-2">
                   <Badge variant={ad.isActive ? "success" : "destructive"}>{ad.isActive ? "Active" : "Inactive"}</Badge>
@@ -243,27 +243,27 @@ export default function AdsPage() {
               <div className="p-3.5">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <h3 className="text-[13px] font-semibold text-white truncate">{ad.title}</h3>
-                    <p className="text-[11px] text-zinc-600 truncate mt-0.5">{ad.apiKey?.appName || "Unknown"}</p>
+                    <h3 className="text-[13px] font-semibold text-foreground truncate">{ad.title}</h3>
+                    <p className="text-[11px] text-faint truncate mt-0.5">{ad.apiKey?.appName || "Unknown"}</p>
                   </div>
-                  <span className="shrink-0 rounded-md bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-bold text-zinc-500 tabular-nums">P{ad.priority}</span>
+                  <span className="shrink-0 rounded-md bg-surface-2 px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground tabular-nums">P{ad.priority}</span>
                 </div>
 
-                {ad.description && <p className="mt-2 text-[11px] text-zinc-500 line-clamp-2 leading-relaxed">{ad.description}</p>}
+                {ad.description && <p className="mt-2 text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">{ad.description}</p>}
 
                 <div className="mt-3 flex items-center gap-3 flex-wrap">
-                  <div className="flex items-center gap-1 text-[11px] text-zinc-500"><Eye className="h-3 w-3 text-zinc-600" /><span className="tabular-nums">{imp(ad).toLocaleString()}</span></div>
-                  <div className="flex items-center gap-1 text-[11px] text-zinc-500"><MousePointerClick className="h-3 w-3 text-zinc-600" /><span className="tabular-nums">{clk(ad).toLocaleString()}</span></div>
-                  <span className="text-[11px] text-zinc-600 tabular-nums">{ctr(ad)}% CTR</span>
+                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground"><Eye className="h-3 w-3 text-faint" /><span className="tabular-nums">{imp(ad).toLocaleString()}</span></div>
+                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground"><MousePointerClick className="h-3 w-3 text-faint" /><span className="tabular-nums">{clk(ad).toLocaleString()}</span></div>
+                  <span className="text-[11px] text-faint tabular-nums">{ctr(ad)}% CTR</span>
                   {(ad.maxImpressions ?? 0) > 0 && (
                     <div className="flex items-center gap-1 text-[11px] text-amber-400/80"><Repeat className="h-3 w-3" /><span>{ad.maxImpressions}x/device</span></div>
                   )}
                 </div>
 
                 <div className="mt-2.5 flex items-center gap-2">
-                  <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-medium text-zinc-400">&quot;{ad.buttonText}&quot;</span>
+                  <span className="rounded bg-surface-2 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">&quot;{ad.buttonText}&quot;</span>
                   {ad.redirectUrl && (
-                    <a href={ad.redirectUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-[10px] text-zinc-600 hover:text-zinc-400 truncate">
+                    <a href={ad.redirectUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-[10px] text-faint hover:text-muted-foreground truncate">
                       <ExternalLink className="h-2.5 w-2.5 shrink-0" /><span className="truncate">{ad.redirectUrl.replace(/^https?:\/\//, "")}</span>
                     </a>
                   )}
@@ -272,23 +272,23 @@ export default function AdsPage() {
 
               {/* Push bar */}
               {ad.isActive && (
-                <div className="flex items-center gap-1.5 border-t border-white/[0.06] px-3.5 py-2">
-                  <Radio className="h-3 w-3 text-zinc-600 shrink-0" />
-                  <span className="text-[10px] text-zinc-600 mr-auto">Push ad to devices:</span>
-                  <button onClick={() => pushAd(ad.id, 0)} className="rounded-md bg-white/[0.06] border border-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-zinc-400 hover:bg-white/[0.1] hover:text-white transition-all">Now</button>
-                  <button onClick={() => pushAd(ad.id, 1)} className="rounded-md bg-white/[0.06] border border-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-zinc-400 hover:bg-white/[0.1] hover:text-white transition-all">1h</button>
-                  <button onClick={() => pushAd(ad.id, 6)} className="rounded-md bg-white/[0.06] border border-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-zinc-400 hover:bg-white/[0.1] hover:text-white transition-all">6h</button>
-                  <button onClick={() => pushAd(ad.id, 24)} className="rounded-md bg-white/[0.06] border border-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-zinc-400 hover:bg-white/[0.1] hover:text-white transition-all">24h</button>
+                <div className="flex items-center gap-1.5 border-t border-border px-3.5 py-2">
+                  <Radio className="h-3 w-3 text-faint shrink-0" />
+                  <span className="text-[10px] text-faint mr-auto">Push ad to devices:</span>
+                  <button onClick={() => pushAd(ad.id, 0)} className="rounded-md bg-surface-2 border border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-surface-2 hover:text-foreground transition-all">Now</button>
+                  <button onClick={() => pushAd(ad.id, 1)} className="rounded-md bg-surface-2 border border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-surface-2 hover:text-foreground transition-all">1h</button>
+                  <button onClick={() => pushAd(ad.id, 6)} className="rounded-md bg-surface-2 border border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-surface-2 hover:text-foreground transition-all">6h</button>
+                  <button onClick={() => pushAd(ad.id, 24)} className="rounded-md bg-surface-2 border border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-surface-2 hover:text-foreground transition-all">24h</button>
                 </div>
               )}
 
               {/* Actions */}
-              <div className="flex border-t border-white/[0.06] divide-x divide-white/[0.06]">
-                <button onClick={() => openEdit(ad)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[11px] font-medium text-zinc-500 transition-colors hover:bg-white/[0.03] hover:text-zinc-300"><Pencil className="h-3 w-3" /> Edit</button>
-                <button onClick={() => toggleAd(ad.id, ad.isActive)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[11px] font-medium text-zinc-500 transition-colors hover:bg-white/[0.03] hover:text-zinc-300">
+              <div className="flex border-t border-border divide-x divide-border">
+                <button onClick={() => openEdit(ad)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"><Pencil className="h-3 w-3" /> Edit</button>
+                <button onClick={() => toggleAd(ad.id, ad.isActive)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground">
                   {ad.isActive ? <><ToggleRight className="h-3 w-3" /> Disable</> : <><ToggleLeft className="h-3 w-3" /> Enable</>}
                 </button>
-                <button onClick={() => deleteAd(ad.id)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[11px] font-medium text-red-400/70 transition-colors hover:bg-red-500/10 hover:text-red-400"><Trash2 className="h-3 w-3" /> Delete</button>
+                <button onClick={() => deleteAd(ad.id)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[11px] font-medium text-red-600/70 dark:text-red-400/70 transition-colors hover:bg-red-500/10 hover:text-red-400"><Trash2 className="h-3 w-3" /> Delete</button>
               </div>
             </div>
           ))}
@@ -318,7 +318,7 @@ export default function AdsPage() {
 
             {/* Layout selector */}
             <div>
-              <label className="mb-1.5 block text-[13px] font-medium text-zinc-400">Layout</label>
+              <label className="mb-1.5 block text-[13px] font-medium text-muted-foreground">Layout</label>
               <div className="grid grid-cols-3 gap-2">
                 {AD_LAYOUTS.map((l) => (
                   <button
@@ -327,12 +327,12 @@ export default function AdsPage() {
                     onClick={() => updateForm({ adType: l.value })}
                     className={`rounded-lg border p-2.5 text-left transition-all ${
                       form.adType === l.value
-                        ? "border-white bg-white/[0.08] text-white"
-                        : "border-white/[0.06] bg-white/[0.02] text-zinc-500 hover:border-white/[0.1]"
+                        ? "border-border-strong bg-surface-2 text-foreground"
+                        : "border-border bg-surface text-muted-foreground hover:border-border-strong"
                     }`}
                   >
                     <p className="text-[11px] font-semibold">{l.label}</p>
-                    <p className="text-[9px] text-zinc-600 mt-0.5">{l.desc}</p>
+                    <p className="text-[9px] text-faint mt-0.5">{l.desc}</p>
                   </button>
                 ))}
               </div>
@@ -345,7 +345,7 @@ export default function AdsPage() {
 
             {/* Frequency selector — user friendly */}
             <div>
-              <label className="mb-1.5 block text-[13px] font-medium text-zinc-400">
+              <label className="mb-1.5 block text-[13px] font-medium text-muted-foreground">
                 How often to show per device
               </label>
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
@@ -356,40 +356,40 @@ export default function AdsPage() {
                     onClick={() => updateForm({ maxImpressions: opt.value })}
                     className={`rounded-lg border px-2 py-2 text-center transition-all ${
                       form.maxImpressions === opt.value
-                        ? "border-white bg-white/[0.08] text-white"
-                        : "border-white/[0.06] bg-white/[0.02] text-zinc-500 hover:border-white/[0.1]"
+                        ? "border-border-strong bg-surface-2 text-foreground"
+                        : "border-border bg-surface text-muted-foreground hover:border-border-strong"
                     }`}
                   >
                     <p className="text-[11px] font-semibold">{opt.label}</p>
-                    <p className="text-[8px] text-zinc-600 mt-0.5 hidden sm:block">{opt.desc}</p>
+                    <p className="text-[8px] text-faint mt-0.5 hidden sm:block">{opt.desc}</p>
                   </button>
                 ))}
               </div>
               {!FREQUENCY_OPTIONS.some(o => o.value === form.maxImpressions) && form.maxImpressions > 0 && (
-                <p className="mt-1.5 text-[11px] text-zinc-500">Custom: {form.maxImpressions} times per device</p>
+                <p className="mt-1.5 text-[11px] text-muted-foreground">Custom: {form.maxImpressions} times per device</p>
               )}
             </div>
 
             {/* Broadcast toggle */}
-            <div className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
+            <div className="flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3">
               <div>
-                <p className="text-[13px] font-medium text-zinc-300">Broadcast to verified users</p>
-                <p className="text-[11px] text-zinc-600 mt-0.5">Show ad on every app open, even after PIN verified</p>
+                <p className="text-[13px] font-medium text-foreground">Broadcast to verified users</p>
+                <p className="text-[11px] text-faint mt-0.5">Show ad on every app open, even after PIN verified</p>
               </div>
               <button
                 type="button"
                 role="switch"
                 aria-checked={form.broadcastToVerified}
                 onClick={() => updateForm({ broadcastToVerified: !form.broadcastToVerified })}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors ${form.broadcastToVerified ? "bg-white" : "bg-white/[0.1]"}`}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors ${form.broadcastToVerified ? "bg-foreground" : "bg-surface-2"}`}
               >
-                <span className={`pointer-events-none inline-block h-5 w-5 rounded-full shadow-sm transition-transform mt-0.5 ${form.broadcastToVerified ? "translate-x-5 bg-black" : "translate-x-0.5 bg-zinc-500"}`} />
+                <span className={`pointer-events-none inline-block h-5 w-5 rounded-full shadow-sm transition-transform mt-0.5 ${form.broadcastToVerified ? "translate-x-5 bg-background" : "translate-x-0.5 bg-zinc-500"}`} />
               </button>
             </div>
 
             {/* Target audience */}
             <div>
-              <label className="mb-1.5 block text-[13px] font-medium text-zinc-400">Who should see this ad?</label>
+              <label className="mb-1.5 block text-[13px] font-medium text-muted-foreground">Who should see this ad?</label>
               <div className="grid grid-cols-3 gap-2">
                 {TARGET_OPTIONS.map((opt) => (
                   <button
@@ -398,12 +398,12 @@ export default function AdsPage() {
                     onClick={() => updateForm({ targetAudience: opt.value as "all" | "verified" | "unverified" })}
                     className={`rounded-lg border p-2.5 text-left transition-all ${
                       form.targetAudience === opt.value
-                        ? "border-white bg-white/[0.08] text-white"
-                        : "border-white/[0.06] bg-white/[0.02] text-zinc-500 hover:border-white/[0.1]"
+                        ? "border-border-strong bg-surface-2 text-foreground"
+                        : "border-border bg-surface text-muted-foreground hover:border-border-strong"
                     }`}
                   >
                     <p className="text-[11px] font-semibold">{opt.label}</p>
-                    <p className="text-[8px] text-zinc-600 mt-0.5">{opt.desc}</p>
+                    <p className="text-[8px] text-faint mt-0.5">{opt.desc}</p>
                   </button>
                 ))}
               </div>
@@ -438,19 +438,19 @@ export default function AdsPage() {
               </div>
 
               {/* Summary */}
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5 space-y-2">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-600">Summary</p>
+              <div className="rounded-xl border border-border bg-surface p-3.5 space-y-2">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-faint">Summary</p>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[12px]">
-                  <span className="text-zinc-600">Layout</span>
-                  <span className="text-zinc-300 capitalize">{form.adType}</span>
-                  <span className="text-zinc-600">Button</span>
-                  <span className="text-zinc-300">&quot;{form.buttonText}&quot;</span>
-                  <span className="text-zinc-600">Priority</span>
-                  <span className="text-zinc-300">{form.priority}</span>
-                  <span className="text-zinc-600">Frequency</span>
-                  <span className="text-zinc-300">{form.maxImpressions === 0 ? "Unlimited" : `${form.maxImpressions}x per device`}</span>
-                  <span className="text-zinc-600">Broadcast</span>
-                  <span className="text-zinc-300">{form.broadcastToVerified ? "Yes" : "No"}</span>
+                  <span className="text-faint">Layout</span>
+                  <span className="text-foreground capitalize">{form.adType}</span>
+                  <span className="text-faint">Button</span>
+                  <span className="text-foreground">&quot;{form.buttonText}&quot;</span>
+                  <span className="text-faint">Priority</span>
+                  <span className="text-foreground">{form.priority}</span>
+                  <span className="text-faint">Frequency</span>
+                  <span className="text-foreground">{form.maxImpressions === 0 ? "Unlimited" : `${form.maxImpressions}x per device`}</span>
+                  <span className="text-faint">Broadcast</span>
+                  <span className="text-foreground">{form.broadcastToVerified ? "Yes" : "No"}</span>
                 </div>
               </div>
 

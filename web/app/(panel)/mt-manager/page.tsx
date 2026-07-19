@@ -39,10 +39,10 @@ export default function MtManagerPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-lg font-semibold tracking-tight text-white">
+        <h1 className="text-lg font-semibold tracking-tight text-foreground">
           MT Manager Guide
         </h1>
-        <p className="mt-0.5 text-[13px] text-zinc-500">
+        <p className="mt-0.5 text-[13px] text-muted-foreground">
           Patch any APK with AdVerify SDK
         </p>
       </div>
@@ -56,11 +56,11 @@ export default function MtManagerPage() {
           <a
             href="/adverify.dex"
             download="adverify.dex"
-            className="mt-3 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-[13px] font-medium text-black hover:bg-zinc-200"
+            className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[var(--brand)] px-4 py-2.5 text-[13px] font-medium text-black hover:brightness-110"
           >
             <Download className="h-4 w-4" />
             Download DEX
-            <span className="text-zinc-500 text-[11px]">(~50KB)</span>
+            <span className="text-muted-foreground text-[11px]">(~50KB)</span>
           </a>
         </Step>
 
@@ -221,18 +221,18 @@ function Step({
           <div
             className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
               highlight
-                ? "bg-white text-black ring-[3px] ring-white/20"
-                : "bg-white/[0.08] text-zinc-400"
+                ? "bg-[var(--brand)] text-black ring-[3px] ring-[var(--brand)]/20"
+                : "bg-surface-2 text-muted-foreground"
             }`}
           >
             {n}
           </div>
-          {!last && <div className="mt-1.5 h-full w-px bg-white/[0.08]" />}
+          {!last && <div className="mt-1.5 h-full w-px bg-surface-2" />}
         </div>
 
         {/* Content */}
         <div className="min-w-0 flex-1 pb-4">
-          <h3 className="mb-1.5 text-[13px] font-semibold text-white leading-7">
+          <h3 className="mb-1.5 text-[13px] font-semibold text-foreground leading-7">
             {title}
           </h3>
           {children}
@@ -256,17 +256,17 @@ function CodeBlock({
   onCopy: (text: string, id: string) => void;
 }) {
   return (
-    <div className="mt-2 rounded-xl border border-white/[0.06] bg-white/[0.03] overflow-hidden">
+    <div className="mt-2 rounded-xl border border-border bg-surface overflow-hidden">
       {/* Header with copy */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/[0.04] sm:px-4">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-border sm:px-4">
         <div className="flex gap-1">
-          <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
-          <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
-          <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
+          <div className="h-2 w-2 rounded-full bg-surface-2" />
+          <div className="h-2 w-2 rounded-full bg-surface-2" />
+          <div className="h-2 w-2 rounded-full bg-surface-2" />
         </div>
         <button
           onClick={() => onCopy(code, id)}
-          className="flex items-center gap-1 rounded-md bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-zinc-500 transition-all hover:bg-white/[0.08] hover:text-zinc-300 active:scale-95"
+          className="flex items-center gap-1 rounded-md bg-surface-2 border border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground transition-all hover:bg-surface-2 hover:text-foreground active:scale-95"
         >
           {copied === id ? (
             <><Check className="h-2.5 w-2.5" /> Copied</>
@@ -278,7 +278,7 @@ function CodeBlock({
       {/* Code */}
       <div className="overflow-x-auto px-3 py-3 sm:px-4 sm:py-3.5">
         <pre>
-          <code className="block whitespace-pre-wrap break-all text-[11px] leading-relaxed text-zinc-400 font-mono sm:text-[12px] sm:break-normal sm:whitespace-pre">
+          <code className="block whitespace-pre-wrap break-all text-[11px] leading-relaxed text-muted-foreground font-mono sm:text-[12px] sm:break-normal sm:whitespace-pre">
             {code}
           </code>
         </pre>
@@ -298,7 +298,7 @@ function Desc({
 }) {
   return (
     <p
-      className={`text-[13px] leading-relaxed text-zinc-500 ${className || ""}`}
+      className={`text-[13px] leading-relaxed text-muted-foreground ${className || ""}`}
     >
       {children}
     </p>
@@ -307,7 +307,7 @@ function Desc({
 
 function Mono({ children }: { children: React.ReactNode }) {
   return (
-    <code className="rounded bg-white/[0.06] px-1 py-px text-[11px] font-mono text-zinc-400">
+    <code className="rounded bg-surface-2 px-1 py-px text-[11px] font-mono text-muted-foreground">
       {children}
     </code>
   );

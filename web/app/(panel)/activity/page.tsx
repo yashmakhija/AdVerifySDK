@@ -70,18 +70,18 @@ export default function ActivityPage() {
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Filter by action (login, purchase...)"
-          className="w-full sm:max-w-xs rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white outline-none transition-all placeholder:text-zinc-600 focus:border-white/[0.15] focus:bg-white/[0.06]"
+          className="w-full sm:max-w-xs rounded-xl border border-border bg-surface-2 px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-faint focus:border-border-strong focus:bg-surface-2"
         />
       </div>
 
       {loading ? (
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-10 text-center text-[13px] text-zinc-600">
+        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
           Loading...
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] p-12 text-center">
-          <Activity className="mx-auto h-8 w-8 text-zinc-700" />
-          <p className="mt-3 text-sm font-medium text-zinc-400">
+        <div className="rounded-xl border border-dashed border-border bg-surface p-12 text-center">
+          <Activity className="mx-auto h-8 w-8 text-faint" />
+          <p className="mt-3 text-sm font-medium text-muted-foreground">
             {filter ? "No matching logs" : "No activity yet"}
           </p>
         </div>
@@ -90,19 +90,19 @@ export default function ActivityPage() {
           {filtered.map((log) => (
             <div
               key={log.id}
-              className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-colors hover:bg-white/[0.03]"
+              className="rounded-xl border border-border bg-surface p-4 transition-colors hover:bg-surface-2"
             >
               {/* Header: avatar + user + action + time */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-[11px] font-bold text-zinc-400 uppercase">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-[11px] font-bold text-muted-foreground uppercase">
                     {(log.user?.username || "?")[0]}
                   </div>
                   <div className="min-w-0">
-                    <span className="text-[13px] font-medium text-white">
+                    <span className="text-[13px] font-medium text-foreground">
                       {log.user?.username || "—"}
                     </span>
-                    <p className="text-[11px] text-zinc-600 truncate">
+                    <p className="text-[11px] text-faint truncate">
                       {log.user?.email}
                     </p>
                   </div>
@@ -111,7 +111,7 @@ export default function ActivityPage() {
                   <Badge variant={actionVariant(log.action)}>
                     {actionLabel(log.action)}
                   </Badge>
-                  <span className="hidden sm:block text-[11px] text-zinc-600 whitespace-nowrap">
+                  <span className="hidden sm:block text-[11px] text-faint whitespace-nowrap">
                     {formatTime(log.createdAt)}
                   </span>
                 </div>
@@ -119,17 +119,17 @@ export default function ActivityPage() {
 
               {/* Details — fully visible, no truncation */}
               {log.details && (
-                <p className="mt-2.5 text-[13px] text-zinc-400 leading-relaxed">
+                <p className="mt-2.5 text-[13px] text-muted-foreground leading-relaxed">
                   {log.details}
                 </p>
               )}
 
               {/* Meta: performed by, IP, time (mobile) */}
-              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-zinc-600">
+              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-faint">
                 {log.performedBy && (
                   <span>
                     Assigned by{" "}
-                    <span className="text-zinc-400 font-medium">
+                    <span className="text-muted-foreground font-medium">
                       {log.performedBy.username}
                     </span>
                   </span>

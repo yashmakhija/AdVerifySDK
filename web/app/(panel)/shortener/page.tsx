@@ -68,7 +68,7 @@ export default function ShortenerPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="flex items-center gap-3 text-zinc-600">
+        <div className="flex items-center gap-3 text-faint">
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-transparent" />
           <span className="text-sm">Loading...</span>
         </div>
@@ -85,23 +85,23 @@ export default function ShortenerPage() {
 
       <div className="max-w-2xl space-y-5">
         {/* Status */}
-        <div className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-4">
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-surface px-5 py-4">
           <div
             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
-              isComplete ? "bg-emerald-500/10" : "bg-white/[0.06]"
+              isComplete ? "bg-emerald-500/10" : "bg-surface-2"
             }`}
           >
             {isComplete ? (
               <CheckCircle2 className="h-4 w-4 text-emerald-400" />
             ) : (
-              <Link2 className="h-4 w-4 text-zinc-400" />
+              <Link2 className="h-4 w-4 text-muted-foreground" />
             )}
           </div>
           <div>
-            <p className="text-sm font-medium text-white">
+            <p className="text-sm font-medium text-foreground">
               {isComplete ? "Custom Shortener Active" : "Using System Default"}
             </p>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-muted-foreground">
               {isComplete
                 ? "All your apps use your own link shortener"
                 : "Leave fields empty to keep using the default system shortener"}
@@ -110,24 +110,24 @@ export default function ShortenerPage() {
         </div>
 
         {/* How it works */}
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-          <p className="mb-2 text-[13px] font-medium text-zinc-400">
+        <div className="rounded-xl border border-border bg-surface p-4">
+          <p className="mb-2 text-[13px] font-medium text-muted-foreground">
             How it works
           </p>
-          <div className="space-y-2 text-[12px] text-zinc-500 leading-relaxed">
+          <div className="space-y-2 text-[12px] text-muted-foreground leading-relaxed">
             <p>
-              <span className="text-zinc-400 font-medium">1.</span> User taps
+              <span className="text-muted-foreground font-medium">1.</span> User taps
               &quot;Get PIN&quot; in app &rarr; our server calls your shortener
               API to create a link
             </p>
             <p>
-              <span className="text-zinc-400 font-medium">2.</span> User
+              <span className="text-muted-foreground font-medium">2.</span> User
               completes the task on your shortener page
             </p>
             <p>
-              <span className="text-zinc-400 font-medium">3.</span> Your
+              <span className="text-muted-foreground font-medium">3.</span> Your
               shortener calls our{" "}
-              <code className="rounded bg-white/[0.06] px-1 py-px text-[11px] font-mono text-zinc-400">
+              <code className="rounded bg-surface-2 px-1 py-px text-[11px] font-mono text-muted-foreground">
                 POST /api/sdk/generate-pin
               </code>{" "}
               with your API secret to generate the PIN
@@ -137,11 +137,11 @@ export default function ShortenerPage() {
 
         {/* Config form */}
         <form onSubmit={handleSave} className="space-y-4">
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-4">
+          <div className="rounded-xl border border-border bg-surface p-4 space-y-4">
             <div>
               <div className="mb-1.5 flex items-center gap-1.5">
-                <Globe className="h-3.5 w-3.5 text-zinc-500" />
-                <label className="text-[13px] font-medium text-zinc-400">
+                <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+                <label className="text-[13px] font-medium text-muted-foreground">
                   Shortener API URL
                 </label>
               </div>
@@ -150,12 +150,12 @@ export default function ShortenerPage() {
                 onChange={(e) =>
                   setForm({ ...form, shortenerApiUrl: e.target.value })
                 }
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-zinc-700 focus:border-white/[0.15] focus:bg-white/[0.06]"
+                className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-faint focus:border-border-strong focus:bg-surface-2"
                 placeholder="https://your-shortener.com"
               />
-              <p className="mt-1.5 text-[11px] text-zinc-600">
+              <p className="mt-1.5 text-[11px] text-faint">
                 We POST to{" "}
-                <code className="font-mono text-zinc-500">
+                <code className="font-mono text-muted-foreground">
                   {"{url}"}/api/v1/adverify/create
                 </code>{" "}
                 with {"{apiKey, deviceId}"}
@@ -164,8 +164,8 @@ export default function ShortenerPage() {
 
             <div>
               <div className="mb-1.5 flex items-center gap-1.5">
-                <Key className="h-3.5 w-3.5 text-zinc-500" />
-                <label className="text-[13px] font-medium text-zinc-400">
+                <Key className="h-3.5 w-3.5 text-muted-foreground" />
+                <label className="text-[13px] font-medium text-muted-foreground">
                   Shortener API Secret
                 </label>
               </div>
@@ -175,12 +175,12 @@ export default function ShortenerPage() {
                   setForm({ ...form, shortenerApiSecret: e.target.value })
                 }
                 type="password"
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-zinc-700 focus:border-white/[0.15] focus:bg-white/[0.06]"
+                className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-faint focus:border-border-strong focus:bg-surface-2"
                 placeholder="Your shortener's secret key"
               />
-              <p className="mt-1.5 text-[11px] text-zinc-600">
+              <p className="mt-1.5 text-[11px] text-faint">
                 Your shortener sends this as{" "}
-                <code className="font-mono text-zinc-500">
+                <code className="font-mono text-muted-foreground">
                   Authorization: Bearer {"{secret}"}
                 </code>{" "}
                 when calling generate-pin
@@ -189,8 +189,8 @@ export default function ShortenerPage() {
 
             <div>
               <div className="mb-1.5 flex items-center gap-1.5">
-                <Link2 className="h-3.5 w-3.5 text-zinc-500" />
-                <label className="text-[13px] font-medium text-zinc-400">
+                <Link2 className="h-3.5 w-3.5 text-muted-foreground" />
+                <label className="text-[13px] font-medium text-muted-foreground">
                   Shortener Frontend URL
                 </label>
               </div>
@@ -199,10 +199,10 @@ export default function ShortenerPage() {
                 onChange={(e) =>
                   setForm({ ...form, shortenerFrontendUrl: e.target.value })
                 }
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-zinc-700 focus:border-white/[0.15] focus:bg-white/[0.06]"
+                className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-faint focus:border-border-strong focus:bg-surface-2"
                 placeholder="https://your-shortener.com"
               />
-              <p className="mt-1.5 text-[11px] text-zinc-600">
+              <p className="mt-1.5 text-[11px] text-faint">
                 The base URL where users see the verification page
               </p>
             </div>
@@ -212,7 +212,7 @@ export default function ShortenerPage() {
           {hasCustomConfig && !isComplete && (
             <div className="flex items-start gap-2.5 rounded-lg border border-amber-500/20 bg-amber-500/[0.06] px-3.5 py-3">
               <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" />
-              <p className="text-[12px] text-amber-300/80">
+              <p className="text-[12px] text-amber-700/80 dark:text-amber-300/80">
                 All 3 fields are required for a custom shortener. Fill in all
                 fields or clear them to use the system default.
               </p>

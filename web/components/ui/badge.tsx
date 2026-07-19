@@ -17,7 +17,7 @@ export function Badge({
         "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
         variant === "success" && "bg-emerald-500/10 text-emerald-400",
         variant === "destructive" && "bg-red-500/10 text-red-400",
-        variant === "default" && "bg-white/[0.06] text-zinc-400",
+        variant === "default" && "bg-surface-2 text-muted-foreground",
         className
       )}
     >

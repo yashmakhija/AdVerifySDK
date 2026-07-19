@@ -39,16 +39,16 @@ export default function TutorialPage() {
       />
 
       {loading ? (
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-10 text-center text-[13px] text-zinc-600">
+        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
           Loading video...
         </div>
       ) : error || !videoUrl ? (
-        <div className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] p-12 text-center">
-          <PlayCircle className="mx-auto h-8 w-8 text-zinc-700" />
-          <p className="mt-3 text-sm font-medium text-zinc-400">
+        <div className="rounded-xl border border-dashed border-border bg-surface p-12 text-center">
+          <PlayCircle className="mx-auto h-8 w-8 text-faint" />
+          <p className="mt-3 text-sm font-medium text-muted-foreground">
             {error ? "Failed to load video" : "No tutorial available yet"}
           </p>
-          <p className="mt-1 text-[12px] text-zinc-600">
+          <p className="mt-1 text-[12px] text-faint">
             {error
               ? "Something went wrong. Try again."
               : "Check back later — a tutorial video will be uploaded soon."}
@@ -56,7 +56,7 @@ export default function TutorialPage() {
           {error && (
             <button
               onClick={load}
-              className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3.5 py-2 text-[12px] font-medium text-zinc-400 transition-all hover:bg-white/[0.06] hover:text-white"
+              className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3.5 py-2 text-[12px] font-medium text-muted-foreground transition-all hover:bg-surface-2 hover:text-foreground"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Retry
@@ -64,7 +64,7 @@ export default function TutorialPage() {
           )}
         </div>
       ) : (
-        <div className="mx-auto max-w-2xl rounded-xl border border-white/[0.06] bg-black overflow-hidden">
+        <div className="mx-auto max-w-2xl rounded-xl border border-border bg-black overflow-hidden">
           <video
             src={videoUrl}
             controls

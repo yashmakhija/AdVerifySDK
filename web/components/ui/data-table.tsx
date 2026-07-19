@@ -21,16 +21,16 @@ export function DataTable<T extends Record<string, any>>({
 
   if (data.length === 0) {
     return (
-      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-10 text-center text-[13px] text-zinc-600">
+      <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
         {emptyMessage}
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-white/[0.06] bg-white/[0.02]">
+    <div className="overflow-x-auto rounded-xl border border-border bg-surface">
       <table className="w-full min-w-[600px] text-left text-sm">
-        <thead className="border-b border-white/[0.06] text-[11px] font-medium uppercase tracking-wider text-zinc-600">
+        <thead className="border-b border-border text-[11px] font-medium uppercase tracking-wider text-faint">
           <tr>
             {columns.map((col) => (
               <th key={String(col.key)} className="px-4 py-3 font-medium sm:px-5">
@@ -39,9 +39,9 @@ export function DataTable<T extends Record<string, any>>({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/[0.04]">
+        <tbody className="divide-y divide-border">
           {data.map((row, i) => (
-            <tr key={i} className="text-zinc-400 transition-colors hover:bg-white/[0.02]">
+            <tr key={i} className="text-muted-foreground transition-colors hover:bg-surface-2">
               {columns.map((col) => (
                 <td key={String(col.key)} className="px-4 py-3 sm:px-5">
                   {col.render

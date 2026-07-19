@@ -27,7 +27,7 @@ function statusIcon(status: string) {
     return <CheckCircle2 className="h-4 w-4 text-emerald-400" />;
   if (status === "cancelled")
     return <XCircle className="h-4 w-4 text-red-400" />;
-  return <Clock className="h-4 w-4 text-zinc-400" />;
+  return <Clock className="h-4 w-4 text-muted-foreground" />;
 }
 
 function formatDate(dateStr: string) {
@@ -68,14 +68,14 @@ export default function BillingPage() {
       />
 
       {loading ? (
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-10 text-center text-[13px] text-zinc-600">
+        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
           Loading...
         </div>
       ) : (
         <>
           {/* Plan Status Card */}
-          <div className="mb-6 rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-600 mb-3">
+          <div className="mb-6 rounded-xl border border-border bg-surface p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-faint mb-3">
               Plan Status
             </p>
 
@@ -88,12 +88,12 @@ export default function BillingPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[16px] font-bold text-white">
+                      <span className="text-[16px] font-bold text-foreground">
                         {planStatus.plan?.name}
                       </span>
                       <Badge variant="success">Active</Badge>
                     </div>
-                    <p className="mt-0.5 text-[12px] text-zinc-500">
+                    <p className="mt-0.5 text-[12px] text-muted-foreground">
                       {planStatus.daysLeft} days remaining · Expires{" "}
                       {planStatus.expiresAt && formatDate(planStatus.expiresAt)}
                     </p>
@@ -103,7 +103,7 @@ export default function BillingPage() {
                   href="https://t.me/TakezoTheunrival?text=Hi%2C%20I%20have%20a%20question%20about%20my%20subscription."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-[13px] font-medium text-zinc-400 transition-all hover:bg-white/[0.06] hover:text-white text-center"
+                  className="shrink-0 rounded-xl border border-border bg-surface px-4 py-2.5 text-[13px] font-medium text-muted-foreground transition-all hover:bg-surface-2 hover:text-foreground text-center"
                 >
                   Contact Support
                 </a>
@@ -119,7 +119,7 @@ export default function BillingPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[16px] font-bold text-white">
+                      <span className="text-[16px] font-bold text-foreground">
                         {planStatus.plan?.name}
                       </span>
                       <Badge variant="destructive">Expiring Soon</Badge>
@@ -151,7 +151,7 @@ export default function BillingPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[16px] font-bold text-white">
+                      <span className="text-[16px] font-bold text-foreground">
                         Grace Period
                       </span>
                       <Badge variant="destructive">Expired</Badge>
@@ -182,7 +182,7 @@ export default function BillingPage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[16px] font-bold text-white">
+                      <span className="text-[16px] font-bold text-foreground">
                         Suspended
                       </span>
                       <Badge variant="destructive">Keys Disabled</Badge>
@@ -208,14 +208,14 @@ export default function BillingPage() {
             {(!planStatus || planStatus.status === "expired") && (
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.04]">
-                    <Receipt className="h-5 w-5 text-zinc-500" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-2">
+                    <Receipt className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div>
-                    <span className="text-[16px] font-bold text-white">
+                    <span className="text-[16px] font-bold text-foreground">
                       No Active Plan
                     </span>
-                    <p className="mt-0.5 text-[12px] text-zinc-500">
+                    <p className="mt-0.5 text-[12px] text-muted-foreground">
                       Get a plan to unlock API keys, ads, PINs, and all features
                     </p>
                   </div>
@@ -224,7 +224,7 @@ export default function BillingPage() {
                   href="https://t.me/TakezoTheunrival?text=Hi%2C%20I%20want%20to%20purchase%20an%20AdVerify%20plan."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 rounded-xl bg-white px-4 py-2.5 text-[13px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98] text-center"
+                  className="shrink-0 rounded-xl bg-[var(--brand)] px-4 py-2.5 text-[13px] font-semibold text-black transition-all hover:brightness-110 active:scale-[0.98] text-center"
                 >
                   Get a Plan
                 </a>
@@ -233,17 +233,17 @@ export default function BillingPage() {
           </div>
 
           {/* Invoice History */}
-          <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-600 mb-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-faint mb-3">
             Invoice History
           </p>
 
           {purchases.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] p-12 text-center">
-              <Receipt className="mx-auto h-8 w-8 text-zinc-700" />
-              <p className="mt-3 text-sm font-medium text-zinc-400">
+            <div className="rounded-xl border border-dashed border-border bg-surface p-12 text-center">
+              <Receipt className="mx-auto h-8 w-8 text-faint" />
+              <p className="mt-3 text-sm font-medium text-muted-foreground">
                 No invoices yet
               </p>
-              <p className="mt-1 text-[12px] text-zinc-600">
+              <p className="mt-1 text-[12px] text-faint">
                 Your payment history will appear here once your plan is
                 activated
               </p>
@@ -253,26 +253,26 @@ export default function BillingPage() {
               {purchases.map((p) => (
                 <div
                   key={p.id}
-                  className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden"
+                  className="rounded-xl border border-border bg-surface overflow-hidden"
                 >
                   <div className="p-4 sm:p-5">
                     {/* Header */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/[0.1] bg-white/[0.06]">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border-strong bg-surface-2">
                           {statusIcon(p.status)}
                         </div>
                         <div>
-                          <span className="text-[14px] font-medium text-white">
+                          <span className="text-[14px] font-medium text-foreground">
                             {p.plan?.name || "Plan"}
                           </span>
-                          <p className="text-[11px] text-zinc-600">
+                          <p className="text-[11px] text-faint">
                             Invoice #{String(p.id).padStart(4, "0")}
                           </p>
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="text-[16px] font-bold text-white">
+                        <span className="text-[16px] font-bold text-foreground">
                           ₹{p.amount}
                         </span>
                         <div className="mt-0.5">
@@ -286,27 +286,27 @@ export default function BillingPage() {
                     {/* Details grid */}
                     <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-y-3 gap-x-4 text-[12px]">
                       <div>
-                        <p className="text-zinc-600 mb-0.5">Purchased</p>
-                        <p className="text-zinc-400">
+                        <p className="text-faint mb-0.5">Purchased</p>
+                        <p className="text-muted-foreground">
                           {formatDate(p.purchasedAt)}
                         </p>
                       </div>
                       <div>
-                        <p className="text-zinc-600 mb-0.5">Expires</p>
-                        <p className="text-zinc-400">
+                        <p className="text-faint mb-0.5">Expires</p>
+                        <p className="text-muted-foreground">
                           {formatDate(p.expiresAt)}
                         </p>
                       </div>
                       <div>
-                        <p className="text-zinc-600 mb-0.5">Duration</p>
-                        <p className="text-zinc-400">
+                        <p className="text-faint mb-0.5">Duration</p>
+                        <p className="text-muted-foreground">
                           {p.plan?.durationDays || 30} days
                         </p>
                       </div>
                       {p.assignedBy && (
                         <div>
-                          <p className="text-zinc-600 mb-0.5">Activated by</p>
-                          <p className="text-zinc-400">
+                          <p className="text-faint mb-0.5">Activated by</p>
+                          <p className="text-muted-foreground">
                             {p.assignedBy.username}
                           </p>
                         </div>
@@ -315,11 +315,11 @@ export default function BillingPage() {
 
                     {/* Admin note */}
                     {p.note && (
-                      <div className="mt-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3.5 py-2.5">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-600 mb-1">
+                      <div className="mt-3 rounded-lg border border-border bg-surface px-3.5 py-2.5">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-faint mb-1">
                           Payment Note
                         </p>
-                        <p className="text-[13px] text-zinc-400 leading-relaxed">
+                        <p className="text-[13px] text-muted-foreground leading-relaxed">
                           {p.note}
                         </p>
                       </div>

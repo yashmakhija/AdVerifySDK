@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 
 export function Footer() {
   return (
@@ -6,11 +7,7 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <div className="flex flex-col gap-4 py-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-5 w-5 items-center justify-center rounded bg-white">
-              <span className="text-[8px] font-extrabold text-black leading-none">
-                A
-              </span>
-            </div>
+            <BrandLogo className="h-5 w-5" />
             <span className="text-[13px] text-zinc-600">
               &copy; {new Date().getFullYear()} AdVerify. Ad serving & PIN
               verification SDK.

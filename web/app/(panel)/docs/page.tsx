@@ -40,17 +40,17 @@ function CodeSnippet({ code, id }: { code: string; id: string }) {
   }
 
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] overflow-hidden">
+    <div className="rounded-xl border border-border bg-surface overflow-hidden">
       {/* Header with copy */}
-      <div className="flex items-center justify-between px-3.5 py-1.5 border-b border-white/[0.04]">
+      <div className="flex items-center justify-between px-3.5 py-1.5 border-b border-border">
         <div className="flex gap-1">
-          <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
-          <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
-          <div className="h-2 w-2 rounded-full bg-white/[0.06]" />
+          <div className="h-2 w-2 rounded-full bg-surface-2" />
+          <div className="h-2 w-2 rounded-full bg-surface-2" />
+          <div className="h-2 w-2 rounded-full bg-surface-2" />
         </div>
         <button
           onClick={copy}
-          className="flex items-center gap-1 rounded-md bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-zinc-500 transition-all hover:bg-white/[0.08] hover:text-zinc-300 active:scale-95"
+          className="flex items-center gap-1 rounded-md bg-surface-2 border border-border px-2 py-0.5 text-[10px] font-medium text-muted-foreground transition-all hover:bg-surface-2 hover:text-foreground active:scale-95"
         >
           {copied === id ? (
             <><Check className="h-2.5 w-2.5" /> Copied</>
@@ -61,7 +61,7 @@ function CodeSnippet({ code, id }: { code: string; id: string }) {
       </div>
       {/* Code */}
       <div className="overflow-x-auto px-3.5 py-3">
-        <pre className="text-[12px] leading-relaxed text-zinc-400 font-mono">
+        <pre className="text-[12px] leading-relaxed text-muted-foreground font-mono">
           <code className="whitespace-pre-wrap break-all sm:whitespace-pre sm:break-normal">
             {code}
           </code>
@@ -80,8 +80,8 @@ export default function DocsPage() {
       />
 
       <div className="space-y-5">
-        <div className="rounded-xl border border-white/[0.06] bg-zinc-950 p-5">
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+        <div className="rounded-xl border border-border bg-background p-5">
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             Quick Start
           </p>
           <div className="space-y-3">
@@ -100,27 +100,27 @@ export default function DocsPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+        <div className="rounded-xl border border-border bg-surface p-5">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             API Endpoints
           </p>
-          <p className="mb-4 text-[13px] text-zinc-500">
+          <p className="mb-4 text-[13px] text-muted-foreground">
             Admin endpoints use HTTP Basic Auth. SDK endpoints use{" "}
-            <code className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[11px] font-mono text-zinc-400">
+            <code className="rounded bg-surface-2 px-1.5 py-0.5 text-[11px] font-mono text-muted-foreground">
               x-api-key
             </code>{" "}
             header.
           </p>
           <div className="overflow-x-auto -mx-5 px-5">
             <table className="w-full min-w-[480px] text-left text-[13px]">
-              <thead className="border-b border-white/[0.04] text-[11px] text-zinc-500">
+              <thead className="border-b border-border text-[11px] text-muted-foreground">
                 <tr>
                   <th className="pb-2.5 pr-3 font-medium w-16">Method</th>
                   <th className="pb-2.5 pr-3 font-medium">Path</th>
                   <th className="pb-2.5 font-medium">Description</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.04]">
+              <tbody className="divide-y divide-border">
                 {ENDPOINTS.map(({ method, path, desc }) => (
                   <tr key={`${method}-${path}`}>
                     <td className="py-2.5 pr-3">
@@ -128,10 +128,10 @@ export default function DocsPage() {
                         {method}
                       </span>
                     </td>
-                    <td className="py-2.5 pr-3 font-mono text-[11px] text-zinc-200 whitespace-nowrap">
+                    <td className="py-2.5 pr-3 font-mono text-[11px] text-foreground whitespace-nowrap">
                       {path}
                     </td>
-                    <td className="py-2.5 text-zinc-500">{desc}</td>
+                    <td className="py-2.5 text-muted-foreground">{desc}</td>
                   </tr>
                 ))}
               </tbody>

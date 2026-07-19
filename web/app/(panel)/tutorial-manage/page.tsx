@@ -64,13 +64,13 @@ export default function TutorialManagePage() {
         description="Upload a tutorial video for your users"
       />
 
-      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 sm:p-6">
+      <div className="rounded-xl border border-border bg-surface p-5 sm:p-6">
         {/* Drop zone */}
         <label
           className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-12 text-center cursor-pointer transition-all ${
             file
-              ? "border-white/[0.15] bg-white/[0.03]"
-              : "border-white/[0.08] bg-white/[0.01] hover:border-white/[0.12] hover:bg-white/[0.03]"
+              ? "border-border-strong bg-surface"
+              : "border-border bg-surface hover:border-border-strong hover:bg-surface-2"
           }`}
         >
           <input
@@ -85,19 +85,19 @@ export default function TutorialManagePage() {
           />
           {file ? (
             <>
-              <Film className="h-8 w-8 text-zinc-400 mb-3" />
-              <p className="text-[14px] font-medium text-white">{file.name}</p>
-              <p className="mt-1 text-[12px] text-zinc-500">
+              <Film className="h-8 w-8 text-muted-foreground mb-3" />
+              <p className="text-[14px] font-medium text-foreground">{file.name}</p>
+              <p className="mt-1 text-[12px] text-muted-foreground">
                 {formatSize(file.size)} · Click to change
               </p>
             </>
           ) : (
             <>
-              <Upload className="h-8 w-8 text-zinc-600 mb-3" />
-              <p className="text-[14px] font-medium text-zinc-400">
+              <Upload className="h-8 w-8 text-faint mb-3" />
+              <p className="text-[14px] font-medium text-muted-foreground">
                 Click to select a video
               </p>
-              <p className="mt-1 text-[12px] text-zinc-600">
+              <p className="mt-1 text-[12px] text-faint">
                 MP4, WebM, MOV · Max 500 MB
               </p>
             </>
@@ -108,12 +108,12 @@ export default function TutorialManagePage() {
         {uploading && (
           <div className="mt-4">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[12px] text-zinc-500">Uploading...</span>
-              <span className="text-[12px] font-medium text-zinc-400">{progress}%</span>
+              <span className="text-[12px] text-muted-foreground">Uploading...</span>
+              <span className="text-[12px] font-medium text-muted-foreground">{progress}%</span>
             </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
               <div
-                className="h-full rounded-full bg-white transition-all duration-300"
+                className="h-full rounded-full bg-[var(--brand)] transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -124,7 +124,7 @@ export default function TutorialManagePage() {
         {done && !uploading && (
           <div className="mt-4 flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/[0.06] px-3.5 py-2.5">
             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            <p className="text-[13px] text-emerald-300">
+            <p className="text-[13px] text-emerald-700 dark:text-emerald-300">
               Video uploaded — users can now watch it from the Tutorial page
             </p>
           </div>
@@ -132,13 +132,13 @@ export default function TutorialManagePage() {
 
         {/* Upload button */}
         <div className="mt-4 flex items-center justify-between">
-          <p className="text-[11px] text-zinc-600">
+          <p className="text-[11px] text-faint">
             This replaces any existing tutorial video
           </p>
           <button
             onClick={handleUpload}
             disabled={!file || uploading}
-            className="rounded-xl bg-white px-5 py-2.5 text-[13px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+            className="rounded-xl bg-[var(--brand)] px-5 py-2.5 text-[13px] font-semibold text-black transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
           >
             {uploading ? "Uploading..." : "Upload Video"}
           </button>

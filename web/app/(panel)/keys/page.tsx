@@ -81,7 +81,7 @@ export default function KeysPage() {
       />
 
       {loading ? (
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-10 text-center text-[13px] text-zinc-600">
+        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
           Loading...
         </div>
       ) : keys.length === 0 ? (

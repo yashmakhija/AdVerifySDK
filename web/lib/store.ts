@@ -103,3 +103,34 @@ export const usePlanGateStore = create<PlanGateState>((set) => ({
   planBlocked: false,
   setPlanBlocked: (planBlocked) => set({ planBlocked }),
 }));
+
+type Theme = "light" | "dark";
+
+interface ThemeState {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
+  /** Sync store to the class already applied by the no-flash inline script. */
+  hydrate: () => void;
+}
+
+export const useThemeStore = create<ThemeState>((set, get) => ({
+  theme: "dark",
+  setTheme: (theme) => {
+    if (typeof document !== "undefined") {
+      document.documentElement.classList.toggle("dark", theme === "dark");
+      try {
+        localStorage.setItem("adverify-theme", theme);
+      } catch {}
+    }
+    set({ theme });
+  },
+  toggleTheme: () => get().setTheme(get().theme === "dark" ? "light" : "dark"),
+  hydrate: () => {
+    if (typeof document === "undefined") return;
+    const theme: Theme = document.documentElement.classList.contains("dark")
+      ? "dark"
+      : "light";
+    set({ theme });
+  },
+}));

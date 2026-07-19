@@ -152,8 +152,8 @@ export default function DashboardPage() {
   if (!stats) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="flex items-center gap-3 text-zinc-600">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-transparent" />
+        <div className="flex items-center gap-3 text-faint">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-border-strong border-t-transparent" />
           <span className="text-sm">Loading...</span>
         </div>
       </div>
@@ -166,10 +166,10 @@ export default function DashboardPage() {
       <div className="mb-6 flex items-center gap-3.5">
         <UserAvatar src={avatar} name={username} size="md" />
         <div>
-          <h1 className="text-lg font-bold tracking-tight text-white">
+          <h1 className="text-lg font-bold tracking-tight text-foreground">
             {greeting.time}, {username || "there"}
           </h1>
-          <p className="mt-0.5 text-[13px] text-zinc-500">{greeting.tagline}</p>
+          <p className="mt-0.5 text-[13px] text-muted-foreground">{greeting.tagline}</p>
         </div>
       </div>
 
@@ -183,19 +183,19 @@ export default function DashboardPage() {
               warning: "border-amber-500/20 bg-amber-500/[0.06]",
             };
             const textColors = {
-              info: "text-blue-300",
-              update: "text-emerald-300",
-              warning: "text-amber-300",
+              info: "text-blue-700 dark:text-blue-300",
+              update: "text-emerald-700 dark:text-emerald-300",
+              warning: "text-amber-700 dark:text-amber-300",
             };
             const subColors = {
-              info: "text-blue-400/60",
-              update: "text-emerald-400/60",
-              warning: "text-amber-400/60",
+              info: "text-blue-600/70 dark:text-blue-400/60",
+              update: "text-emerald-600/70 dark:text-emerald-400/60",
+              warning: "text-amber-600/70 dark:text-amber-400/60",
             };
             const iconColors = {
-              info: "bg-blue-500/10 text-blue-400",
-              update: "bg-emerald-500/10 text-emerald-400",
-              warning: "bg-amber-500/10 text-amber-400",
+              info: "bg-blue-500/10 text-blue-500 dark:text-blue-400",
+              update: "bg-emerald-500/10 text-emerald-500 dark:text-emerald-400",
+              warning: "bg-amber-500/10 text-amber-500 dark:text-amber-400",
             };
             return (
               <div
@@ -221,7 +221,7 @@ export default function DashboardPage() {
                 </div>
                 <button
                   onClick={() => dismissAnnouncement(a.id)}
-                  className="shrink-0 mt-0.5 flex h-5 w-5 items-center justify-center rounded text-zinc-600 transition-colors hover:text-zinc-300"
+                  className="shrink-0 mt-0.5 flex h-5 w-5 items-center justify-center rounded text-faint transition-colors hover:text-muted-foreground"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -236,13 +236,13 @@ export default function DashboardPage() {
         <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-red-500/30 bg-red-500/[0.08] px-4 py-3.5">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-500/15">
-              <Ban className="h-4 w-4 text-red-400" />
+              <Ban className="h-4 w-4 text-red-500 dark:text-red-400" />
             </div>
             <div>
-              <p className="text-[13px] font-medium text-red-300">
+              <p className="text-[13px] font-medium text-red-700 dark:text-red-300">
                 Your API keys have been suspended
               </p>
-              <p className="text-[11px] text-red-400/60">
+              <p className="text-[11px] text-red-600/70 dark:text-red-400/60">
                 Your plan expired and the grace period is over. Renew to
                 reactivate everything.
               </p>
@@ -263,13 +263,13 @@ export default function DashboardPage() {
         <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-red-500/20 bg-red-500/[0.06] px-4 py-3.5">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-500/10">
-              <AlertTriangle className="h-4 w-4 text-red-400" />
+              <AlertTriangle className="h-4 w-4 text-red-500 dark:text-red-400" />
             </div>
             <div>
-              <p className="text-[13px] font-medium text-red-300">
+              <p className="text-[13px] font-medium text-red-700 dark:text-red-300">
                 {planStatus.message}
               </p>
-              <p className="text-[11px] text-red-400/60">
+              <p className="text-[11px] text-red-600/70 dark:text-red-400/60">
                 Your API keys still work but will be suspended soon. Renew now
                 to avoid disruption.
               </p>
@@ -290,13 +290,13 @@ export default function DashboardPage() {
         <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-red-500/20 bg-red-500/[0.06] px-4 py-3.5">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-500/10">
-              <AlertTriangle className="h-4 w-4 text-red-400" />
+              <AlertTriangle className="h-4 w-4 text-red-500 dark:text-red-400" />
             </div>
             <div>
-              <p className="text-[13px] font-medium text-red-300">
+              <p className="text-[13px] font-medium text-red-700 dark:text-red-300">
                 No active plan
               </p>
-              <p className="text-[11px] text-red-400/60">
+              <p className="text-[11px] text-red-600/70 dark:text-red-400/60">
                 Get a plan to start using AdVerify
               </p>
             </div>
@@ -305,7 +305,7 @@ export default function DashboardPage() {
             href="https://t.me/TakezoTheunrival?text=Hi%2C%20I%20want%20to%20purchase%20an%20AdVerify%20plan."
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 rounded-lg bg-white px-4 py-2 text-[13px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98] text-center"
+            className="shrink-0 rounded-lg bg-[var(--brand)] px-4 py-2 text-[13px] font-semibold text-black transition-all hover:brightness-110 active:scale-[0.98] text-center"
           >
             Get a Plan
           </a>
@@ -316,14 +316,14 @@ export default function DashboardPage() {
         <div className="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3.5">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10">
-              <AlertTriangle className="h-4 w-4 text-amber-400" />
+              <AlertTriangle className="h-4 w-4 text-amber-500 dark:text-amber-400" />
             </div>
             <div>
-              <p className="text-[13px] font-medium text-amber-300">
+              <p className="text-[13px] font-medium text-amber-700 dark:text-amber-300">
                 Plan expires in {planStatus.daysLeft} day
                 {planStatus.daysLeft !== 1 ? "s" : ""}
               </p>
-              <p className="text-[11px] text-amber-400/60">
+              <p className="text-[11px] text-amber-600/70 dark:text-amber-400/60">
                 {planStatus.plan?.name} · Renew to keep your ads and PINs active
               </p>
             </div>
@@ -342,40 +342,40 @@ export default function DashboardPage() {
       {/* Quick Start — show for new users with no API keys */}
       {isNewUser ? (
         <div className="mb-8">
-          <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] overflow-hidden">
-            <div className="px-5 py-4 border-b border-white/[0.06]">
-              <h2 className="text-[14px] font-semibold text-white">
+          <div className="rounded-xl border border-border bg-surface overflow-hidden">
+            <div className="px-5 py-4 border-b border-border">
+              <h2 className="text-[14px] font-semibold text-foreground">
                 Get started in 4 steps
               </h2>
-              <p className="mt-0.5 text-[12px] text-zinc-600">
+              <p className="mt-0.5 text-[12px] text-faint">
                 Set up your first app with AdVerify
               </p>
             </div>
-            <div className="divide-y divide-white/[0.04]">
+            <div className="divide-y divide-border">
               {QUICK_START_STEPS.map(
                 ({ step, title, description, href, icon: Icon, cta }) => (
                   <Link
                     key={step}
                     href={href}
-                    className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-white/[0.02]"
+                    className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-surface-2"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] transition-colors group-hover:border-white/[0.15] group-hover:bg-white/[0.06]">
-                      <Icon className="h-[18px] w-[18px] text-zinc-500 transition-colors group-hover:text-white" />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-surface transition-colors group-hover:border-border-strong group-hover:bg-surface-2">
+                      <Icon className="h-[18px] w-[18px] text-muted-foreground transition-colors group-hover:text-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/[0.06] text-[10px] font-bold text-zinc-500">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-surface-2 text-[10px] font-bold text-muted-foreground">
                           {step}
                         </span>
-                        <h3 className="text-[13px] font-medium text-white">
+                        <h3 className="text-[13px] font-medium text-foreground">
                           {title}
                         </h3>
                       </div>
-                      <p className="mt-0.5 text-[12px] text-zinc-600 pl-7">
+                      <p className="mt-0.5 text-[12px] text-faint pl-7">
                         {description}
                       </p>
                     </div>
-                    <span className="hidden sm:flex shrink-0 items-center gap-1 text-[12px] font-medium text-zinc-600 transition-colors group-hover:text-white">
+                    <span className="hidden sm:flex shrink-0 items-center gap-1 text-[12px] font-medium text-faint transition-colors group-hover:text-foreground">
                       {cta}
                       <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                     </span>
@@ -447,7 +447,7 @@ export default function DashboardPage() {
 
       {pinStats && (
         <>
-          <h2 className="mt-8 mb-3 text-[13px] font-semibold text-zinc-400">
+          <h2 className="mt-8 mb-3 text-[13px] font-semibold text-muted-foreground">
             PIN Analytics
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">

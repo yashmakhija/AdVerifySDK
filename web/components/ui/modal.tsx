@@ -33,12 +33,12 @@ export function Modal({ isOpen, onClose, title, children, wide }: ModalProps) {
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm p-0 sm:items-center sm:p-5"
       onClick={(e) => e.target === overlayRef.current && onClose()}
     >
-      <div className={`w-full rounded-t-2xl border border-white/[0.08] bg-[#111] shadow-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto animate-in ${wide ? "sm:max-w-3xl" : "sm:max-w-md"}`}>
-        <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-          <h3 className="text-[14px] font-semibold text-white">{title}</h3>
+      <div className={`w-full rounded-t-2xl border border-border bg-popover shadow-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto animate-in ${wide ? "sm:max-w-3xl" : "sm:max-w-md"}`}>
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <h3 className="text-[14px] font-semibold text-foreground">{title}</h3>
           <button
             onClick={onClose}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-white/[0.06] hover:text-zinc-300"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-faint transition-colors hover:bg-surface-2 hover:text-foreground"
           >
             <X className="h-4 w-4" />
           </button>
@@ -56,12 +56,12 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export function FormInput({ label, className, ...props }: FormInputProps) {
   return (
     <div>
-      <label className="mb-1.5 block text-[13px] font-medium text-zinc-400">
+      <label className="mb-1.5 block text-[13px] font-medium text-muted-foreground">
         {label}
       </label>
       <input
         className={cn(
-          "w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white outline-none transition-all placeholder:text-zinc-600 focus:border-white/[0.15] focus:bg-white/[0.06]",
+          "w-full rounded-xl border border-border bg-surface-2 px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-faint focus:border-border-strong focus:bg-surface-2",
           className
         )}
         {...props}
@@ -84,13 +84,13 @@ export function FormSelect({
   return (
     <div>
       {label && (
-        <label className="mb-1.5 block text-[13px] font-medium text-zinc-400">
+        <label className="mb-1.5 block text-[13px] font-medium text-muted-foreground">
           {label}
         </label>
       )}
       <select
         className={cn(
-          "w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white outline-none transition-all focus:border-white/[0.15] focus:bg-white/[0.06]",
+          "w-full rounded-xl border border-border bg-surface-2 px-3.5 py-2.5 text-sm text-foreground outline-none transition-all focus:border-border-strong focus:bg-surface-2",
           className
         )}
         {...props}
@@ -113,12 +113,12 @@ export function FormTextarea({
 }: FormTextareaProps) {
   return (
     <div>
-      <label className="mb-1.5 block text-[13px] font-medium text-zinc-400">
+      <label className="mb-1.5 block text-[13px] font-medium text-muted-foreground">
         {label}
       </label>
       <textarea
         className={cn(
-          "w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-3.5 py-2.5 text-sm text-white outline-none transition-all placeholder:text-zinc-600 focus:border-white/[0.15] focus:bg-white/[0.06]",
+          "w-full rounded-xl border border-border bg-surface-2 px-3.5 py-2.5 text-sm text-foreground outline-none transition-all placeholder:text-faint focus:border-border-strong focus:bg-surface-2",
           className
         )}
         rows={3}

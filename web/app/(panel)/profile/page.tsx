@@ -93,53 +93,53 @@ export default function ProfilePage() {
       <PageHeader title="Profile" description="Your account details" />
 
       {/* Profile Card */}
-      <div className="mb-6 rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 sm:p-6">
+      <div className="mb-6 rounded-xl border border-border bg-surface p-5 sm:p-6">
         <div className="flex items-center gap-4">
           <button onClick={openAvatarPicker} className="group relative">
             <UserAvatar src={avatar} name={username} size="lg" />
             <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-              <Pencil className="h-4 w-4 text-white" />
+              <Pencil className="h-4 w-4 text-foreground" />
             </div>
           </button>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="text-[18px] font-bold text-white truncate">
+              <h2 className="text-[18px] font-bold text-foreground truncate">
                 {username}
               </h2>
               {role === "ADMIN" && <Badge variant="default">Admin</Badge>}
               {role === "USER" && <Badge variant="success">User</Badge>}
             </div>
-            <p className="text-[13px] text-zinc-500 truncate">{email}</p>
+            <p className="text-[13px] text-muted-foreground truncate">{email}</p>
           </div>
         </div>
 
         <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-600 mb-1">
+          <div className="rounded-lg border border-border bg-surface px-4 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-faint mb-1">
               Username
             </p>
-            <p className="text-[14px] text-zinc-300 font-medium">{username}</p>
+            <p className="text-[14px] text-foreground font-medium">{username}</p>
           </div>
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-600 mb-1">
+          <div className="rounded-lg border border-border bg-surface px-4 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-faint mb-1">
               Email
             </p>
-            <p className="text-[14px] text-zinc-300 font-medium truncate">
+            <p className="text-[14px] text-foreground font-medium truncate">
               {email}
             </p>
           </div>
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-600 mb-1">
+          <div className="rounded-lg border border-border bg-surface px-4 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-faint mb-1">
               Role
             </p>
-            <p className="text-[14px] text-zinc-300 font-medium">{role}</p>
+            <p className="text-[14px] text-foreground font-medium">{role}</p>
           </div>
         </div>
       </div>
 
       {/* Change Password */}
-      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 sm:p-6">
-        <h3 className="text-[14px] font-semibold text-white mb-4">
+      <div className="rounded-xl border border-border bg-surface p-5 sm:p-6">
+        <h3 className="text-[14px] font-semibold text-foreground mb-4">
           Change Password
         </h3>
         <form onSubmit={handleChangePassword} className="space-y-4 max-w-sm">
@@ -171,7 +171,7 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={pwLoading}
-              className="rounded-xl bg-white px-5 py-2.5 text-[13px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-50"
+              className="rounded-xl bg-[var(--brand)] px-5 py-2.5 text-[13px] font-semibold text-black transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
             >
               {pwLoading ? "Updating..." : "Update Password"}
             </button>
@@ -200,7 +200,7 @@ export default function ProfilePage() {
 
           {/* Grid */}
           <div>
-            <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-600">
+            <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-faint">
               Pick an avatar
             </p>
             <div className="grid grid-cols-4 gap-2.5">
@@ -216,7 +216,7 @@ export default function ProfilePage() {
                     "relative aspect-square overflow-hidden rounded-xl border-2 transition-all hover:scale-105",
                     !useCustom && selectedAvatar === a.url
                       ? "border-white shadow-lg shadow-white/10"
-                      : "border-white/[0.06] hover:border-white/[0.15]"
+                      : "border-border hover:border-border-strong"
                   )}
                 >
                   <img
@@ -226,7 +226,7 @@ export default function ProfilePage() {
                   />
                   {!useCustom && selectedAvatar === a.url && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--brand)]">
                         <Check className="h-3.5 w-3.5 text-black" strokeWidth={3} />
                       </div>
                     </div>
@@ -241,7 +241,7 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => setUseCustom(!useCustom)}
-              className="flex items-center gap-2 text-[12px] font-medium text-zinc-500 transition-colors hover:text-zinc-300"
+              className="flex items-center gap-2 text-[12px] font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               <LinkIcon className="h-3.5 w-3.5" />
               {useCustom ? "Use preset avatars" : "Use custom URL instead"}
@@ -264,7 +264,7 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => setAvatarModal(false)}
-              className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2 text-[13px] font-medium text-zinc-400 transition-all hover:bg-white/[0.06]"
+              className="rounded-xl border border-border bg-surface px-4 py-2 text-[13px] font-medium text-muted-foreground transition-all hover:bg-surface-2"
             >
               Cancel
             </button>
@@ -272,7 +272,7 @@ export default function ProfilePage() {
               type="button"
               onClick={handleAvatarSave}
               disabled={avatarLoading || !activeAvatarUrl}
-              className="rounded-xl bg-white px-4 py-2 text-[13px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-50"
+              className="rounded-xl bg-[var(--brand)] px-4 py-2 text-[13px] font-semibold text-black transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
             >
               {avatarLoading ? "Saving..." : "Save"}
             </button>

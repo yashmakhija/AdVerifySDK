@@ -79,14 +79,14 @@ export default function UsersPage() {
       />
 
       {loading ? (
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-10 text-center text-[13px] text-zinc-600">
+        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
           Loading...
         </div>
       ) : users.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] p-12 text-center">
-          <Users className="mx-auto h-8 w-8 text-zinc-700" />
-          <p className="mt-3 text-sm font-medium text-zinc-400">No users yet</p>
-          <p className="mt-1 text-[12px] text-zinc-600">Create your first user to get started</p>
+        <div className="rounded-xl border border-dashed border-border bg-surface p-12 text-center">
+          <Users className="mx-auto h-8 w-8 text-faint" />
+          <p className="mt-3 text-sm font-medium text-muted-foreground">No users yet</p>
+          <p className="mt-1 text-[12px] text-faint">Create your first user to get started</p>
           <Button size="sm" className="mt-4" onClick={() => setModal(true)}>
             Create User
           </Button>
@@ -94,10 +94,10 @@ export default function UsersPage() {
       ) : (
         <>
           {/* Desktop */}
-          <div className="hidden lg:block rounded-xl border border-white/[0.06] bg-white/[0.02]">
+          <div className="hidden lg:block rounded-xl border border-border bg-surface">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-white/[0.06] text-[11px] font-medium uppercase tracking-wider text-zinc-600">
+                <tr className="border-b border-border text-[11px] font-medium uppercase tracking-wider text-faint">
                   <th className="px-5 py-3.5">Username</th>
                   <th className="px-5 py-3.5">Email</th>
                   <th className="px-5 py-3.5">Role</th>
@@ -106,18 +106,18 @@ export default function UsersPage() {
                   <th className="px-5 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.04]">
+              <tbody className="divide-y divide-border">
                 {users.map((u) => {
                   const plan = getActivePlan(u);
                   return (
-                    <tr key={u.id} className="text-zinc-400 transition-colors hover:bg-white/[0.02]">
+                    <tr key={u.id} className="text-muted-foreground transition-colors hover:bg-surface-2">
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-2.5">
                           <UserAvatar src={u.avatar} name={u.username} size="sm" />
-                          <span className="font-medium text-white">{u.username}</span>
+                          <span className="font-medium text-foreground">{u.username}</span>
                         </div>
                       </td>
-                      <td className="px-5 py-3.5 text-zinc-500 text-[13px]">{u.email}</td>
+                      <td className="px-5 py-3.5 text-muted-foreground text-[13px]">{u.email}</td>
                       <td className="px-5 py-3.5">
                         <Badge variant={u.role === "ADMIN" ? "default" : "success"}>
                           {u.role}
@@ -127,7 +127,7 @@ export default function UsersPage() {
                         {plan ? (
                           <Badge variant="success">{plan}</Badge>
                         ) : (
-                          <span className="text-[12px] text-zinc-600">No plan</span>
+                          <span className="text-[12px] text-faint">No plan</span>
                         )}
                       </td>
                       <td className="px-5 py-3.5">
@@ -153,7 +153,7 @@ export default function UsersPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => deleteUser(u.id)}
-                            className="text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 h-7 px-2.5 gap-1.5"
+                            className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-500/10 h-7 px-2.5 gap-1.5"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
@@ -171,14 +171,14 @@ export default function UsersPage() {
             {users.map((u) => {
               const plan = getActivePlan(u);
               return (
-                <div key={u.id} className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
+                <div key={u.id} className="rounded-xl border border-border bg-surface overflow-hidden">
                   <div className="p-4 space-y-2">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <UserAvatar src={u.avatar} name={u.username} size="sm" />
                         <div className="min-w-0">
-                          <h3 className="font-medium text-white truncate">{u.username}</h3>
-                          <p className="text-[11px] text-zinc-600 mt-0.5">{u.email}</p>
+                          <h3 className="font-medium text-foreground truncate">{u.username}</h3>
+                          <p className="text-[11px] text-faint mt-0.5">{u.email}</p>
                         </div>
                       </div>
                       <Badge variant={u.isActive ? "success" : "destructive"} className="shrink-0">
@@ -190,10 +190,10 @@ export default function UsersPage() {
                       {plan && <Badge variant="success">{plan}</Badge>}
                     </div>
                   </div>
-                  <div className="flex border-t border-white/[0.06] divide-x divide-white/[0.06]">
+                  <div className="flex border-t border-border divide-x divide-border">
                     <button
                       onClick={() => toggleActive(u.id, u.isActive)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-white/[0.03]"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-2"
                     >
                       {u.isActive ? (
                         <><ToggleRight className="h-3.5 w-3.5" /> Deactivate</>
@@ -203,7 +203,7 @@ export default function UsersPage() {
                     </button>
                     <button
                       onClick={() => deleteUser(u.id)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-red-600 dark:text-red-400 transition-colors hover:bg-red-500/10"
                     >
                       <Trash2 className="h-3.5 w-3.5" /> Delete
                     </button>

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, ArrowRight, Shield } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
 
 const LINKS = [
   { label: "Features", href: "#features" },
@@ -21,12 +22,7 @@ export function Navbar() {
         <div className="flex h-[52px] items-center justify-between px-4 sm:px-5">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div
-              className="flex h-7 w-7 items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-105"
-              style={{ backgroundImage: "linear-gradient(135deg, var(--brand), var(--brand-2))" }}
-            >
-              <Shield className="h-3.5 w-3.5 text-black" />
-            </div>
+            <BrandLogo className="h-7 w-7 transition-transform duration-200 group-hover:scale-105" />
             <span className="text-[14px] font-bold tracking-tight text-white">
               AdVerify
             </span>

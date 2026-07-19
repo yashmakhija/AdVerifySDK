@@ -101,7 +101,7 @@ export default function PinConfigPage() {
 
       {/* App selector */}
       <div className="mb-6 max-w-sm">
-        <p className="mb-2 text-[13px] font-medium text-zinc-500">
+        <p className="mb-2 text-[13px] font-medium text-muted-foreground">
           Select an app to configure
         </p>
         <AppSelector
@@ -115,16 +115,16 @@ export default function PinConfigPage() {
       {selectedKey && (
         <form onSubmit={handleSave} className="max-w-2xl space-y-5">
           {/* Enable/disable toggle */}
-          <div className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-4">
+          <div className="flex items-center justify-between rounded-xl border border-border bg-surface px-5 py-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.06]">
-                <Shield className="h-4 w-4 text-zinc-400" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-surface-2">
+                <Shield className="h-4 w-4 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-sm font-medium text-white">
+                <p className="text-sm font-medium text-foreground">
                   PIN Verification
                 </p>
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-muted-foreground">
                   Require PIN before app access
                 </p>
               </div>
@@ -137,7 +137,7 @@ export default function PinConfigPage() {
                 setForm({ ...form, pinEnabled: !form.pinEnabled })
               }
               className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
-                form.pinEnabled ? "bg-white" : "bg-white/[0.08]"
+                form.pinEnabled ? "bg-[var(--brand)]" : "bg-surface-2"
               }`}
             >
               <span
@@ -151,10 +151,10 @@ export default function PinConfigPage() {
           {form.pinEnabled && (
             <>
               {/* Message */}
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-border bg-surface p-4">
                 <div className="mb-3 flex items-center gap-2">
-                  <MessageSquare className="h-3.5 w-3.5 text-zinc-500" />
-                  <label className="text-[13px] font-medium text-zinc-400">
+                  <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
+                  <label className="text-[13px] font-medium text-muted-foreground">
                     PIN Message
                   </label>
                 </div>
@@ -163,17 +163,17 @@ export default function PinConfigPage() {
                   onChange={(e) =>
                     setForm({ ...form, pinMessage: e.target.value })
                   }
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-white outline-none transition-colors focus:border-white/[0.15] focus:bg-white/[0.06]"
+                  className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-border-strong focus:bg-surface-2"
                   placeholder="Enter your PIN to unlock the app"
                 />
               </div>
 
               {/* Button texts */}
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                <div className="rounded-xl border border-border bg-surface p-4">
                   <div className="mb-3 flex items-center gap-2">
-                    <Type className="h-3.5 w-3.5 text-zinc-500" />
-                    <label className="text-[13px] font-medium text-zinc-400">
+                    <Type className="h-3.5 w-3.5 text-muted-foreground" />
+                    <label className="text-[13px] font-medium text-muted-foreground">
                       Get PIN Button
                     </label>
                   </div>
@@ -182,15 +182,15 @@ export default function PinConfigPage() {
                     onChange={(e) =>
                       setForm({ ...form, getPinBtnText: e.target.value })
                     }
-                    className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-white outline-none transition-colors focus:border-white/[0.15] focus:bg-white/[0.06]"
+                    className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-border-strong focus:bg-surface-2"
                     placeholder="Get PIN"
                   />
                 </div>
 
-                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                <div className="rounded-xl border border-border bg-surface p-4">
                   <div className="mb-3 flex items-center gap-2">
-                    <Type className="h-3.5 w-3.5 text-zinc-500" />
-                    <label className="text-[13px] font-medium text-zinc-400">
+                    <Type className="h-3.5 w-3.5 text-muted-foreground" />
+                    <label className="text-[13px] font-medium text-muted-foreground">
                       Enter PIN Button
                     </label>
                   </div>
@@ -199,17 +199,17 @@ export default function PinConfigPage() {
                     onChange={(e) =>
                       setForm({ ...form, enterPinBtnText: e.target.value })
                     }
-                    className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-sm text-white outline-none transition-colors focus:border-white/[0.15] focus:bg-white/[0.06]"
+                    className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-border-strong focus:bg-surface-2"
                     placeholder="Enter PIN"
                   />
                 </div>
               </div>
 
               {/* Max attempts */}
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+              <div className="rounded-xl border border-border bg-surface p-4">
                 <div className="mb-3 flex items-center gap-2">
-                  <Hash className="h-3.5 w-3.5 text-zinc-500" />
-                  <label className="text-[13px] font-medium text-zinc-400">
+                  <Hash className="h-3.5 w-3.5 text-muted-foreground" />
+                  <label className="text-[13px] font-medium text-muted-foreground">
                     Max Attempts
                   </label>
                 </div>
@@ -225,20 +225,20 @@ export default function PinConfigPage() {
                         maxAttempts: Number(e.target.value),
                       })
                     }
-                    className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-white/[0.08] [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+                    className="h-1.5 flex-1 cursor-pointer appearance-none rounded-full bg-surface-2 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--brand)]"
                   />
-                  <span className="min-w-[2.5rem] rounded-md bg-white/[0.06] px-2.5 py-1 text-center text-sm font-medium text-white">
+                  <span className="min-w-[2.5rem] rounded-md bg-surface-2 px-2.5 py-1 text-center text-sm font-medium text-foreground">
                     {form.maxAttempts}
                   </span>
                 </div>
-                <p className="mt-2 text-xs text-zinc-500">
+                <p className="mt-2 text-xs text-muted-foreground">
                   User gets {form.maxAttempts} tries before being locked out
                 </p>
               </div>
 
               {/* Expiry mode */}
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-                <p className="mb-3 text-[13px] font-medium text-zinc-400">
+              <div className="rounded-xl border border-border bg-surface p-4">
+                <p className="mb-3 text-[13px] font-medium text-muted-foreground">
                   PIN Expiry
                 </p>
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -249,15 +249,15 @@ export default function PinConfigPage() {
                     }
                     className={`flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
                       form.expiryMode === "never"
-                        ? "border-white bg-white/[0.04]"
-                        : "border-white/[0.04] bg-white/[0.02] hover:border-white/[0.08]"
+                        ? "border-white bg-surface-2"
+                        : "border-border bg-surface hover:border-border-strong"
                     }`}
                   >
                     <div
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
                         form.expiryMode === "never"
-                          ? "bg-white text-black"
-                          : "bg-white/[0.06] text-zinc-500"
+                          ? "bg-[var(--brand)] text-black"
+                          : "bg-surface-2 text-muted-foreground"
                       }`}
                     >
                       <Infinity className="h-5 w-5" />
@@ -266,13 +266,13 @@ export default function PinConfigPage() {
                       <p
                         className={`text-sm font-medium ${
                           form.expiryMode === "never"
-                            ? "text-white"
-                            : "text-zinc-400"
+                            ? "text-foreground"
+                            : "text-muted-foreground"
                         }`}
                       >
                         Never Expire
                       </p>
-                      <p className="text-xs text-zinc-500">
+                      <p className="text-xs text-muted-foreground">
                         One-time verification, lasts forever
                       </p>
                     </div>
@@ -285,15 +285,15 @@ export default function PinConfigPage() {
                     }
                     className={`flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
                       form.expiryMode === "duration"
-                        ? "border-white bg-white/[0.04]"
-                        : "border-white/[0.04] bg-white/[0.02] hover:border-white/[0.08]"
+                        ? "border-white bg-surface-2"
+                        : "border-border bg-surface hover:border-border-strong"
                     }`}
                   >
                     <div
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
                         form.expiryMode === "duration"
-                          ? "bg-white text-black"
-                          : "bg-white/[0.06] text-zinc-500"
+                          ? "bg-[var(--brand)] text-black"
+                          : "bg-surface-2 text-muted-foreground"
                       }`}
                     >
                       <Clock className="h-5 w-5" />
@@ -302,13 +302,13 @@ export default function PinConfigPage() {
                       <p
                         className={`text-sm font-medium ${
                           form.expiryMode === "duration"
-                            ? "text-white"
-                            : "text-zinc-400"
+                            ? "text-foreground"
+                            : "text-muted-foreground"
                         }`}
                       >
                         Time-based Expiry
                       </p>
-                      <p className="text-xs text-zinc-500">
+                      <p className="text-xs text-muted-foreground">
                         PIN expires after set duration
                       </p>
                     </div>
@@ -316,9 +316,9 @@ export default function PinConfigPage() {
                 </div>
 
                 {form.expiryMode === "duration" && (
-                  <div className="mt-4 flex items-center gap-3 rounded-lg border border-white/[0.04] bg-white/[0.03] px-4 py-3">
-                    <Clock className="h-4 w-4 shrink-0 text-zinc-500" />
-                    <span className="text-sm text-zinc-400">Expires after</span>
+                  <div className="mt-4 flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-3">
+                    <Clock className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Expires after</span>
                     <input
                       type="number"
                       value={form.expiryHours}
@@ -329,10 +329,10 @@ export default function PinConfigPage() {
                         })
                       }
                       min={1}
-                      className="w-20 rounded-md border border-white/[0.08] bg-white/[0.04] px-2.5 py-1.5 text-center text-sm font-medium text-white outline-none focus:border-white/[0.15]"
+                      className="w-20 rounded-md border border-border bg-surface-2 px-2.5 py-1.5 text-center text-sm font-medium text-foreground outline-none focus:border-border-strong"
                     />
-                    <span className="text-sm text-zinc-400">hours</span>
-                    <span className="ml-auto text-xs text-zinc-500">
+                    <span className="text-sm text-muted-foreground">hours</span>
+                    <span className="ml-auto text-xs text-muted-foreground">
                       {form.expiryHours >= 24
                         ? `${Math.floor(form.expiryHours / 24)}d ${form.expiryHours % 24}h`
                         : `${form.expiryHours}h`}
@@ -344,7 +344,7 @@ export default function PinConfigPage() {
           )}
 
           <div className="flex items-center justify-between pt-1">
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-muted-foreground">
               {selectedApp
                 ? `Configuring: ${selectedApp.appName}`
                 : ""}

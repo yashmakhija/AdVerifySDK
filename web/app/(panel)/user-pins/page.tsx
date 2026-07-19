@@ -111,10 +111,10 @@ export default function UserPinsPage() {
     <div>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight text-white">
+          <h1 className="text-lg font-semibold tracking-tight text-foreground">
             User PINs
           </h1>
-          <p className="mt-0.5 text-[13px] text-zinc-500">
+          <p className="mt-0.5 text-[13px] text-muted-foreground">
             View and manage user PIN verifications
           </p>
         </div>
@@ -125,9 +125,9 @@ export default function UserPinsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-9 gap-2 px-3 font-normal text-zinc-400"
+                  className="h-9 gap-2 px-3 font-normal text-muted-foreground"
                 >
-                  <CalendarIcon className="h-3.5 w-3.5 text-zinc-500" />
+                  <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
                   {selectedDate ? format(selectedDate, "MMM d, yyyy") : "Pick a date"}
                 </Button>
               </PopoverTrigger>
@@ -144,7 +144,7 @@ export default function UserPinsPage() {
             {selectedDate && (
               <button
                 onClick={clearDate}
-                className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/[0.06] hover:text-zinc-300"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -169,32 +169,32 @@ export default function UserPinsPage() {
 
       {pinStats && (
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+          <div className="rounded-lg border border-border bg-surface p-3.5">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
               {selectedDate ? format(selectedDate, "MMM d") : "Today"} Generated
             </p>
-            <p className="mt-1 text-xl font-semibold text-white">
+            <p className="mt-1 text-xl font-semibold text-foreground">
               {pinStats.todayGenerated}
             </p>
           </div>
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+          <div className="rounded-lg border border-border bg-surface p-3.5">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
               {selectedDate ? format(selectedDate, "MMM d") : "Today"} Used
             </p>
-            <p className="mt-1 text-xl font-semibold text-white">
+            <p className="mt-1 text-xl font-semibold text-foreground">
               {pinStats.todayUsed}
             </p>
           </div>
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+          <div className="rounded-lg border border-border bg-surface p-3.5">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
               Active PINs
             </p>
             <p className="mt-1 text-xl font-semibold text-emerald-400">
               {pinStats.totalActive}
             </p>
           </div>
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+          <div className="rounded-lg border border-border bg-surface p-3.5">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
               Expired PINs
             </p>
             <p className="mt-1 text-xl font-semibold text-red-400">
@@ -210,7 +210,7 @@ export default function UserPinsPage() {
             key: "app",
             label: "App",
             render: (p: UserPin) => (
-              <span className="text-zinc-500">
+              <span className="text-muted-foreground">
                 {p.apiKey?.appName || "-"}
               </span>
             ),
@@ -219,7 +219,7 @@ export default function UserPinsPage() {
             key: "deviceId",
             label: "Device ID",
             render: (p: UserPin) => (
-              <code className="rounded-md bg-white/[0.06] px-2 py-0.5 text-xs text-zinc-400 font-mono">
+              <code className="rounded-md bg-surface-2 px-2 py-0.5 text-xs text-muted-foreground font-mono">
                 {p.deviceId.slice(0, 12)}...
               </code>
             ),
@@ -228,7 +228,7 @@ export default function UserPinsPage() {
             key: "pin",
             label: "PIN",
             render: (p: UserPin) => (
-              <span className="font-mono font-medium text-white">
+              <span className="font-mono font-medium text-foreground">
                 {p.pin}
               </span>
             ),
@@ -245,7 +245,7 @@ export default function UserPinsPage() {
             key: "expires",
             label: "Expires",
             render: (p: UserPin) => (
-              <span className="text-zinc-500 text-xs">
+              <span className="text-muted-foreground text-xs">
                 {!p.isUsed
                   ? "-"
                   : !p.expiresAt
@@ -258,7 +258,7 @@ export default function UserPinsPage() {
             key: "created",
             label: "Created",
             render: (p: UserPin) => (
-              <span className="text-zinc-500">
+              <span className="text-muted-foreground">
                 {new Date(p.createdAt).toLocaleDateString()}
               </span>
             ),

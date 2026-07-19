@@ -114,14 +114,14 @@ export default function PlansPage() {
       />
 
       {loading ? (
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-10 text-center text-[13px] text-zinc-600">
+        <div className="rounded-xl border border-border bg-surface p-10 text-center text-[13px] text-faint">
           Loading...
         </div>
       ) : plans.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] p-12 text-center">
-          <CreditCard className="mx-auto h-8 w-8 text-zinc-700" />
-          <p className="mt-3 text-sm font-medium text-zinc-400">No plans yet</p>
-          <p className="mt-1 text-[12px] text-zinc-600">Create your first plan to start selling</p>
+        <div className="rounded-xl border border-dashed border-border bg-surface p-12 text-center">
+          <CreditCard className="mx-auto h-8 w-8 text-faint" />
+          <p className="mt-3 text-sm font-medium text-muted-foreground">No plans yet</p>
+          <p className="mt-1 text-[12px] text-faint">Create your first plan to start selling</p>
           <Button size="sm" className="mt-4" onClick={openCreate}>
             Create Plan
           </Button>
@@ -131,19 +131,19 @@ export default function PlansPage() {
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden"
+              className="rounded-xl border border-border bg-surface overflow-hidden"
             >
               <div className="p-5 space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h3 className="font-medium text-white">{plan.name}</h3>
+                    <h3 className="font-medium text-foreground">{plan.name}</h3>
                     {plan.subtitle && (
-                      <p className="text-[11px] text-zinc-600 mt-0.5">{plan.subtitle}</p>
+                      <p className="text-[11px] text-faint mt-0.5">{plan.subtitle}</p>
                     )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {plan.badge && (
-                      <span className="rounded-full bg-white px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-black">
+                      <span className="rounded-full bg-[var(--brand)] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-black">
                         {plan.badge}
                       </span>
                     )}
@@ -156,51 +156,51 @@ export default function PlansPage() {
                 {/* Price */}
                 <div className="flex items-baseline gap-2">
                   {plan.originalPrice && (
-                    <span className="text-[14px] font-medium text-zinc-600 line-through">
+                    <span className="text-[14px] font-medium text-faint line-through">
                       {plan.currency}{plan.originalPrice}
                     </span>
                   )}
-                  <span className="text-2xl font-bold text-white">
+                  <span className="text-2xl font-bold text-foreground">
                     {plan.currency}{plan.price}
                   </span>
-                  <span className="text-[12px] text-zinc-600">
+                  <span className="text-[12px] text-faint">
                     /{plan.durationDays}d
                   </span>
                 </div>
 
                 {/* Details */}
                 <div className="flex flex-wrap gap-2 text-[11px]">
-                  <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-zinc-500">
+                  <span className="rounded-full border border-border bg-surface px-2 py-0.5 text-muted-foreground">
                     {plan.maxApps === 0 ? "Unlimited" : plan.maxApps} apps
                   </span>
-                  <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-zinc-500">
+                  <span className="rounded-full border border-border bg-surface px-2 py-0.5 text-muted-foreground">
                     {plan.maxAds === 0 ? "Unlimited" : plan.maxAds} ads
                   </span>
                   {plan.maxSpots && (
-                    <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-zinc-500">
+                    <span className="rounded-full border border-border bg-surface px-2 py-0.5 text-muted-foreground">
                       {plan._count?.purchases || 0}/{plan.maxSpots} spots
                     </span>
                   )}
-                  <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-zinc-500">
+                  <span className="rounded-full border border-border bg-surface px-2 py-0.5 text-muted-foreground">
                     {plan._count?.purchases || 0} subscribers
                   </span>
                 </div>
 
                 {plan.description && (
-                  <p className="text-[12px] text-zinc-600 leading-relaxed">{plan.description}</p>
+                  <p className="text-[12px] text-faint leading-relaxed">{plan.description}</p>
                 )}
               </div>
 
-              <div className="flex border-t border-white/[0.06] divide-x divide-white/[0.06]">
+              <div className="flex border-t border-border divide-x divide-border">
                 <button
                   onClick={() => openEdit(plan)}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-white/[0.03]"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-2"
                 >
                   <Pencil className="h-3.5 w-3.5" /> Edit
                 </button>
                 <button
                   onClick={() => deletePlan(plan.id)}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-red-600 dark:text-red-400 transition-colors hover:bg-red-500/10"
                 >
                   <Trash2 className="h-3.5 w-3.5" /> Delete
                 </button>

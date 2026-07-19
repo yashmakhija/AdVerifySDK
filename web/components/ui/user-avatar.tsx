@@ -33,7 +33,7 @@ export function UserAvatar({ src, name, size = "md", className }: UserAvatarProp
   return (
     <div
       className={cn(
-        "shrink-0 flex items-center justify-center rounded-full bg-gradient-to-br from-zinc-600 to-zinc-800 font-bold text-white uppercase",
+        "shrink-0 flex items-center justify-center rounded-full bg-gradient-to-br from-[var(--brand)] to-[var(--brand-2)] font-bold text-black uppercase",
         SIZES[size],
         className
       )}

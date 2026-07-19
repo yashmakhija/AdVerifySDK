@@ -7,7 +7,8 @@ import { Sidebar } from "@/components/sidebar";
 import { ToastContainer } from "@/components/ui/toast";
 import { PlanRequiredCard } from "@/components/ui/plan-gate";
 import { usePlanGuard } from "@/lib/use-plan-guard";
-import { Menu, Shield } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
+import { Menu } from "lucide-react";
 
 // Pages accessible without an active plan
 const FREE_PAGES = ["/billing", "/profile"];
@@ -35,23 +36,21 @@ export default function PanelLayout({
   const showBlocked = checked && blocked && !isFreePage;
 
   return (
-    <div className="flex h-screen bg-[#09090b]">
+    <div className="flex h-screen bg-background">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile header */}
-        <header className="flex h-14 items-center gap-3 border-b border-white/[0.06] bg-black/80 backdrop-blur-xl px-4 md:hidden">
+        <header className="flex h-14 items-center gap-3 border-b border-border bg-background/80 backdrop-blur-xl px-4 md:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-300"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-surface-2 hover:text-foreground"
           >
             <Menu className="h-4 w-4" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white">
-              <Shield className="h-3 w-3 text-black" />
-            </div>
-            <span className="text-[14px] font-semibold text-white">AdVerify</span>
+            <BrandLogo className="h-7 w-7" />
+            <span className="text-[14px] font-semibold text-foreground">AdVerify</span>
           </div>
         </header>
 

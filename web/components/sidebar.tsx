@@ -17,7 +17,6 @@ import {
   Settings,
   LogOut,
   X,
-  Shield,
   Users,
   CreditCard,
   Receipt,
@@ -28,6 +27,8 @@ import {
   Upload,
 } from "lucide-react";
 import { UserAvatar } from "@/components/ui/user-avatar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { BrandLogo } from "@/components/brand-logo";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -73,23 +74,21 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
       )}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-[240px] flex-col border-r border-white/[0.06] bg-black transition-transform duration-250 ease-out md:static md:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 flex w-[240px] flex-col border-r border-border bg-background transition-transform duration-250 ease-out md:static md:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Logo */}
-        <div className="flex h-14 items-center justify-between px-5 border-b border-white/[0.06]">
+        <div className="flex h-14 items-center justify-between px-5 border-b border-border">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white">
-              <Shield className="h-3.5 w-3.5 text-black" />
-            </div>
-            <span className="text-[14px] font-bold tracking-tight text-white">
+            <BrandLogo className="h-7 w-7" />
+            <span className="text-[14px] font-bold tracking-tight text-foreground">
               AdVerify
             </span>
           </Link>
           <button
             onClick={onClose}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-600 hover:bg-white/[0.06] hover:text-zinc-300 md:hidden"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-faint hover:bg-surface-2 hover:text-muted-foreground md:hidden"
           >
             <X className="h-4 w-4" />
           </button>
@@ -110,27 +109,27 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
                   className={cn(
                     "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150",
                     isLocked
-                      ? "text-zinc-700 hover:bg-white/[0.02]"
+                      ? "text-faint/70 hover:bg-surface"
                       : isActive
-                        ? "bg-white/[0.08] text-white"
-                        : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
+                        ? "bg-[var(--brand)]/10 text-foreground"
+                        : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"
                   )}
                 >
                   <item.icon
                     className={cn(
                       "h-[16px] w-[16px]",
                       isLocked
-                        ? "text-zinc-700"
+                        ? "text-faint/70"
                         : isActive
-                          ? "text-white"
-                          : "text-zinc-600"
+                          ? "text-[var(--brand)]"
+                          : "text-faint"
                     )}
                   />
                   {item.label}
                   {isLocked ? (
-                    <LockKeyhole className="ml-auto h-3 w-3 text-zinc-700" />
+                    <LockKeyhole className="ml-auto h-3 w-3 text-faint/70" />
                   ) : isActive ? (
-                    <div className="ml-auto h-1.5 w-1.5 rounded-full bg-white" />
+                    <div className="ml-auto h-1.5 w-1.5 rounded-full bg-[var(--brand)]" />
                   ) : null}
                 </Link>
               );
@@ -139,7 +138,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
 
           {role === "ADMIN" && (
             <>
-              <p className="px-3 pt-5 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-700">
+              <p className="px-3 pt-5 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-faint">
                 Management
               </p>
               <div className="space-y-0.5">
@@ -154,19 +153,19 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
                       className={cn(
                         "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150",
                         isActive
-                          ? "bg-white/[0.08] text-white"
-                          : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
+                          ? "bg-[var(--brand)]/10 text-foreground"
+                          : "text-muted-foreground hover:bg-surface-2 hover:text-foreground"
                       )}
                     >
                       <item.icon
                         className={cn(
                           "h-[16px] w-[16px]",
-                          isActive ? "text-white" : "text-zinc-600"
+                          isActive ? "text-[var(--brand)]" : "text-faint"
                         )}
                       />
                       {item.label}
                       {isActive && (
-                        <div className="ml-auto h-1.5 w-1.5 rounded-full bg-white" />
+                        <div className="ml-auto h-1.5 w-1.5 rounded-full bg-[var(--brand)]" />
                       )}
                     </Link>
                   );
@@ -176,36 +175,37 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           )}
         </nav>
 
-        {/* Profile + Logout */}
-        <div className="border-t border-white/[0.06] p-3 space-y-1.5">
+        {/* Theme + Profile + Logout */}
+        <div className="border-t border-border p-3 space-y-1.5">
+          <ThemeToggle />
           <Link
             href="/profile"
             onClick={onClose}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-150",
               pathname === "/profile"
-                ? "bg-white/[0.08]"
-                : "hover:bg-white/[0.04]"
+                ? "bg-[var(--brand)]/10"
+                : "hover:bg-surface-2"
             )}
           >
             <UserAvatar src={avatar} name={username} size="sm" />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <p className="text-[13px] font-medium text-zinc-200 truncate">
+                <p className="text-[13px] font-medium text-foreground truncate">
                   {username}
                 </p>
                 {role === "ADMIN" && (
-                  <span className="shrink-0 rounded bg-white/[0.08] px-1.5 py-px text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+                  <span className="shrink-0 rounded bg-surface-2 px-1.5 py-px text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
                     Admin
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-zinc-600 truncate">{email}</p>
+              <p className="text-[11px] text-faint truncate">{email}</p>
             </div>
           </Link>
           <button
             onClick={logout}
-            className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-zinc-600 transition-all hover:bg-red-500/10 hover:text-red-400"
+            className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-faint transition-all hover:bg-red-500/10 hover:text-red-400"
           >
             <LogOut className="h-[15px] w-[15px]" />
             Sign Out

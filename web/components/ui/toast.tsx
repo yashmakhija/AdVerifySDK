@@ -17,7 +17,7 @@ export function ToastContainer() {
 
   return (
     <div className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 animate-in">
-      <div className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-[#111] px-4 py-2.5 text-[13px] font-medium text-white shadow-2xl shadow-black/40">
+      <div className="flex items-center gap-2 rounded-xl border border-border bg-popover px-4 py-2.5 text-[13px] font-medium text-foreground shadow-2xl shadow-black/40">
         <Check className="h-3.5 w-3.5 text-emerald-400" />
         {message}
       </div>

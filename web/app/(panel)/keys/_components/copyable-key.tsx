@@ -19,13 +19,13 @@ export function CopyableKey({ value }: { value: string }) {
     <button
       onClick={copy}
       title="Click to copy"
-      className="group inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-1.5 font-mono text-[11px] text-zinc-500 transition-all hover:border-white/[0.1] hover:bg-white/[0.06] active:scale-[0.98] max-w-full"
+      className="group inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground transition-all hover:border-border-strong hover:bg-surface-2 active:scale-[0.98] max-w-full"
     >
       <span className="truncate">{value}</span>
       {copied ? (
         <Check className="h-3 w-3 shrink-0 text-emerald-400" />
       ) : (
-        <Copy className="h-3 w-3 shrink-0 text-zinc-600 transition-colors group-hover:text-zinc-300" />
+        <Copy className="h-3 w-3 shrink-0 text-faint transition-colors group-hover:text-foreground" />
       )}
     </button>
   );
